@@ -4,6 +4,7 @@
 
 from mpl_tools import *
 
+mpl.use('agg')
 
 def test_1():
     fig, ax = freshfig(1)
@@ -17,23 +18,33 @@ def test_1():
     ax2 = fig.add_axes([.5,.5,*size],frameon=True, xticks=[], yticks=[], facecolor="b")
     ax2.patch.set_alpha(0.1)
 
+    plt.draw()
+    fig.savefig("tmp1.pdf")
+
     # Once:
     # align_ax_with(ax2, get_legend_bbox(ax)(), "NW+")
     # Continuous:
     anchor_axes(ax2, get_legend_bbox(ax), "S+W")
     # anchor_axes(ax2, lambda: ax.bbox , "NE")
 
+    plt.draw()
+    fig.savefig("tmp2.pdf")
+
     add_log_toggler(ax, ax2)
 
-    # Call plt.show(), which blocks, so that
-    # the axes re-positioning gets called,
-    # but close after an interval of time.
-    # https://stackoverflow.com/a/30365738/38281
-    def close_event():
-        plt.close()
-    timer = fig.canvas.new_timer(interval=2000)
-    timer.add_callback(close_event)
-    timer.start()
-    plt.show()
+    plt.draw()
+    fig.savefig("tmp3.pdf")
+
+    # OBSOLETE (after switching to Agg backend) ?
+    # # Call plt.show(), which blocks, so that
+    # # the axes re-positioning gets called,
+    # # but close after an interval of time.
+    # # https://stackoverflow.com/a/30365738/38281
+    # def close_event():
+        # plt.close()
+    # timer = fig.canvas.new_timer(interval=2000)
+    # timer.add_callback(close_event)
+    # timer.start()
+    # plt.show()
 
     assert 2==2
