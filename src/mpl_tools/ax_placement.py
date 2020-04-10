@@ -1,4 +1,5 @@
 from matplotlib.artist import allow_rasterization
+
 from mpl_tools.misc import *
 
 

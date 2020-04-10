@@ -29,6 +29,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   Contributing
    License <license>
    Authors <authors>
    Changelog <changelog>
