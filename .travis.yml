@@ -17,6 +17,7 @@ install:
 before_script:
   - git config --global user.email "patrick.n.raanes@gmail.com"
   - git config --global user.name "Patrick N. Raanes"
+  - export MPLBACKEND=Agg
 script:
   - python setup.py develop
 # - python setup.py test # DEPRECATED. USE WHAT'S BELOW INSTEAD

@@ -23,23 +23,23 @@ def add_log_toggler(ax, button_ax, ylim=None):
 def toggle_scale(ax,ylim=None):
     "Toggle log. scale."
 
+    log_is_on = getattr(ax,"_log_is_on",False)
+    ax._log_is_on = not log_is_on
+
     # Get current status -- button
-    if isinstance(ax.toggle_log, mpl.widgets.Button):
-        log_is_on = getattr(ax,"_log_is_on",False)
-        ax._log_is_on = not log_is_on
+    # if isinstance(ax.toggle_log, mpl.widgets.Button):
+    #     if log_is_on:
+    #         # ax.toggle_log.label.set_text("Log. scale: Off")
+    #         ax.toggle_log.color = "w"
+    #     else:
+    #         # ax.toggle_log.label.set_text("Log. scale: On")
+    #         ax.toggle_log.color = "#D5F2E8"
 
-        if log_is_on:
-            # ax.toggle_log.label.set_text("Log. scale: Off")
-            ax.toggle_log.color = "w"
-        else:
-            # ax.toggle_log.label.set_text("Log. scale: On")
-            ax.toggle_log.color = "#D5F2E8"
-
-    # Get current status -- Checkmark
-    elif isinstance(ax.toggle_log, mpl.widgets.CheckButtons):
-        log_is_on = not ax.toggle_log.get_status()[0]
-    else:
-        raise TypeError
+    # # Get current status -- Checkmark
+    # elif isinstance(ax.toggle_log, mpl.widgets.CheckButtons):
+    #     log_is_on = not ax.toggle_log.get_status()[0]
+    # else:
+    #     raise TypeError
 
     # Toggle
     if log_is_on:
