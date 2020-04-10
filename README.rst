@@ -14,6 +14,9 @@ mpl-tools
 .. image:: https://badge.fury.io/py/mpl-tools.svg
     :target: https://badge.fury.io/py/mpl-tools
 
+.. image:: https://img.shields.io/pypi/dw/mpl-tools
+    :alt: PyPI - Downloads
+
 .. image:: https://coveralls.io/repos/github/patricknraanes/mpl-tools/badge.svg?branch=master
     :target: https://coveralls.io/github/patricknraanes/mpl-tools?branch=master
 
