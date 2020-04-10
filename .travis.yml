@@ -4,6 +4,8 @@
 
 sudo: false
 language: python
+services:
+  - xvfb
 virtualenv:
   system_site_packages: false
 matrix:
