@@ -9,3 +9,8 @@ except DistributionNotFound:
     __version__ = 'unknown'
 finally:
     del get_distribution, DistributionNotFound
+
+
+from mpl_tools.misc import *
+from mpl_tools.ax_placement import *
+from mpl_tools.log_toggler import *
