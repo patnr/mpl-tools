@@ -1,7 +1,10 @@
+import matplotlib as mpl
+from matplotlib import pyplot as plt
 from matplotlib.artist import allow_rasterization
 
 from mpl_tools.misc import *
 
+__all__ = ["align_ax_with", "anchor_axes", "set_ax_size"]
 
 def set_ax_size(ax, w, h):
     "Width/Height in display (pixel) coords."

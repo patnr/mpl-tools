@@ -1,10 +1,9 @@
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
+__all__ = ["thousands", "freshfig", "get_legend_bbox", "xFontsize"]
 
-def f(x):
-
-    return x*2
+thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')
 
 def freshfig(num=None,figsize=None,*args,**kwargs):
     """Create/clear figure.
@@ -27,8 +26,6 @@ def freshfig(num=None,figsize=None,*args,**kwargs):
 
     _, ax = plt.subplots(num=fig.number,*args,**kwargs)
     return fig, ax
-
-thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')
 
 def get_legend_bbox(ax):
     """Get legend's bbox in pixel ("display") coords."""
