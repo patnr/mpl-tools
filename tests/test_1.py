@@ -9,8 +9,7 @@ from mpl_tools import *
 
 
 def show(fig):
-    # https://stackoverflow.com/a/48728877/38281
-    # mpl.use('agg')
+    # https://stackoverflow.com/q/35403127/#comment106377020_48728877
     BE = mpl.get_backend().lower()
     if BE=="agg":
         plt.draw()
@@ -21,18 +20,17 @@ def show(fig):
 
 
 def test_1():
+
     fig, ax = freshfig(1)
     K = 5
     for i in range(K):
         ax.plot([0,K], [0,i], label=i)
     ax.legend()
-
     add_log_toggler(ax)
-    show(fig)
 
+    show(fig)
     toggle_scale(ax)
     show(fig)
-
     toggle_scale(ax)
     show(fig)
 
