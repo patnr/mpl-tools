@@ -19,7 +19,7 @@ def show(fig):
         plt.pause(.5)
 
 
-def test_1():
+def test_log_toggling():
 
     fig, ax = freshfig(1)
     K = 5
