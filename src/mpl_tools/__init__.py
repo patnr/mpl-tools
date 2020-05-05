@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from pkg_resources import DistributionNotFound, get_distribution
 
+import matplotlib as mpl
+
 from mpl_tools.ax_placement import *
 from mpl_tools.log_toggler import *
 from mpl_tools.misc import *
@@ -13,3 +15,8 @@ except DistributionNotFound:
     __version__ = 'unknown'
 finally:
     del get_distribution, DistributionNotFound, dist_name
+
+
+if mpl.get_backend()=="Qt5Agg":
+    print("Warning: Qt5Agg is used, "
+    "which has been known to cause slow-down with "+dist_name)
