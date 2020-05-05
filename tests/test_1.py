@@ -24,7 +24,7 @@ def test_log_toggling():
     fig, ax = freshfig(1)
     K = 5
     for i in range(K):
-        ax.plot([0,K], [0,i], label=i)
+        ax.plot([0,K], [6**x for x in [-2,i]], label=i)
     ax.legend()
     add_log_toggler(ax)
 
