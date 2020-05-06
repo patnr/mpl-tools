@@ -44,3 +44,42 @@ def xFontsize(fontsize,fig,*args):
     plt.pause(.1)
     fontsize = fig.canvas.renderer.points_to_pixels(fontsize)
     return tuple(a*fontsize for a in args)
+
+
+
+
+
+# stackoverflow.com/a/11103301
+def on_xlim_changed(ax):
+    """
+    Autoscale y-axis for subplots with sharex=True.
+
+    Usage:
+    for ax in fig.axes:
+        ax.callbacks.connect('xlim_changed', on_xlim_changed)
+    """
+    xlim = ax.get_xlim()
+    for a in ax.figure.axes:
+            # shortcuts: last avoids n**2 behavior when each axis fires event
+            if a is ax or len(a.lines) == 0 or getattr(a, 'xlim', None) == xlim:
+                    continue
+
+            ylim = np.inf, -np.inf
+            for l in a.lines:
+                    x, y = l.get_data()
+                    # faster, but assumes that x is sorted
+                    start, stop = np.searchsorted(x, xlim)
+                    yc = y[max(start-1,0):(stop+1)]
+                    ylim = min(ylim[0], np.nanmin(yc)), max(ylim[1], np.nanmax(yc))
+
+            # TODO: update limits from Patches, Texts, Collections, ...
+
+            # x axis: emit=False avoids infinite loop
+            a.set_xlim(xlim, emit=False)
+
+            # y axis: set dataLim, make sure that autoscale in 'y' is on
+            corners = (xlim[0], ylim[0]), (xlim[1], ylim[1])
+            a.dataLim.update_from_data_xy(corners, ignore=True, updatex=False)
+            a.autoscale(enable=True, axis='y')
+            # cache xlim to mark 'a' as treated
+            a.xlim = xlim
