@@ -4,7 +4,7 @@ from matplotlib.artist import allow_rasterization
 
 from mpl_tools.misc import *
 
-__all__ = ["align_ax_with", "anchor_axes", "set_ax_size"]
+__all__ = ["align_ax_with", "anchor_axes", "set_ax_size","trans2fig"]
 
 def set_ax_size(ax, w, h):
     "Width/Height in display (pixel) coords."
@@ -41,6 +41,32 @@ def align_ax_with(ax, bbox, loc, pad=4):
     # Set
     ax.set_position(B)
 
+
+# TODO: make use of this in the above funcs
+def trans2fig(axis, rect, from_data=True):
+    """Transform (data or axis) coordinates to figure coordinates.
+
+    Inspired by: https://stackoverflow.com/a/17478227/38281.
+
+    Usage:
+    >>> rect = trans2fig(ax, [x,y,w,h])
+    >>> ax2 = ax.figure.add_axes(rect)
+    """
+    x, y, w, h = rect
+
+    FT = axis.figure.transFigure.inverted().transform
+
+    if from_data:
+        # Transform: data-->display-->figure
+        T = lambda xy: FT(axis.transData.transform(xy))
+    else:
+        # Transform: axes-->display-->figure
+        T = lambda xy: FT(axis.transAxes.transform(xy))
+
+    x, y = T((x,y))
+    w, h = T([w,h]) - T([0,0]) # affine transform wrt. 0
+
+    return x,y,w,h
 
 
 def anchor_axes(ax, get_anchor, loc="NW+"):
