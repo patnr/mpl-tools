@@ -1,7 +1,12 @@
+import json
+
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-__all__ = ["thousands", "freshfig", "get_legend_bbox", "xFontsize"]
+__all__ = ["thousands", "freshfig",
+           "fig_placement_save", "fig_placement_load",
+           "get_legend_bbox", "xFontsize",
+           "is_notebook_or_qt", "axprops", "fig_colorbar"]
 
 thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')
 
@@ -34,6 +39,46 @@ def freshfig(num=None,figsize=None,*args,**kwargs):
 
     _, ax = plt.subplots(num=fig.number,*args,**kwargs)
     return fig, ax
+
+
+
+def get_fmw(fignum):
+    """If this fails, there's probs no way to make placement work."""
+    return plt.figure(fignum).canvas.manager.window
+
+def fig_placement_save(path="./.fig_geometries"):
+    placements = {}
+    for fignum in plt.get_fignums():
+        fmw = get_fmw(fignum)
+        try: # For Qt4Agg/Qt5Agg
+            geo = dict(
+                w = fmw.width(),
+                h = fmw.height(),
+                x = fmw.x(),
+                y = fmw.y(),
+            )
+        except: # For TkAgg
+            geo = fmw.geometry()
+        placements[fignum] = geo
+    with open(path,"w") as F:
+        F.write(json.dumps(placements))
+
+def fig_placement_load(path="./.fig_geometries"):
+    with open(path,"r") as F:
+        placements = json.load(F)
+    for fignum in placements:
+        plt.figure(int(fignum))
+        fmw = get_fmw(int(fignum))
+        geo = placements[fignum]
+        try: # For Qt4Agg/Qt5Agg
+            fmw.setGeometry( geo['x'], geo['y'], geo['w'], geo['h'])
+        except: # For TkAgg
+            # geo = "{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}".format(**geo)
+            fmw.geometry(newGeometry=geo)
+
+
+
+
 
 def get_legend_bbox(ax):
     """Get legend's bbox in pixel ("display") coords."""
