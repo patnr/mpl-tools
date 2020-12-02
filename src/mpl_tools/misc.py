@@ -136,3 +136,34 @@ def on_xlim_changed(ax):
             a.autoscale(enable=True, axis='y')
             # cache xlim to mark 'a' as treated
             a.xlim = xlim
+
+
+def axprops(dct):
+    """Filters `dct` for properties associated with a plot axes.
+
+    Example:
+    >>> # Note how kwargs gets split into axes/line properties.
+    >>> def myplotter(ax, x, y, **kwargs)
+    >>>     ax.set(**axprops(kwargs))
+    >>>     ax.plot(x, y, kwargs)
+    """
+
+    # List of included axis properties
+    props = ["title", "facecolor", "aspect"]
+    # Append xyz-specific props
+    for ax in ["x", "y", "z"]:
+        for p in ["label", "ticks", "scale", "lim"]:
+            props.append(ax+p)
+
+    # intersection(dct,props)
+    props = {p:dct.pop(p) for p in props if p in dct}
+
+    return props
+
+def fig_colorbar(fig,collections,*args,**kwargs):
+    """Add colorbar to the right on a figure."""
+    fig.subplots_adjust(right=0.8)
+    cax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    cbar = fig.colorbar(collections, cax, *args, **kwargs)
+    plt.pause(0.1)
+    return cbar
