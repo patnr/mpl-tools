@@ -5,6 +5,14 @@ __all__ = ["thousands", "freshfig", "get_legend_bbox", "xFontsize"]
 
 thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')
 
+try:
+    __IPYTHON__
+    from IPython import get_ipython
+    is_notebook_or_qt = 'zmq' in str(type(get_ipython())).lower()
+except (NameError,ImportError):
+    is_notebook_or_qt = False
+
+
 def freshfig(num=None,figsize=None,*args,**kwargs):
     """Create/clear figure.
 
