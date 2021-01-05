@@ -4,10 +4,11 @@ version = "0.2"
 description = "Tools for working with matplotlib"
 authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
 license = "MIT"
-
-#repository = "github..."
 readme = "README.md"
 keywords = ["matplotlib", "plotting"]
+repository = "https://github.com/patricknraanes/mpl-tools"
+#homepage = "https://python-poetry.org/"
+#documentation = "https://python-poetry.org/docs"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
