@@ -11,7 +11,7 @@ repository = "https://github.com/patricknraanes/mpl-tools"
 #documentation = "https://python-poetry.org/docs"
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.7"
 matplotlib = ">=3.0"
 
 [tool.poetry.dev-dependencies]
