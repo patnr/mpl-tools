@@ -37,7 +37,8 @@ def align_ax_with(ax, bbox, loc, pad=4):
     if "N+" in loc: y+= h          + pad
     B = mpl.transforms.Bbox.from_bounds(x,y,w,h)
     # Convert to figure coordinates
-    B = B.inverse_transformed(ax.figure.transFigure)
+    # B = B.inverse_transformed(ax.figure.transFigure) # deprecated
+    B = B.transformed(ax.figure.transFigure.inverted())
     # Set
     ax.set_position(B)
 
