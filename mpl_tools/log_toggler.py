@@ -26,7 +26,7 @@ def add_log_toggler(ax, pos="leg:S+W", ylim=None):
         pos = pos.replace("leg:","")
         # Continuous re-positioning:
         anchor_axes(button_ax, get_legend_bbox(ax), pos)
-        # Position once-only (will scale with figure):
+        # Position once only (will scale with figure):
         # align_ax_with(button_ax, get_legend_bbox(ax)(), "NW+")
     else:
         anchor_axes(button_ax, lambda: ax.bbox , "NE")

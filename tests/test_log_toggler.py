@@ -14,7 +14,7 @@ into `tests/baseline_images/my_test_module/`.
 Then, the next time, the test will succeed.
 """
 
-from matplotlib.testing.decorators import image_comparison
+from matplotlib.testing.decorators import image_comparison, check_figures_equal
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -46,18 +46,23 @@ def comparison(fun):
     return fun
 
 
-def gen_plot():
+def gen_plot(fig=None):
     """Generate base plot."""
 
     # Cleanup from previous tests. Don't know why this isn't in image_comparison.
     # Clearly, cleanup is part of the code in mpl/testing/decorators.py
     plt.close("all")
 
+    if fig is None:
+        fig, ax = plt.subplots()
+    else:
+        ax = fig.subplots()
+
     nLines = 5
-    fig, ax = plt.subplots()
     for i in range(nLines):
         ax.plot([0, 1], [6**x for x in [-2, i]], label=i)
     plt.legend()
+
     return fig, ax
 
 
@@ -85,3 +90,15 @@ def test_4():
     add_log_toggler(ax)
     toggle_scale(ax)
     toggle_scale(ax)
+
+
+# This test doesn't require a saved baseline image,
+# and was supposed to replace test_4, coz both test toggle the scale twice,
+# and presumably that would yield the original image.
+# But, toggle_scale actually sets custom formatter and ylim, and so therefore it fails.
+# @check_figures_equal(extensions=('pdf',))
+# def test_5(fig_test, fig_ref):
+#     _, ax1 = gen_plot(fig_ref)
+#     _, ax2 = gen_plot(fig_test)
+#     toggle_scale(ax2)
+#     toggle_scale(ax2)
