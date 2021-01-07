@@ -7,9 +7,14 @@ from mpl_tools.misc import get_legend_bbox, thousands, xFontsize
 
 __all__ = ["add_log_toggler", "toggle_scale"]
 
+
+
 def add_log_toggler(ax, pos="leg:S+W", ylim=None):
     """Add button that toggles log. scale."""
     fig = ax.figure
+
+    if mpl.get_backend()=="Qt5Agg":
+        print("Warning: Qt5Agg is used, which is not very fast with this function")
 
     # button_ax: size and creation
     size = xFontsize(mpl.rcParams['font.size'],fig,10,2.5)

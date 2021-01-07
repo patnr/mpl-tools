@@ -11,9 +11,3 @@ try:
     __version__ = version(__name__)
 except:
     pass
-
-
-if mpl.get_backend()=="Qt5Agg":
-    print("Warning: Qt5Agg is used",
-          "which has been known to cause slow-down with",
-          Path(__file__).parent.resolve())
