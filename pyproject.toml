@@ -24,10 +24,11 @@ flakehell = "*"
 
 line_profiler = "*"
 pre-commit = "*"
-ipython = "*"
 ipdb = "*"
 pdbpp = "*"
 pudb = "*"
+ipython = "*"
+jedi = "<0.18" # ipython/issues/12740
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
