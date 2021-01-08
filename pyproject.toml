@@ -31,6 +31,13 @@ ipython = "*"
 pyqt5 = "*" # GUI-backend for mpl
 jedi = "<0.18" # ipython/issues/12740
 
+[tool.flakehell]
+exclude = ["README.rst", "README.md"]
+max_line_length = 88
+format = "colored"
+show_source = true
+whitelist = "../../allowlist.txt"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
