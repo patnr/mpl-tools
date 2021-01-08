@@ -16,9 +16,6 @@ matplotlib = ">=3.0"
 importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-#pytest-cov coverage pytest-sugar pytest-benchmark pytest-clarity pytest-xdist
-
 flakehell = "*"
 flake8-docstrings = "*"
 flake8-bugbear = "*"
@@ -36,6 +33,11 @@ ipython = "*"
 pyqt5 = "*" # GUI-backend for mpl
 jedi = "<0.18" # ipython/issues/12740
 tox = "^3.20.1"
+pytest = "^5.2"
+pytest-cov = "^2.10.1"
+pytest-sugar = "^0.9.4"
+# pytest-benchmark pytest-clarity pytest-xdist
+
 
 [tool.tox]
 legacy_tox_ini = """
