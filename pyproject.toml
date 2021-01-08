@@ -13,6 +13,7 @@ repository = "https://github.com/patricknraanes/mpl-tools"
 [tool.poetry.dependencies]
 python = ">=3.7"
 matplotlib = ">=3.0"
+importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
