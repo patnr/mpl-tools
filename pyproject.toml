@@ -20,7 +20,12 @@ pytest = "^5.2"
 #pytest-cov coverage pytest-sugar pytest-benchmark pytest-clarity pytest-xdist
 
 flakehell = "*"
-# flake8-docstrings, flake8-bugbear, flake8-comprehensions, flake8-isort
+flake8-docstrings = "*"
+flake8-bugbear = "*"
+flake8-comprehensions = "*"
+flake8-isort = "*"
+flake8-builtins = "*"
+pep8-naming = "*"
 
 line_profiler = "*"
 pre-commit = "*"
