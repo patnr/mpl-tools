@@ -1,12 +1,11 @@
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-from matplotlib.widgets import Button, CheckButtons
+from matplotlib.widgets import CheckButtons  # Button
 
 from mpl_tools.ax_placement import anchor_axes
 from mpl_tools.misc import get_legend_bbox, thousands
 
 __all__ = ["add_log_toggler", "toggle_scale"]
-
 
 
 def add_log_toggler(ax, pos="leg:S+W", ylim=None):
