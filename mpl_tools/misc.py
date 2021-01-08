@@ -84,8 +84,8 @@ def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
 
     placements = {num: get_fig_geo(num) for num in plt.get_fignums()}
 
-    with open(path, "w") as F:
-        F.write(json.dumps(placements))
+    with open(path, "w") as file:
+        file.write(json.dumps(placements))
 
 
 def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
@@ -98,8 +98,8 @@ def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
               "Create a new one using fig_placement_save().")
         return
 
-    with open(path, "r") as F:
-        placements = json.load(F)
+    with open(path, "r") as file:
+        placements = json.load(file)
 
     for num in placements:
         set_fig_geo(num, placements[num])

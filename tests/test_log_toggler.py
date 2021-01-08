@@ -21,16 +21,16 @@ import matplotlib.pyplot as plt
 from mpl_tools.log_toggler import add_log_toggler, toggle_scale
 
 import warnings
-from pytest import PytestUnknownMarkWarning as warning
+from pytest import PytestUnknownMarkWarning
 
 
-class suppress_w(object):
+class SuppressWarn(object):
     """Turn off warning due to something in `image_comparison`."""
     def __enter__(self):
-        warnings.simplefilter("ignore", warning)
+        warnings.simplefilter("ignore", PytestUnknownMarkWarning)
 
-    def __exit__(self, type, value, traceback):
-        warnings.simplefilter("default", warning)
+    def __exit__(self, type_, value, traceback):
+        warnings.simplefilter("default", PytestUnknownMarkWarning)
 
 
 def comparison(fun):
@@ -40,7 +40,7 @@ def comparison(fun):
     wrapper = image_comparison(baseline_images=[name],
                                remove_text=False, extensions=['pdf'])
 
-    with suppress_w():
+    with SuppressWarn():
         fun = wrapper(fun)
 
     return fun
