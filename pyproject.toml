@@ -46,7 +46,7 @@ exclude = ["README.rst", "README.md", "example.py"]
 max_line_length = 88
 format = "grouped" # also try "stat"
 show_source = false
-whitelist = "../../allowlist.txt" # Used by flake8-spellcheck.
+#whitelist = "../../allowlist.txt" # Used by flake8-spellcheck.
 
 [tool.flakehell.plugins]
 pyflakes = ["+*"]
