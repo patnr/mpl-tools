@@ -1,41 +1,55 @@
-# Travis configuration file using the build matrix feature
-# Read more under http://docs.travis-ci.com/user/build-configuration/
-# THIS SCRIPT IS SUPPOSED TO BE AN EXAMPLE. MODIFY IT ACCORDING TO YOUR NEEDS!
-
-sudo: false
+# From https://github.com/python-poetry/poetry/issues/366
+# TODO: investigate other options from that issue thread
+# TODO: merge with https://github.com/pyslackers/slack-sansio/blob/2adb7c285deccbbb915d3890c27dc6d9adf38a3c/.travis.yml
+#       especially for python matrix and coveralls and tox (tox-travis) usage.
 language: python
-virtualenv:
-  system_site_packages: false
-matrix:
-  fast_finish: true
-  include:
-    - python: 3.6
-      env: DISTRIB="ubuntu" TOX_PYTHON_VERSION="py36" COVERAGE="true"
-    - env: DISTRIB="conda" PYTHON_VERSION="3.6" COVERAGE="false"
-install:
-  - source tests/travis_install.sh
-before_script:
-  - git config --global user.email "patrick.n.raanes@gmail.com"
-  - git config --global user.name "Patrick N. Raanes"
-  - export MPLBACKEND=Agg
-script:
-  - python setup.py develop
-# - python setup.py test # DEPRECATED. USE WHAT'S BELOW INSTEAD
-# (requires that you did `$ putup --travis --tox --pre-commit`):
-  - tox
-  - |
-    if [[ "$COVERAGE" == "true" ]]; then
-      pre-commit install
-      pre-commit run --all-files
-    fi
-after_success:
-  - |
-    if [[ "$COVERAGE" == "true" ]]; then
-       coveralls || echo "failed"
-    fi
-after_script:
-  - travis-cleanup
+python: "3.8"
+dist: xenial
+
+stages:
+  - lint
+  - test
+  - name: deploy
+    if: tag IS present
+
 cache:
   pip: true
   directories:
-    - $HOME/miniconda
+    - "$HOME/.cache/pre-commit"
+
+jobs:
+  include:
+    - stage: lint
+      install:
+        - pip install pre-commit
+        - pre-commit install-hooks
+      script:
+        - pre-commit run --all-files
+    - stage: test
+      install:
+        - pip install --upgrade pip
+        - pip install poetry
+        - poetry install -v
+      script:
+        - pytest --cov mpl_tools
+    - stage: deploy
+      script:
+        - echo Deploying to PyPI...
+
+before_deploy:
+  # User and password environment variables are set as hidden variables through
+  # the web interface in the project settings.
+  - pip install --upgrade pip
+  - pip install poetry
+  - poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
+  - poetry build
+
+deploy:
+  provider: script
+  script: poetry publish
+  skip_cleanup: true
+  on:
+    all_branches: true  # Travis recognizes tag names as "branches"
+    condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
+    repo: daltonmaag/statmake
+    tags: true
