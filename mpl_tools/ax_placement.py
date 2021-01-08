@@ -1,17 +1,17 @@
 import matplotlib as mpl
-from matplotlib import pyplot as plt
 from matplotlib.artist import allow_rasterization
 
-from mpl_tools.misc import *
+# from mpl_tools.misc import *
 
-__all__ = ["align_ax_with", "anchor_axes", "set_ax_size","trans2fig"]
+__all__ = ["align_ax_with", "anchor_axes", "set_ax_size", "trans2fig"]
+
 
 def set_ax_size(ax, w, h):
     "Width/Height in display (pixel) coords."
     fig = ax.figure
-    w,h = fig.transFigure.inverted().transform([w,h])
-    x,y,_,_ = ax.get_position().bounds
-    ax.set_position([x,y,w,h])
+    w, h = fig.transFigure.inverted().transform([w, h])
+    x, y, _, _ = ax.get_position().bounds
+    ax.set_position([x, y, w, h])
 
 
 def align_ax_with(ax, bbox, loc, pad=4):
@@ -28,14 +28,18 @@ def align_ax_with(ax, bbox, loc, pad=4):
     with padding specified by pad.
     """
     # Get new bbox placed with mpl builtin tool
-    B = ax.bbox.anchored(loc.replace("+",""), container=bbox)
+    B = ax.bbox.anchored(loc.replace("+", ""), container=bbox)
     # Adjust for + flags
-    x,y,w,h = B.bounds
-    if "W+" in loc: x+= bbox.width + pad
-    if "E+" in loc: x-= bbox.width + pad
-    if "S+" in loc: y-= h          + pad
-    if "N+" in loc: y+= h          + pad
-    B = mpl.transforms.Bbox.from_bounds(x,y,w,h)
+    x, y, w, h = B.bounds
+    if "W+" in loc:
+        x += pad + bbox.width
+    if "E+" in loc:
+        x -= pad + bbox.width
+    if "S+" in loc:
+        y -= pad + h
+    if "N+" in loc:
+        y += pad + h
+    B = mpl.transforms.Bbox.from_bounds(x, y, w, h)
     # Convert to figure coordinates
     # B = B.inverse_transformed(ax.figure.transFigure) # deprecated
     B = B.transformed(ax.figure.transFigure.inverted())
@@ -59,15 +63,17 @@ def trans2fig(axis, rect, from_data=True):
 
     if from_data:
         # Transform: data-->display-->figure
-        T = lambda xy: FT(axis.transData.transform(xy))
+        def T(xy):
+            return FT(axis.transData.transform(xy))
     else:
         # Transform: axes-->display-->figure
-        T = lambda xy: FT(axis.transAxes.transform(xy))
+        def T(xy):
+            return FT(axis.transAxes.transform(xy))
 
-    x, y = T((x,y))
-    w, h = T([w,h]) - T([0,0]) # affine transform wrt. 0
+    x, y = T((x, y))
+    w, h = T([w, h]) - T([0, 0])  # affine transform wrt. 0
 
-    return x,y,w,h
+    return x, y, w, h
 
 
 def anchor_axes(ax, get_anchor, loc="NW+"):
@@ -86,7 +92,7 @@ def anchor_axes(ax, get_anchor, loc="NW+"):
     # Patch the Axes instance's draw() method.
     @allow_rasterization
     def draw(self, renderer):
-        set_ax_size(self,*size)
+        set_ax_size(self, *size)
         align_ax_with(self, get_anchor(), loc)
         _draw(renderer)
     _draw = ax.draw

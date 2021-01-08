@@ -93,9 +93,9 @@ def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
         path = ".".join([path, platform.node()])
 
     if not os.path.exists(path):
-        print("Warning: no saved figure placement found"
-              " under the name " + path +
-              ". Create a new one using fig_placement_save().")
+        print("Warning: no saved figure placement found",
+              f"under the name {path}.",
+              "Create a new one using fig_placement_save().")
         return
 
     with open(path, "r") as F:
@@ -138,7 +138,7 @@ def on_xlim_changed(ax):
             x, y = ln.get_data()
             # faster, but assumes that x is sorted
             start, stop = np.searchsorted(x, xlim)
-            yc = y[max(start-1, 0):(stop+1)]
+            yc = y[max(start - 1, 0):(stop + 1)]
             ylim = min(ylim[0], np.nanmin(yc)), max(ylim[1], np.nanmax(yc))
 
         # TODO: update limits from Patches, Texts, Collections, ...
@@ -168,7 +168,7 @@ def axprops(dct):
     # Append xyz-specific props
     for ax in ["x", "y", "z"]:
         for p in ["label", "ticks", "scale", "lim"]:
-            props.append(ax+p)
+            props.append(ax + p)
 
     # intersection(dct,props)
     props = {p: dct.pop(p) for p in props if p in dct}

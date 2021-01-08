@@ -14,9 +14,8 @@ into `tests/baseline_images/my_test_module/`.
 Then, the next time, the test will succeed.
 """
 
-from matplotlib.testing.decorators import image_comparison, check_figures_equal
+from matplotlib.testing.decorators import image_comparison
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from mpl_tools.log_toggler import add_log_toggler, toggle_scale
@@ -29,6 +28,7 @@ class suppress_w(object):
     """Turn off warning due to something in `image_comparison`."""
     def __enter__(self):
         warnings.simplefilter("ignore", warning)
+
     def __exit__(self, type, value, traceback):
         warnings.simplefilter("default", warning)
 
