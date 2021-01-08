@@ -13,6 +13,5 @@ This package provides some tools to work with [Matplotlib](https://matplotlib.or
   - `align_ax_with`
   - `set_ax_size`
   - `get_legend_bbox`
-  - `xFontsize`
 - `add_log_toggler`
   - `toggle_scale`

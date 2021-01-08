@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from matplotlib.widgets import Button, CheckButtons
 
 from mpl_tools.ax_placement import anchor_axes
-from mpl_tools.misc import get_legend_bbox, thousands, xFontsize
+from mpl_tools.misc import get_legend_bbox, thousands
 
 __all__ = ["add_log_toggler", "toggle_scale"]
 
@@ -17,7 +17,7 @@ def add_log_toggler(ax, pos="leg:S+W", ylim=None):
         print("Warning: Qt5Agg is used, which is not very fast with this function")
 
     # button_ax: size and creation
-    size = xFontsize(mpl.rcParams['font.size'],fig,10,2.5)
+    size = _xFontsize(mpl.rcParams['font.size'],fig,10,2.5)
     size = fig.transFigure.inverted().transform(size)
     rect = [.5,.5, *size]
     button_ax = fig.add_axes(rect, frameon=False, xticks=[], yticks=[])
@@ -76,3 +76,10 @@ def toggle_scale(ax,ylim=None,formatter=thousands,_toggle_button=True):
             ax.set_yscale("log")
             ax.yaxis.set_major_formatter(formatter)
         plt.draw()
+
+
+def _xFontsize(fontsize, fig, *args):
+    """Multiply by fontsize, in pixels (rather than points)."""
+    plt.pause(.1)
+    fontsize = fig.canvas.renderer.points_to_pixels(fontsize)
+    return tuple(a*fontsize for a in args)

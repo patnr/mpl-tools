@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 __all__ = [
     "thousands", "freshfig",
     "get_fig_geo", "set_fig_geo", "fig_placement_save", "fig_placement_load",
-    "get_legend_bbox", "xFontsize",
+    "get_legend_bbox",
     "is_notebook_or_qt", "axprops", "fig_colorbar"]
 
 thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')
@@ -117,13 +117,6 @@ def get_legend_bbox(ax):
     return inner
 
 
-def xFontsize(fontsize, fig, *args):
-    """Multiply by fontsize, in pixels (rather than points)."""
-    plt.pause(.1)
-    fontsize = fig.canvas.renderer.points_to_pixels(fontsize)
-    return tuple(a*fontsize for a in args)
-
-
 # stackoverflow.com/a/11103301
 def on_xlim_changed(ax):
     """
@@ -165,10 +158,9 @@ def axprops(dct):
     """Filters `dct` for properties associated with a plot axes.
 
     Example:
-    >>> # Note how kwargs gets split into axes/line properties.
-    >>> def myplotter(ax, x, y, **kwargs)
-    >>>     ax.set(**axprops(kwargs))
-    >>>     ax.plot(x, y, kwargs)
+    >>> def myplotter(ax, x, y, **COMMON)
+    >>>     ax.set(**axprops(COMMON))
+    >>>     ax.plot(x, y, COMMON)
     """
 
     # List of included axis properties
