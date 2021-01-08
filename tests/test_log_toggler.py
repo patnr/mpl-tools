@@ -14,14 +14,13 @@ into `tests/baseline_images/my_test_module/`.
 Then, the next time, the test will succeed.
 """
 
-from matplotlib.testing.decorators import image_comparison
+import warnings
 
 import matplotlib.pyplot as plt
+from matplotlib.testing.decorators import image_comparison
+from pytest import PytestUnknownMarkWarning
 
 from mpl_tools.log_toggler import add_log_toggler, toggle_scale
-
-import warnings
-from pytest import PytestUnknownMarkWarning
 
 
 class SuppressWarn(object):
