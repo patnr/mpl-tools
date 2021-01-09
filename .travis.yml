@@ -1,7 +1,8 @@
 # From https://github.com/python-poetry/poetry/issues/366
 # TODO: investigate other options from that issue thread
 # TODO: merge with https://github.com/pyslackers/slack-sansio/blob/2adb7c285deccbbb915d3890c27dc6d9adf38a3c/.travis.yml
-#       especially for python matrix and coveralls and tox (tox-travis) usage.
+#       especially for python matrix and coveralls and tox (tox-travis) usage (despite what
+#       this says: https://docs.travis-ci.com/user/languages/python/#using-tox-as-the-build-script )
 language: python
 python: "3.8"
 dist: xenial
