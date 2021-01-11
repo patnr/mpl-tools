@@ -11,7 +11,7 @@ repository = "https://github.com/patricknraanes/mpl-tools"
 #documentation = "https://python-poetry.org/docs"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = "^3.7"
 matplotlib = ">=3.0"
 importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 
@@ -36,8 +36,8 @@ tox = "^3.20.1"
 pytest = "^5.2"
 pytest-cov = "^2.10.1"
 pytest-sugar = "^0.9.4"
+tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
 # pytest-benchmark pytest-clarity pytest-xdist
-
 
 [tool.tox]
 legacy_tox_ini = """
@@ -48,6 +48,7 @@ legacy_tox_ini = """
 [tox]
 # Requires that these python versions exist on your system
 envlist = py3{7,8,9}
+# Required with poetry:
 isolated_build = True
 
 [tox:.package]
@@ -56,10 +57,10 @@ basepython = python3
 
 [testenv]
 # platform = linux2|darwindeps
-deps = pytest
-Use `{posargs}` to forward arguments from tox command
+# Use tox-poetry-installer to install from poetry lockfile, including dev-dependencies:
+install_dev_deps = true
+# Use `{posargs}` to forward arguments from tox command
 commands =
-    python -c "import IPython"
     pytest
 """
 
