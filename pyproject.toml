@@ -33,9 +33,9 @@ ipython = "*"
 pyqt5 = "*" # GUI-backend for mpl
 jedi = "<0.18" # ipython/issues/12740
 tox = "^3.20.1"
-pytest = "^5.2"
 pytest-cov = "^2.10.1"
 pytest-sugar = "^0.9.4"
+pytest = ">=6" # >6 to enable config in pyproject.toml
 tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
 # pytest-benchmark pytest-clarity pytest-xdist
 
