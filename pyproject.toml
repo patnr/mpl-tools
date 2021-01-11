@@ -59,6 +59,7 @@ basepython = python3
 deps = pytest
 Use `{posargs}` to forward arguments from tox command
 commands =
+    python -c "import IPython"
     pytest
 """
 
