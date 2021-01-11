@@ -105,8 +105,8 @@ commands =
 # commands = coverage erase
 # """
 
-# Could also be configured as part of tox,
-# ref https://pytest-cov.readthedocs.io/en/latest/tox.html
+# Does not apply when run through tox? Ref
+# https://pytest-cov.readthedocs.io/en/latest/tox.html
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--cov --cov-report term-missing"

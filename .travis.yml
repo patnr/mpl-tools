@@ -34,8 +34,16 @@ jobs:
       script:
         - pre-commit run --all-files
 
-    # Tox-travis ensures that only the environments matching the
-    # *python version of the travis server* are run.
+    # AFAIK, the main reason to use tox on travis-ci (as well as locally)
+    # is just to avoid repeating ourselves.
+    #
+    # The package tox-travis ensures that only the environments matching
+    # the *python version of the travis server* are run.
+    #
+    # If you want to only run specific [testenv:name] tests
+    # (for example, heavier linting could be run through tox)
+    # with specific stages/pythons, then see this examle:
+    # https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
     - stage: test
       install: pip install tox-travis
       script: tox
