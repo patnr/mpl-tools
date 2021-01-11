@@ -43,6 +43,7 @@ pytest-sugar = "^0.9.4"
 legacy_tox_ini = """
 # https://tox.readthedocs.io/en/latest/example/package.html#poetry
 # https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
+# https://python-poetry.org/docs/faq/#is-tox-supported
 
 [tox]
 # Requires that these python versions exist on your system
@@ -50,12 +51,13 @@ envlist = py3{7,8,9}
 isolated_build = True
 
 [tox:.package]
-# I tried, but don't quite understand what this is for
+# I don't quite understand what this is for
 basepython = python3
 
 [testenv]
 # platform = linux2|darwindeps
 deps = pytest
+Use `{posargs}` to forward arguments from tox command
 commands =
     pytest
 """
