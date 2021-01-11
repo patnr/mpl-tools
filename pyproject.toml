@@ -8,7 +8,7 @@ readme = "README.md"
 keywords = ["matplotlib", "plotting"]
 repository = "https://github.com/patricknraanes/mpl-tools"
 #homepage = "https://python-poetry.org/"
-#documentation = "https://python-poetry.org/docs"
+#documentation = "https://patricknraanes.github.io/mpl-tools"
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -32,34 +32,37 @@ pudb = "*"
 ipython = "*"
 pyqt5 = "*" # GUI-backend for mpl
 jedi = "<0.18" # ipython/issues/12740
-tox = "^3.20.1"
-pytest-cov = "^2.10.1"
-pytest-sugar = "^0.9.4"
+
 pytest = ">=6" # >6 to enable config in pyproject.toml
-tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
+pytest-cov = "*"
+coverage = ">=5.1" # >5.0b1 to enable config in pyproject.toml
+pytest-sugar = "*"
 # pytest-benchmark pytest-clarity pytest-xdist
 
-[tool.tox]
-legacy_tox_ini = """
-# Poetry/tox integration is subject to rapid change, I suspect. Read these:
+# Note: Poetry/tox integration is subject to rapid change, ref:
 # - https://tox.readthedocs.io/en/latest/example/package.html#poetry
 # - https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
 # - https://python-poetry.org/docs/faq/#is-tox-supported
 # - https://github.com/python-poetry/poetry/issues/1941
 # - https://github.com/python-poetry/poetry/issues/1745
+tox = "^3.20.1"
+tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
 
+[tool.tox]
+legacy_tox_ini = """
 [tox]
-# - List of tests (detailed under [testenv:name] below) to run.
+envlist = py3{7,8,9}
+# - List of tests (detailed under [testenv:name] below) to run by default.
+# - Use CLI option `-e` to only run specific tests.
 # - Requires that the python versions exist on your system.
 #   - On ubuntu, apt install was sufficient to get them.
 #   - On MacOS, use pyenv coz brew does not make muliple versions available concurrently.
-envlist = py3{7,8,9}
+
 # Required with poetry:
 isolated_build = True
 
 [tox:.package]
-# I don't quite understand what this does.
-basepython = python3
+#basepython = python3
 
 # Top-level test specificatios (gets inherited by other testenvs).
 # Combines with `envlist` to generate tests.
@@ -71,11 +74,13 @@ platform = linux|darwindeps
 # including the dev-dependencies (to avoid repeating ourselves):
 install_dev_deps = true
 
-# Use `{posargs}` to forward arguments from tox command
+# Use `posargs` to forward arguments from tox command.
 commands =
-    pytest
+    pytest {posargs}
 """
 
+# Could also be configured as part of tox,
+# ref https://pytest-cov.readthedocs.io/en/latest/tox.html
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--cov=mpl_tools"
