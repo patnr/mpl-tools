@@ -82,10 +82,10 @@ commands =
 # [tox]
 # envlist = clean,py3{7,8,9}
 # isolated_build = True
-# 
+#
 # [testenv]
 # install_dev_deps = true
-# 
+#
 # # Pytest explanations
 # # * envsitepackagesdir : https://stackoverflow.com/a/59072005
 # # * cov-append         : https://pytest-cov.readthedocs.io/en/latest/tox.html
@@ -97,7 +97,7 @@ commands =
 #     --cov-append \
 #     --cov-report=term-missing \
 #     {posargs}
-# 
+#
 # [testenv:clean]
 # install_dev_deps = false
 # deps = coverage
