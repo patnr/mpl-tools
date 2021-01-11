@@ -64,8 +64,8 @@ basepython = python3
 # Top-level test specificatios (gets inherited by other testenvs).
 # Combines with `envlist` to generate tests.
 [testenv]
-# platform = linux2|darwindeps
 # Only run test on this platform
+platform = linux|darwindeps
 
 # Use tox-poetry-installer to install from lockfile (for reproducibility),
 # including the dev-dependencies (to avoid repeating ourselves):
