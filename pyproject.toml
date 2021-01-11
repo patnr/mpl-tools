@@ -48,45 +48,95 @@ pytest-sugar = "*"
 tox = "^3.20.1"
 tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
 
+# - Tox requires that the python versions exist on your system.
+#   - On ubuntu, apt install was sufficient to get them.
+#   - On MacOS, use pyenv coz brew does not make muliple versions available concurrently.
 [tool.tox]
 legacy_tox_ini = """
 [tox]
+# List of tests (detailed under [testenv:name] below) to run by default.
+# Use CLI option `-e` to only run specific tests.
 envlist = py3{7,8,9}
-# - List of tests (detailed under [testenv:name] below) to run by default.
-# - Use CLI option `-e` to only run specific tests.
-# - Requires that the python versions exist on your system.
-#   - On ubuntu, apt install was sufficient to get them.
-#   - On MacOS, use pyenv coz brew does not make muliple versions available concurrently.
 
 # Required with poetry:
 isolated_build = True
 
-[tox:.package]
-#basepython = python3
-
-# Top-level test specificatios (gets inherited by other testenvs).
-# Combines with `envlist` to generate tests.
+# Combines with `envlist` to generate tests. Gets inherited.
 [testenv]
-# Only run test on this platform
+
+# Only run on these OSs:
 platform = linux|darwindeps
 
-# Use tox-poetry-installer to install from lockfile (for reproducibility),
-# including the dev-dependencies (to avoid repeating ourselves):
+# Use tox-poetry-installer to install the
+# - dev-dependencies given above (to avoid repeating ourselves)
+# - from the lockfile (for reproducibility),
 install_dev_deps = true
 
-# Use `posargs` to forward arguments from tox command.
 commands =
     pytest {posargs}
 """
+
+# Example of how to generate coverage reports within tox runs, ref
+# https://pytest-cov.readthedocs.io/en/latest/tox.html
+# legacy_tox_ini = """
+# [tox]
+# envlist = clean,py3{7,8,9}
+# isolated_build = True
+# 
+# [testenv]
+# install_dev_deps = true
+# 
+# # Pytest explanations
+# # * envsitepackagesdir : https://stackoverflow.com/a/59072005
+# # * cov-append         : https://pytest-cov.readthedocs.io/en/latest/tox.html
+# # * term-missing       : List lines not covered
+# # * {posargs}          : arguments forwarded from tox command
+# commands =
+#     pytest \
+#     --cov {envsitepackagesdir}/mpl_tools \
+#     --cov-append \
+#     --cov-report=term-missing \
+#     {posargs}
+# 
+# [testenv:clean]
+# install_dev_deps = false
+# deps = coverage
+# skip_install = true
+# commands = coverage erase
+# """
 
 # Could also be configured as part of tox,
 # ref https://pytest-cov.readthedocs.io/en/latest/tox.html
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--cov=mpl_tools"
-testpaths = [
-    "tests",
+addopts = "--cov --cov-report term-missing"
+# Not necessary with the above norecursedirs:
+#testpaths = [
+    #"tests",
     #"integration",
+#]
+norecursedirs = """.* build dist CVS _darcs {arch} *.egg venv \
+tmp*""" # add tmp to the above (defaults)
+
+[tool.coverage.run]
+branch = true # more rigour => lowers the coverage percentage
+source = ["mpl_tools"]
+omit = ["bad_file.py"]
+
+[tool.coverage.report]
+ignore_errors = true
+exclude_lines = [
+    # Standard marker to exclude lines
+    "pragma: no cover",
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self.debug",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:"
 ]
 
 [tool.autopep8]
