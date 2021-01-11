@@ -41,24 +41,36 @@ tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
 
 [tool.tox]
 legacy_tox_ini = """
-# https://tox.readthedocs.io/en/latest/example/package.html#poetry
-# https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
-# https://python-poetry.org/docs/faq/#is-tox-supported
+# Poetry/tox integration is subject to rapid change, I suspect. Read these:
+# - https://tox.readthedocs.io/en/latest/example/package.html#poetry
+# - https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
+# - https://python-poetry.org/docs/faq/#is-tox-supported
+# - https://github.com/python-poetry/poetry/issues/1941
+# - https://github.com/python-poetry/poetry/issues/1745
 
 [tox]
-# Requires that these python versions exist on your system
+# - List of tests (detailed under [testenv:name] below) to run.
+# - Requires that the python versions exist on your system.
+#   - On ubuntu, apt install was sufficient to get them.
+#   - On MacOS, use pyenv coz brew does not make muliple versions available concurrently.
 envlist = py3{7,8,9}
 # Required with poetry:
 isolated_build = True
 
 [tox:.package]
-# I don't quite understand what this is for
+# I don't quite understand what this does.
 basepython = python3
 
+# Top-level test specificatios (gets inherited by other testenvs).
+# Combines with `envlist` to generate tests.
 [testenv]
 # platform = linux2|darwindeps
-# Use tox-poetry-installer to install from poetry lockfile, including dev-dependencies:
+# Only run test on this platform
+
+# Use tox-poetry-installer to install from lockfile (for reproducibility),
+# including the dev-dependencies (to avoid repeating ourselves):
 install_dev_deps = true
+
 # Use `{posargs}` to forward arguments from tox command
 commands =
     pytest
