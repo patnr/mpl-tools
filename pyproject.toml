@@ -63,6 +63,14 @@ commands =
     pytest
 """
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=mpl_tools"
+testpaths = [
+    "tests",
+    #"integration",
+]
+
 [tool.autopep8]
 max_line_length = 120
 ignore = "E501,W6"  # or ["E501", "W6"]
