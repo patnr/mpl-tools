@@ -1,6 +1,7 @@
 # Makefile for installation.
 #
 # Run `make` with no arguments to see a list of what you can do with it.
+# NB: This Makefile is mostly linux-only.
 #
 # Developer notes:
 # ----------------
@@ -56,9 +57,11 @@ help: ## Show this help message
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 get_poetry: # internal -- leave undoc'd
-	@echo "Installing poetry"
+	@
+	@command -v poetry &> /dev/null || \
+		{ echo "Installing poetry"; \
+		curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - ; }
 	# Could also use `pip install poetry`, but that's not really recommended.
-	curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 	# See also a more secure and detailed version at
 	# https://github.com/wrike/callisto/blob/master/Makefile
 
