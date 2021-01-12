@@ -7,19 +7,27 @@ repos:
         exclude_types: ['html', 'python']
     -   id: check-added-large-files
     -   id: check-ast
-    -   id: check-json
+    #-   id: check-json
     -   id: check-merge-conflict
-    -   id: check-xml
-    -   id: check-yaml
+    #-   id: check-xml
+    #-   id: check-yaml
     -   id: debug-statements
     -   id: detect-aws-credentials
         args:
         - --allow-missing-credentials
     -   id: detect-private-key
     -   id: end-of-file-fixer
-    -   id: requirements-txt-fixer
+    #-   id: requirements-txt-fixer
     -   id: mixed-line-ending
         args: ['--fix=no']
+
+-   repo: meta
+    hooks:
+    -   id: check-hooks-apply
+    -   id: check-useless-excludes
+    #-   id: identity # for debugging pre-commits
+
+
 
 -   repo: https://github.com/life4/flakehell
     rev: v.0.7.1
