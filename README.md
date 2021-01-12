@@ -18,12 +18,21 @@ This package provides some tools to work with [Matplotlib](https://matplotlib.or
 
 ## Installation
 
+#### Normal installation
+
 ```sh
 pip install mpl-tools
 ```
 
-Or, **if you want to develop the code**, download the repository, and run
+#### For development
 
 ```sh
 make
 ```
+
+<!-- markdownlint-configure-file
+{
+  "no-multiple-blanks": false,
+  "header-increment": false
+}
+-->
