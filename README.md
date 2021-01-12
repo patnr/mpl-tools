@@ -27,6 +27,7 @@ pip install mpl-tools
 #### For development
 
 ```sh
+git clone <this repo>
 make
 ```
 
