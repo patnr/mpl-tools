@@ -9,6 +9,7 @@ dist: xenial
 stages:
   - lint
   - test
+  - test_with_make
   - coverage
   # TODO:
   #- name: deploy
@@ -47,6 +48,10 @@ jobs:
     - stage: test
       install: pip install tox-travis
       script: tox
+
+    - stage: test_with_make
+      install: make install
+      script: make tox
 
     - stage: coverage
       python: 3.9
