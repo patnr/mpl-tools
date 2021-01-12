@@ -1,3 +1,17 @@
+"""Documentation.
+
+coc-settings
+Poetry
+Installation
+- pip
+- make
+Pytest
+- Using mpl image comparison
+Tox
+Travis-CI
+Deploy when git tag is pushed
+"""
+
 try:
     import importlib.metadata as importlib_metadata
 except ModuleNotFoundError:
