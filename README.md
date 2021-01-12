@@ -15,3 +15,15 @@ This package provides some tools to work with [Matplotlib](https://matplotlib.or
   - `get_legend_bbox`
 - `add_log_toggler`
   - `toggle_scale`
+
+## Installation
+
+```sh
+pip install mpl-tools
+```
+
+Or, **if you want to develop the code**, download the repository, and run
+
+```sh
+make
+```
