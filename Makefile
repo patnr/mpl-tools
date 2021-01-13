@@ -1,24 +1,31 @@
-# Makefile for installation.
+# Run `make` with no arguments to view possible actions.
 #
-# Run `make` with no arguments to see a list of what you can do with it.
 # NB: This Makefile is mostly linux-only.
 #
-# Developer notes:
+# Why this file ? (when you already use poetry/pyproject.toml)
 # ----------------
-# Poetry not only deals with depedency resolution, but also
-# packaging/distribution. Therefore it pretty much assumes
-# that the package should be pip-installable (i.e. a "library"),
-# and doesn't provide installation methods for "applications".
-#
-# Maybe this will be an alternative to this makefile in the future:
-# https://github.com/python-poetry/poetry-core/pull/40
-#
-# Meanwhile, this Makefile takes care of
+# 	Poetry not only deals with dependency resolution.
+# It also handles packaging/distribution. But, only for PyPI (pip).
+# 	So how are "applications" (vs "libraries") to be packaged?
+# Using pipx? Distributing as .deb package? What about MacOS? etc. Ref:
+# https://docs.python-guide.org/shipping/freezing/#freezing-your-code-ref
+# Remember, they need to create an isolated python environment,
+# and download (or vendorize) dependencies.
+# 	Similarly, how should it be installed from source (github),
+# for the purpose of development?
+# One alternative is to state that poetry is prerequisite.
+# Another way is to provide this makefile, since (GNU) make
+# is pretty universal. This makefile takes care of
 # - Poetry installation
 # - Venv activation (with poetry)
-# - Runnig tests, etc.
+# - Task running (invoker), avoiding the necessity for
+#   multiple small scripts for testing, cleaning, linting, publishing, etc.
+#   Note that task execution might be handled by poetry in the future:
+#   https://github.com/python-poetry/poetry-core/pull/40 .
+# - Providing (fairly readable) recipies
 #
-# Makefile notes:
+# Makefile syntax:
+# ----------------
 # - cheatsheet: https://devhints.io/makefile
 # - Must use tabs to prefix the action parts of rules!
 # - .PHONY is used to declare targets that don't yield (epynomous) files.
@@ -87,7 +94,7 @@ install-no-dev: get_poetry ## Install without dev. tools
 # (although poetry is smart enough to avoid re-installing, it takes time).
 #run test test tox lint: install
 
-clean: ## Clean the directory
+clean: ## Rm build/test/cache files
 	@rm -rf build dist .eggs *.egg-info
 	@rm -rf .benchmarks .coverage coverage.xml htmlcov report.xml .tox
 	@find . -type d -name '.mypy_cache' -exec rm -rf {} +
@@ -101,7 +108,7 @@ test: ## Run tests
 	@$(POETRY) run pytest
 	#$(POETRY) run pytest $(TESTS)
 
-tox: ## Run tests against all supported python versions
+tox: ## Run tests in all supported python versions
 	@$(POETRY) run tox
 
 # Provide output also in case of no issues.
@@ -111,8 +118,8 @@ lint: ## Run linter
 	echo -e "❌ Issues detected. See above."
 
 autoformat:  ## Run autoformatter
-	#@black .
 	@echo "Autoformatting not supported at the moment."
+	#@black .
 
 
 # Not sure how useful this is, but I leave it for reference:
