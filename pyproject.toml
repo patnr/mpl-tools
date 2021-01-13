@@ -58,6 +58,9 @@ legacy_tox_ini = """
 # Use CLI option `-e` to only run specific tests.
 envlist = py3{7,8,9}
 
+# Avoid Dropbox syncing
+toxworkdir={homedir}/.tox
+
 # Required with poetry:
 isolated_build = True
 
