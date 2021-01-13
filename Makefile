@@ -109,10 +109,10 @@ clean: ## Rm build/test/cache files
 	@find . -type f -name "*.py[co]" -exec rm -rf {} +
 	#@git clean -Xdf # DANGEROUS -- delete all files in .gitignore
 
-tests: test ## Alias for test
 test: ## Run tests
 	@$(POETRY) run pytest
 	#$(POETRY) run pytest $(TESTS)
+tests: test ## Alias for test
 
 tox: ## Run tests in all supported python versions
 	@$(POETRY) run tox
@@ -127,9 +127,13 @@ autoformat:  ## Run autoformatter
 	@echo "Autoformatting not supported at the moment."
 	#@black .
 
-
-docs: ## Build docs
-	@$(POETRY) run pdoc ...
+doc: ## Build docs (preview in ./docs/index.html)
+	@$(POETRY) run pdoc \
+		--force --html \
+		--template-dir docs/templates \
+		-o ./docs \
+		$(SRC) docs/dev_guide.py
+docs: doc ## Alias for doc
 
 version_bump: ## Bump version
 	:
