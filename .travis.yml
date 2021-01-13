@@ -1,20 +1,25 @@
 # Inspired by https://github.com/python-poetry/poetry/issues/366
+# More elaborate (but is there a point to that?) tox/travis:
+# https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
+
 language: python
 python:
-  - "3.7"
-  - "3.8"
-  - "3.9"
+  - 3.9
+  - 3.8
+  - 3.7
 dist: xenial
 
-# Overwrite default, which looks for requirements.txt, ref
-# https://stackoverflow.com/a/57271598/38281
-install: skip
-script: skip
-
 # https://stackoverflow.com/q/34377017/38281
-#before_script:
-#after_script:
+before_script:
+  - python --version
+  - pip install -U pip
+install: pip install tox-travis # only use current (travis) python
+#install: skip # overwrite default, which looks for requirements.txt, ref https://stackoverflow.com/a/57271598/38281
+script: tox
+after_script: skip
 
+# Jobs run in parallel. But some things should only run
+# after others have succeeded (eg. "deploy") => Stages
 # https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
 stages:
   - lint
@@ -32,8 +37,8 @@ cache:
   directories:
     - "$HOME/.cache/pre-commit"
 
-
 jobs:
+  # Don't wait for allowed-failures to declare build success.
   fast_finish: true
 
   include:
@@ -46,20 +51,14 @@ jobs:
       script:
         - pre-commit run --all-files
 
-    # More elaborate (but is there a point to that?) tox/travis:
-    # https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
-    - stage: test
-      install: pip install tox-travis # only use current (travis) python
-      script: tox
-
     - stage: test_with_make
+      python: 3.9
       install: make install
       script: make tox
 
     - stage: coverage
       python: 3.9
       install:
-        - pip install --upgrade pip
         - pip install poetry coveralls
         - poetry install -v
       script:
