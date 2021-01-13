@@ -8,8 +8,14 @@ dist: xenial
 
 # Overwrite default, which looks for requirements.txt, ref
 # https://stackoverflow.com/a/57271598/38281
-install: pip --version
+install: skip
+script: skip
 
+# https://stackoverflow.com/q/34377017/38281
+#before_script:
+#after_script:
+
+# https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
 stages:
   - lint
   - test
@@ -26,6 +32,7 @@ cache:
   directories:
     - "$HOME/.cache/pre-commit"
 
+
 jobs:
   fast_finish: true
 
@@ -39,18 +46,10 @@ jobs:
       script:
         - pre-commit run --all-files
 
-    # AFAIK, the main reason to use tox on travis-ci (as well as locally)
-    # is just to avoid repeating ourselves.
-    #
-    # The package tox-travis ensures that only the environments matching
-    # the *python version of the travis server* are run.
-    #
-    # If you want to only run specific [testenv:name] tests
-    # (for example, heavier linting could be run through tox)
-    # with specific stages/pythons, then see this examle:
+    # More elaborate (but is there a point to that?) tox/travis:
     # https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
     - stage: test
-      install: pip install tox-travis
+      install: pip install tox-travis # only use current (travis) python
       script: tox
 
     - stage: test_with_make
@@ -63,8 +62,6 @@ jobs:
         - pip install --upgrade pip
         - pip install poetry coveralls
         - poetry install -v
-      #before_script:
       script:
         - pytest
       after_success: coveralls || echo "failed"
-      #after_script:
