@@ -76,7 +76,7 @@ commands =
     pytest {posargs}
 """
 
-# Example of how to generate coverage reports within tox runs, ref
+# Example of how to generate COVERAGE reports WITHIN TOX runs, ref
 # https://pytest-cov.readthedocs.io/en/latest/tox.html
 # legacy_tox_ini = """
 # [tox]

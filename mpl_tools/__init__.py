@@ -1,13 +1,17 @@
 """Documentation.
 
+Want tests to run on any level (pytest, tox, travis)
+
+Screw cookiecutter and pyscaffold
 coc-settings
-Poetry
+Poetry/pyproject
 Installation
 - pip
 - make
 Pytest
 - Using mpl image comparison
 Tox
+pyenv
 Travis-CI
 Deploy when git tag is pushed
 """
