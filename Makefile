@@ -54,7 +54,7 @@ POETRY:=python3 $(HOME)/.poetry/bin/poetry
 POETRY_URL:=https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
 
 # Explained above
-.PHONY: all clean help lint type test tests test-cov tox autoformat
+.PHONY: all clean help lint type test tests test-cov tox autoformat doc docs
 .PHONY: venv poetry install install-dev
 
 # w/o this, the topmost target is the default
@@ -67,10 +67,16 @@ help: ## Show this help message
 
 get_poetry: # internal -- leave undoc'd
 	@command -v poetry &> /dev/null || \
-	# Could also use `pip install poetry`, but that's not really recommended.
-	# See also a more secure and detailed version at
-	# https://github.com/wrike/callisto/blob/master/Makefile
 		{ echo "Installing poetry"; curl -sSL $(POETRY_URL) | python - ; }
+	# - See also a more secure and detailed version at
+	#   https://github.com/wrike/callisto/blob/master/Makefile
+	# - Could also use `pip install poetry`, but that's not really recommended.
+	# - Pipx is probably not a good idea either, ref:
+	#   https://github.com/python-poetry/poetry/issues/677#issuecomment-443372910
+	# - Approaches using venv:
+	#   https://news.ycombinator.com/item?id=20677114
+	#   https://stackoverflow.com/a/59335943/38281
+
 
 define echo_install_success
 	echo -e "\033[0;34m\n✔️ ✔️ ✔️ ✔️ ✔️ ✔️  You can now run scripts using:\033[0m"
@@ -122,17 +128,13 @@ autoformat:  ## Run autoformatter
 	#@black .
 
 
-# Not sure how useful this is, but I leave it for reference:
-# ----------------------------------
-# From https://stackoverflow.com/a/59335943/38281
-# venv:
-# 	test -d venv || virtualenv -p python3 --no-site-packages venv
-#
-# From https://news.ycombinator.com/item?id=20677114
-# venv:
-# 	python3 -m virtualenv --version 1>/dev/null 2>/dev/null || \
-# 	 ( echo "Please install virtualenv (python3 -m pip install virtualenv wheel setuptools)" && false )
-# 	[ -d venv.d ] || python3 -m virtualenv -p python3 venv.d
-# 	./venv.d/bin/pip install -r requirements.txt
-# install: venv
-# 	source venv/bin/activate && pip install -r requirements.txt
+docs: ## Build docs
+	@$(POETRY) run pdoc ...
+
+version_bump: ## Bump version
+	:
+
+publish: docs ## Publish to PyPI (pip)
+	git add doc ; git commmit -m "Build doc"; git push
+	git tag; git ta gpush
+	poetry publish
