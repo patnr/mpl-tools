@@ -40,9 +40,11 @@ SHELL := bash
 MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 
+# POETRY:=poetry
 # Hack to avoid poetry using (and complaining about) python < 3
 # https://github.com/python-poetry/poetry/issues/3288#issuecomment-717090078
 POETRY:=python3 $(HOME)/.poetry/bin/poetry
+POETRY_URL:=https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
 
 # Explained above
 .PHONY: all clean help lint type test tests test-cov tox autoformat
@@ -57,13 +59,11 @@ help: ## Show this help message
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 get_poetry: # internal -- leave undoc'd
-	@
 	@command -v poetry &> /dev/null || \
-		{ echo "Installing poetry"; \
-		curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python - ; }
 	# Could also use `pip install poetry`, but that's not really recommended.
 	# See also a more secure and detailed version at
 	# https://github.com/wrike/callisto/blob/master/Makefile
+		{ echo "Installing poetry"; curl -sSL $(POETRY_URL) | python - ; }
 
 define echo_install_success
 	echo -e "\033[0;34m\n✔️ ✔️ ✔️ ✔️ ✔️ ✔️  You can now run scripts using:\033[0m"
