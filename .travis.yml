@@ -15,10 +15,10 @@ before_install:
   - pip install -U pip
 install:
   - pip install poetry
-  - poetry install -v
+  - poetry install
   - pip install tox-travis # only use current/travis python!
 before_script: skip
-script: tox
+script: tox -rsx
 after_script: skip
 
 # Jobs run in parallel. But some things should only run
@@ -60,7 +60,7 @@ jobs:
     - stage: coverage
       install:
         - pip install poetry coveralls
-        - poetry install -v
+        - poetry install
       script:
         - pytest
       after_success: coveralls || echo "failed"

@@ -6,6 +6,10 @@ Whenever something changes, the corresponding test will fail.
 If a test fails, the **difference to the baseline** may be inspected
 by opening `result_images/my_test_module/test_name-failed-diff.png`.
 
+If you're using a different extension that `.png`,
+then the images will be converted to `.png` before comparison.
+Also note that **travis** does not support `.png` comparison.
+
 Failure also happens when **adding new tests**.
 To fix this (and complete the addition of the new test),
 copy the png file (not "-expected.png")
@@ -16,11 +20,14 @@ Then, the next time, the test will succeed.
 
 import warnings
 
-import matplotlib.pyplot as plt
+import matplotlib as mpl
 from matplotlib.testing.decorators import image_comparison
 from pytest import PytestUnknownMarkWarning
 
 from mpl_tools.log_toggler import add_log_toggler, toggle_scale
+
+mpl.use("agg")
+import matplotlib.pyplot as plt  # noqa
 
 
 class SuppressWarn(object):
@@ -37,7 +44,7 @@ def comparison(fun):
     name = fun.__name__.split("test_")[1]
 
     wrapper = image_comparison(baseline_images=[name],
-                               remove_text=False, extensions=['pdf'])
+                               remove_text=False, extensions=['png'])
 
     with SuppressWarn():
         fun = wrapper(fun)
@@ -95,7 +102,7 @@ def test_4():
 # and was supposed to replace test_4, coz both test toggle the scale twice,
 # and presumably that would yield the original image.
 # But, toggle_scale actually sets custom formatter and ylim, and so therefore it fails.
-# @check_figures_equal(extensions=('pdf',))
+# @check_figures_equal(extensions=('png',))
 # def test_5(fig_test, fig_ref):
 #     _, ax1 = gen_plot(fig_ref)
 #     _, ax2 = gen_plot(fig_test)
