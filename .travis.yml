@@ -18,7 +18,7 @@ install:
   - poetry install
   - pip install tox-travis # only use current/travis python!
 before_script: skip
-script: tox -rsx
+script: tox -- -rsx
 after_script: skip
 
 # Jobs run in parallel. But some things should only run
