@@ -1,3 +1,5 @@
+# Ref dev_guide.py for some comments on this config.
+
 [tool.poetry]
 name = "mpl-tools"
 version = "0.2"
@@ -8,7 +10,15 @@ readme = "README.md"
 keywords = ["matplotlib", "plotting"]
 repository = "https://github.com/patricknraanes/mpl-tools"
 #homepage = "https://python-poetry.org/"
-#documentation = "https://patricknraanes.github.io/mpl-tools"
+documentation = "https://patricknraanes.github.io/mpl-tools"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+##################
+#  Dependencies  #
+##################
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -16,6 +26,18 @@ matplotlib = ">=3.0"
 importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 
 [tool.poetry.dev-dependencies]
+# Test
+pytest = ">=6" # >6 to enable config in pyproject.toml
+pytest-cov = "*"
+coverage = ">=5.1" # >5.0b1 to enable config in pyproject.toml
+pytest-sugar = "*"
+# pytest-benchmark pytest-clarity pytest-xdist
+
+# Note: Poetry/tox integration is subject to rapid change, ref dev_guide.py
+tox = "^3.20.1"
+tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
+
+# Lint
 flakehell = "*"
 flake8-docstrings = "*"
 flake8-bugbear = "*"
@@ -24,105 +46,45 @@ flake8-isort = "*"
 flake8-builtins = "*"
 pep8-naming = "*"
 
+# My standard tools
 line_profiler = "*"
 pre-commit = "*"
 ipdb = "*"
 pdbpp = "*"
 pudb = "*"
 ipython = "*"
-pyqt5 = "*" # GUI-backend for mpl
 jedi = "<0.18" # ipython/issues/12740
 
-pdoc3 = "^0.9.2"
+pyqt5 = "*" # GUI-backend for mpl
+pdoc3 = "^0.9.2" # Doc generation
 
-pytest = ">=6" # >6 to enable config in pyproject.toml
-pytest-cov = "*"
-coverage = ">=5.1" # >5.0b1 to enable config in pyproject.toml
-pytest-sugar = "*"
-# pytest-benchmark pytest-clarity pytest-xdist
+##########
+#  Test  #
+##########
 
-# Note: Poetry/tox integration is subject to rapid change, ref:
-# - https://tox.readthedocs.io/en/latest/example/package.html#poetry
-# - https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini
-# - https://python-poetry.org/docs/faq/#is-tox-supported
-# - https://github.com/python-poetry/poetry/issues/1941
-# - https://github.com/python-poetry/poetry/issues/1745
-tox = "^3.20.1"
-tox-poetry-installer = {extras = ["poetry"], version = "^0.6.1"}
-
-# - Tox requires that the python versions exist on your system.
-#   - On ubuntu, apt install was sufficient to get them.
-#   - On MacOS, use pyenv coz brew does not make muliple versions available concurrently.
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-# List of tests (detailed under [testenv:name] below) to run by default.
-# Use CLI option `-e` to only run specific tests.
 envlist = py3{7,8,9}
-
-# Avoid Dropbox syncing
 toxworkdir={homedir}/.tox
-
-# Required with poetry:
 isolated_build = True
 
-# Combines with `envlist` to generate tests. Gets inherited.
 [testenv]
-
-# Only run on these OSs:
 platform = linux|darwindeps
-
-# Use tox-poetry-installer to install the
-# - dev-dependencies given above (to avoid repeating ourselves)
-# - from the lockfile (for reproducibility),
 install_dev_deps = true
-
 commands =
     pytest {posargs}
 """
 
-# Example of how to generate COVERAGE reports WITHIN TOX runs, ref
-# https://pytest-cov.readthedocs.io/en/latest/tox.html
-# legacy_tox_ini = """
-# [tox]
-# envlist = clean,py3{7,8,9}
-# isolated_build = True
-#
-# [testenv]
-# install_dev_deps = true
-#
-# # Pytest explanations
-# # * envsitepackagesdir : https://stackoverflow.com/a/59072005
-# # * cov-append         : https://pytest-cov.readthedocs.io/en/latest/tox.html
-# # * term-missing       : List lines not covered
-# # * {posargs}          : arguments forwarded from tox command
-# commands =
-#     pytest \
-#     --cov {envsitepackagesdir}/mpl_tools \
-#     --cov-append \
-#     --cov-report=term-missing \
-#     {posargs}
-#
-# [testenv:clean]
-# install_dev_deps = false
-# deps = coverage
-# skip_install = true
-# commands = coverage erase
-# """
-
-# Does not apply when run through tox? Ref
-# https://pytest-cov.readthedocs.io/en/latest/tox.html
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "--cov --cov-report term-missing"
-# Not necessary with the above norecursedirs:
-#testpaths = [
-    #"tests",
-    #"integration",
-#]
+#testpaths = ["tests", "integration"] # norecursedirs suffices
 norecursedirs = """.* build dist CVS _darcs {arch} *.egg venv \
 tmp*""" # add tmp to the above (defaults)
 
+# TODO: If coverage.py is installed with the toml extra (pip install coverage[toml]),
+# it will automatically read from “pyproject.toml”
 [tool.coverage.run]
 branch = true # more rigour => lowers the coverage percentage
 source = ["mpl_tools"]
@@ -131,30 +93,24 @@ omit = ["bad_file.py"]
 [tool.coverage.report]
 ignore_errors = true
 exclude_lines = [
-    # Standard marker to exclude lines
     "pragma: no cover",
-    # Don't complain about missing debug-only code:
     "def __repr__",
     "if self.debug",
-    # Don't complain if tests don't hit defensive assertion code:
     "raise AssertionError",
     "raise NotImplementedError",
-    # Don't complain if non-runnable code isn't run:
     "if 0:",
     "if __name__ == .__main__.:"
 ]
 
-[tool.autopep8]
-max_line_length = 120
-ignore = "E501,W6"  # or ["E501", "W6"]
+##########
+#  Lint  #
+##########
 
-# Unlike flake8, flakehell
-# - may be configured in pyproject.toml
-# - has prettier formatting
-# - does not use installed plugins that are not listed below
+[tool.autopep8]
+max_line_length = 88
+ignore = "E501,W6" # or ["E501", "W6"]
+
 [tool.flakehell]
-# optionally inherit from remote config (or local if you want)
-# base = "https://raw.githubusercontent.com/life4/flakehell/master/pyproject.toml"
 exclude = [".*", "README.*", "example*.py"]
 max_line_length = 88
 format = "grouped" # also try "stat"
@@ -174,26 +130,8 @@ flake8-bugbear = ["+*"]
 flake8-builtins = ["+*"]
 flake8-comprehensions = ["+*", "-C408"]
 #flake8-darglint = ["+*"]
-#flake8-docstrings = ["+*"]
+flake8-docstrings = ["+*"]
 #flake8-eradicate = ["+*"]
 #flake8-isort = ["+*"]
 #flake8-pytest-style = ["+*"]
 #flake8-spellcheck = ["+*"]
-
-# Example configs. NB: remember to comment-out the corresponding lines above
-#pyflakes = ["+*", "-F401"] # ignore F401
-#pycodestyle = ["+*", "-E722"] # ignore E722
-#flake8-docstrings = ["-*"] # explicitly disable plugin
-#flake8-bandit = ["+*", "-S322"]
-#flake8-bandit = ["-*", "+S1??"] # enable only codes from S100 to S199
-
-# Exceptions:
-# [tool.flakehell.exceptions."tests/"]
-# pycodestyle = ["-F401"]     # disable a check
-# pyflakes = ["-*"]           # disable a plugin
-# [tool.flakehell.exceptions."tests/test_example.py"]
-# pyflakes = ["+*"]           # enable a plugin
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
