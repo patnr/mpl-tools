@@ -54,4 +54,4 @@ jobs:
     - stage: coverage
       install: pip install coveralls
       script: poetry run pytest
-      after_success: poetry run coveralls || echo "failed"
+      after_success: coveralls || echo "failed"
