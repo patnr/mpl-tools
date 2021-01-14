@@ -135,10 +135,21 @@ doc: ## Build docs (preview in ./docs/index.html)
 		$(SRC) docs/dev_guide.py
 docs: doc ## Alias for doc
 
-version_bump: ## Bump version
-	:
-
-publish: docs ## Publish to PyPI (pip)
-	git add doc ; git commmit -m "Build doc"; git push
-	git tag; git ta gpush
-	poetry publish
+# As opposed to `poetry publish`, this accomplishes
+# - Builds docs. TODO: re-include
+# - Bumps version with poetry, and tags git with the result,
+#   thus synchronizing these versions
+#   (note that __init__.py gets its __version__ independently).
+#   Travis then gets triggered, and since the commit includes a tag,
+#   it will deploy to PyPI. Of course, travis is slow,
+#   but it means that only successful builds are published.
+publish: docs ## Publish new version to PyPI (for pip). Via Travis-CI => Slow.
+	@git add docs
+	git commit -m "Build doc"
+	VERSION=$(shell poetry version patch | rev | cut -f1 -d" " | rev)
+	echo "New version" $$VERSION
+	git add pyproject.toml
+	git commit -m "Bump version"
+	git tag v$$VERSION
+	git push
+	git push origin --tags
