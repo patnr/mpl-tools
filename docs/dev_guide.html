@@ -43,20 +43,98 @@ Linting
 - Travis: for PRs
 - As part of pytest - maybe for heavier (eg pylint) linting.
 - As part of tox - nah. This is one overlap too many</p>
+<p>Flakehell
+Unlike flake8, flakehell
+- may be configured in pyproject.toml
+- has prettier formatting
+- does not use installed plugins that are not listed below
+One interesting option not explored yet is to
+inherit from remote config (or local if you want), e.g.:
+<code>base = "https://raw.githubusercontent.com/life4/flakehell/master/pyproject.toml"</code></p>
+<p>Flakehell also enables intricate plugin configuration.
+Examples follow.
+NB: remember to comment-out the corresponding lines above</p>
+<pre><code>pyflakes = ["+*", "-F401"] # ignore F401
+pycodestyle = ["+*", "-E722"] # ignore E722
+flake8-docstrings = ["-*"] # explicitly disable plugin
+flake8-bandit = ["+*", "-S322"]
+flake8-bandit = ["-*", "+S1??"] # enable only codes from S100 to S199
+
+# Exceptions:
+# [tool.flakehell.exceptions."tests/"]
+# pycodestyle = ["-F401"]     # disable a check
+# pyflakes = ["-*"]           # disable a plugin
+# [tool.flakehell.exceptions."tests/test_example.py"]
+# pyflakes = ["+*"]           # enable a plugin
+</code></pre>
 <p>Installation and tasks with Makefile</p>
 <p>Pytest
-- Using mpl image comparison
-Tox
-pyenv
-Travis-CI</p>
+- Using mpl image comparison</p>
+<p>Tox requires that the python versions exist on your system.
+=&gt; pyenv</p>
+<p>Travis-CI</p>
 <pre><code># AFAIK, the main reason to use tox on travis-ci (as well as locally)
 # is just to avoid repeating ourselves.
 </code></pre>
 <p>Deploy when git tag is pushed</p>
+<h2 id="toxpoetry">Tox/poetry</h2>
+<p>Poetry/tox integration is subject to rapid change, ref:
+- <a href="https://tox.readthedocs.io/en/latest/example/package.html#poetry">https://tox.readthedocs.io/en/latest/example/package.html#poetry</a>
+- <a href="https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini">https://tox.readthedocs.io/en/latest/example/basic.html#pyproject-toml-tox-legacy-ini</a>
+- <a href="https://python-poetry.org/docs/faq/#is-tox-supported">https://python-poetry.org/docs/faq/#is-tox-supported</a>
+- <a href="https://github.com/python-poetry/poetry/issues/1941">https://github.com/python-poetry/poetry/issues/1941</a>
+- <a href="https://github.com/python-poetry/poetry/issues/1745">https://github.com/python-poetry/poetry/issues/1745</a></p>
+<p>Remember,
+- <code>envlist</code> lists the tests run by default.
+Use CLI option <code>-e</code> to only run particular ones.
+Tests can be detailed using [testenv:myname] sections.
+- <code>toxworkdir={homedir}/.tox</code> puts the tox envs in HOME,
+to avoid Dropbox syncing them.
+- <code>isolated_build = True</code> is required with poetry
+- <code>install_dev_deps</code> comes with <code>tox-poetry-installer</code> and is used to install the
+- dev-dependencies already specified in pyproject.toml
+(avoids repeating ourselves)
+- from the lockfile (for reproducibility)</p>
+<h2 id="toxcoverage">Tox/Coverage</h2>
+<p>Tox installs in its own venv, while <code>coverage</code> is pointed to the repo
+(from its config in pyproject.toml).
+Therefore there will be <code>0%</code> coverage.
+Refs:</p>
+<ul>
+<li><a href="https://stackoverflow.com/a/59072005/38281">1</a></li>
+<li><a href="https://pytest-cov.readthedocs.io/en/latest/tox.html">2</a>.</li>
+</ul>
+<p>It is possible to get coverage reports ALSO from within tox runs,
+but it requires that pytest be configured via tox,
+which is a bit uglier, requiring that you set
+<code>tool.tox.legacy_tox_ini</code> to the following:</p>
+<pre><code>```ini
+[tox]
+envlist = clean,py3{8,9}
+isolated_build = True
+
+[testenv]
+install_dev_deps = true
+
+# Pytest explanations
+# * envsitepackagesdir : &lt;https://stackoverflow.com/a/59072005&gt;
+# * cov-append         : &lt;https://pytest-cov.readthedocs.io/en/latest/tox.html&gt;
+# * term-missing       : List lines not covered
+# * {posargs}          : arguments forwarded from tox command
+commands =
+    pytest         --cov {envsitepackagesdir}/mpl_tools         --cov-append         --cov-report=term-missing         {posargs}
+
+[testenv:clean]
+install_dev_deps = false
+deps = coverage
+skip_install = true
+commands = coverage erase
+```
+</code></pre>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L29" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L120" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 # Dev guide
@@ -74,12 +152,40 @@ Linting
  - As part of pytest - maybe for heavier (eg pylint) linting.
  - As part of tox - nah. This is one overlap too many
 
+Flakehell
+Unlike flake8, flakehell
+- may be configured in pyproject.toml
+- has prettier formatting
+- does not use installed plugins that are not listed below
+One interesting option not explored yet is to
+inherit from remote config (or local if you want), e.g.:
+`base = &#34;https://raw.githubusercontent.com/life4/flakehell/master/pyproject.toml&#34;`
+
+Flakehell also enables intricate plugin configuration.
+Examples follow.
+NB: remember to comment-out the corresponding lines above
+
+    pyflakes = [&#34;+*&#34;, &#34;-F401&#34;] # ignore F401
+    pycodestyle = [&#34;+*&#34;, &#34;-E722&#34;] # ignore E722
+    flake8-docstrings = [&#34;-*&#34;] # explicitly disable plugin
+    flake8-bandit = [&#34;+*&#34;, &#34;-S322&#34;]
+    flake8-bandit = [&#34;-*&#34;, &#34;+S1??&#34;] # enable only codes from S100 to S199
+
+    # Exceptions:
+    # [tool.flakehell.exceptions.&#34;tests/&#34;]
+    # pycodestyle = [&#34;-F401&#34;]     # disable a check
+    # pyflakes = [&#34;-*&#34;]           # disable a plugin
+    # [tool.flakehell.exceptions.&#34;tests/test_example.py&#34;]
+    # pyflakes = [&#34;+*&#34;]           # enable a plugin
+
 Installation and tasks with Makefile
 
 Pytest
 - Using mpl image comparison
-Tox
-pyenv
+
+Tox requires that the python versions exist on your system.
+=&gt; pyenv
+
 Travis-CI
 
     # AFAIK, the main reason to use tox on travis-ci (as well as locally)
@@ -87,6 +193,69 @@ Travis-CI
 
 
 Deploy when git tag is pushed
+
+## Tox/poetry
+
+Poetry/tox integration is subject to rapid change, ref:
+- &lt;https://tox.readthedocs.io/en/latest/example/package.html#poetry&gt;
+- &lt;https://tox.readthedocs.io/en/latest/example/basic.html\
+#pyproject-toml-tox-legacy-ini&gt;
+- &lt;https://python-poetry.org/docs/faq/#is-tox-supported&gt;
+- &lt;https://github.com/python-poetry/poetry/issues/1941&gt;
+- &lt;https://github.com/python-poetry/poetry/issues/1745&gt;
+
+Remember,
+- `envlist` lists the tests run by default.
+  Use CLI option `-e` to only run particular ones.
+  Tests can be detailed using [testenv:myname] sections.
+- `toxworkdir={homedir}/.tox` puts the tox envs in HOME,
+  to avoid Dropbox syncing them.
+- `isolated_build = True` is required with poetry
+- `install_dev_deps` comes with `tox-poetry-installer` and is used to install the
+  - dev-dependencies already specified in pyproject.toml
+    (avoids repeating ourselves)
+  - from the lockfile (for reproducibility)
+
+## Tox/Coverage
+Tox installs in its own venv, while `coverage` is pointed to the repo
+(from its config in pyproject.toml).
+Therefore there will be `0%` coverage.
+Refs:
+
+- [1](https://stackoverflow.com/a/59072005/38281)
+- [2](https://pytest-cov.readthedocs.io/en/latest/tox.html).
+
+It is possible to get coverage reports ALSO from within tox runs,
+but it requires that pytest be configured via tox,
+which is a bit uglier, requiring that you set
+`tool.tox.legacy_tox_ini` to the following:
+
+    ```ini
+    [tox]
+    envlist = clean,py3{8,9}
+    isolated_build = True
+
+    [testenv]
+    install_dev_deps = true
+
+    # Pytest explanations
+    # * envsitepackagesdir : https://stackoverflow.com/a/59072005
+    # * cov-append         : https://pytest-cov.readthedocs.io/en/latest/tox.html
+    # * term-missing       : List lines not covered
+    # * {posargs}          : arguments forwarded from tox command
+    commands =
+        pytest \
+        --cov {envsitepackagesdir}/mpl_tools \
+        --cov-append \
+        --cov-report=term-missing \
+        {posargs}
+
+    [testenv:clean]
+    install_dev_deps = false
+    deps = coverage
+    skip_install = true
+    commands = coverage erase
+    ```
 &#34;&#34;&#34;</code></pre>
 </details>
 </section>
@@ -112,6 +281,8 @@ data-gaCategoryParameter="dev_guide">
 <li><a href="#items">Items</a></li>
 </ul>
 </li>
+<li><a href="#toxpoetry">Tox/poetry</a></li>
+<li><a href="#toxcoverage">Tox/Coverage</a></li>
 </ul>
 </li>
 </ul>
