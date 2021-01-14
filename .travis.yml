@@ -2,13 +2,13 @@
 # More elaborate (but is there a point to that?) tox/travis:
 # https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
 
+# Build matrix (used by "test") stage
 language: python
+dist: xenial
 python:
-  - 3.9 # top => base version
+  - 3.9
   - 3.8
   - 3.7
-dist: xenial
-
 # https://stackoverflow.com/q/34377017/38281
 before_install:
   - python --version
@@ -16,16 +16,14 @@ before_install:
 install:
   - pip install poetry
   - poetry install -v
-  # Only use current (travis) python (should install with poetry add?):
-  - pip install tox-travis
+  - pip install tox-travis # only use current/travis python!
 before_script: skip
 script: tox
 after_script: skip
 
 # Jobs run in parallel. But some things should only run
 # after others have succeeded (eg. "deploy") => Stages
-# Here we specify their order. Jobs (each dash under jobs.include)
-# inherit previous stage name (the default being "test").
+# Here we specify their order.
 # https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
 stages:
   - lint
@@ -43,14 +41,12 @@ cache:
   directories:
     - "$HOME/.cache/pre-commit"
 
+# Explicitly included (i.e. particular) jobs.
+# There is one for each dash under `jobs.include`.
+# The 1st value of a matrix dimension (e.g. "python") is used unless overwritten.
 jobs:
-  # Don't wait for allowed-failures to declare build success.
-  fast_finish: true
-
   include:
-
     - stage: lint
-      python: 3.9
       install:
         - pip install pre-commit
         - pre-commit install-hooks
@@ -58,12 +54,10 @@ jobs:
         - pre-commit run --all-files
 
     - stage: test_with_make
-      python: 3.9
       install: make install
       script: make tox
 
     - stage: coverage
-      python: 3.9
       install:
         - pip install poetry coveralls
         - poetry install -v
