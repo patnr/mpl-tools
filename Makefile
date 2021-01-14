@@ -128,6 +128,7 @@ autoformat:  ## Run autoformatter
 	#@black .
 
 doc: ## Build docs (preview in ./docs/index.html)
+	@echo -e "Generating docs"
 	@$(POETRY) run pdoc \
 		--force --html \
 		--template-dir docs/templates \
@@ -136,18 +137,26 @@ doc: ## Build docs (preview in ./docs/index.html)
 docs: doc ## Alias for doc
 
 # As opposed to `poetry publish`, this accomplishes
-# - Builds docs. TODO: re-include
+# - Builds docs.
 # - Bumps version with poetry, and tags git with the result,
 #   thus synchronizing these versions
 #   (note that __init__.py gets its __version__ independently).
 #   Travis then gets triggered, and since the commit includes a tag,
 #   it will deploy to PyPI. Of course, travis is slow,
-#   but it means that only successful builds are published.
+#   but it means that only successfully tested builds are published.
 publish: docs ## Publish new version to PyPI (for pip). Via Travis-CI => Slow.
-	@git add docs
-	git commit -m "Build doc"
+	@echo
+	@echo -e "\033[0;34m" "Committing updated docs" "\033[0m"
+	git add docs
+	git commit -m "Build doc" 1>/dev/null || true
+	@echo
+	@echo -e "\033[0;34m" "Bumping package version" "\033[0m"
 	VERSION=$(shell poetry version patch | rev | cut -f1 -d" " | rev)
 	echo "New version" $$VERSION
+	@echo
+	@echo -e "\033[0;34m" "Pushing updated package" \
+		"which will be deployed to PyPI in due time" \
+		"after running tests on Travis-CI" "\033[0m"
 	git add pyproject.toml
 	git commit -m "Bump version"
 	git tag v$$VERSION
