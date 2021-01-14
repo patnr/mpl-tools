@@ -17,6 +17,7 @@ repos:
         - --allow-missing-credentials
     -   id: detect-private-key
     -   id: end-of-file-fixer
+        exclude_types: ['html']
     #-   id: requirements-txt-fixer
     -   id: mixed-line-ending
         args: ['--fix=no']
@@ -26,8 +27,6 @@ repos:
     -   id: check-hooks-apply
     -   id: check-useless-excludes
     #-   id: identity # for debugging pre-commits
-
-
 
 -   repo: https://github.com/life4/flakehell
     rev: v.0.7.1
