@@ -30,9 +30,7 @@ stages:
   - test
   - test_with_make
   - coverage
-  # TODO:
-  #- name: deploy
-  #  if: tag IS present
+  - deploy
 
 # Might not be a good idea to cache .tox, ref:
 # https://github.com/sclorg/rpm-list-builder/issues/28
@@ -55,3 +53,24 @@ jobs:
       install: pip install coveralls
       script: poetry run pytest
       after_success: coveralls || echo "failed"
+
+    - stage: deploy
+      script:
+        - echo Deploying to PyPI...
+
+
+before_deploy:
+  # Username set as env variables through web interface of project on travis
+  - poetry config http-basic.pypi patricknraanes $PYPI_PASS
+  #- poetry config pypi-token.pypi $PYPI_PASSWORD
+  - poetry build
+deploy:
+  provider: script
+  script: poetry publish
+  skip_cleanup: true
+  on:
+    #all_branches: false
+    #condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
+    repo: patricknraanes/mpl-tools
+    tags: true
+#if: tag IS present
