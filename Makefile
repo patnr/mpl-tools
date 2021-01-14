@@ -128,7 +128,7 @@ autoformat:  ## Run autoformatter
 	#@black .
 
 doc: ## Build docs (preview in ./docs/index.html)
-	@echo -e "Generating docs"
+	@echo -e "\033[0;34m" "Generating docs" "\033[0m"
 	@$(POETRY) run pdoc \
 		--force --html \
 		--template-dir docs/templates \
