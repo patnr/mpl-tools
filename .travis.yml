@@ -62,5 +62,5 @@ jobs:
         - pip install poetry coveralls
         - poetry install
       script:
-        - pytest
-      after_success: coveralls || echo "failed"
+        - poetry run pytest
+      after_success: poetry run coveralls || echo "failed"
