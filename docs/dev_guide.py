@@ -79,15 +79,22 @@ Remember,
   - from the lockfile (for reproducibility)
 
 ## Tox/Coverage
-It appears that `[tool.pytest.ini_options]`
-does not apply when pytest is run through tox?
-Example of how to generate COVERAGE reports WITHIN TOX runs,
-[ref](https://pytest-cov.readthedocs.io/en/latest/tox.html).
-Set `tool.tox.legacy_tox_ini` to the following:
+Tox installs in its own venv, while `coverage` is pointed to the repo
+(from its config in pyproject.toml).
+Therefore there will be `0%` coverage.
+Refs:
+
+- [1](https://stackoverflow.com/a/59072005/38281)
+- [2](https://pytest-cov.readthedocs.io/en/latest/tox.html).
+
+It is possible to get coverage reports ALSO from within tox runs,
+but it requires that pytest be configured via tox,
+which is a bit uglier, requiring that you set
+`tool.tox.legacy_tox_ini` to the following:
 
     ```ini
     [tox]
-    envlist = clean,py3{7,8,9}
+    envlist = clean,py3{8,9}
     isolated_build = True
 
     [testenv]
