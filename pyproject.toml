@@ -29,7 +29,8 @@ importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 # Test
 pytest = ">=6" # >6 to enable config in pyproject.toml
 pytest-cov = "*"
-coverage = ">=5.1" # >5.0b1 to enable config in pyproject.toml
+coverage = {extras = ["toml"], version = ">=5.1"}
+# "toml" and ">5.0b1" to enable config in pyproject.toml
 pytest-sugar = "*"
 # pytest-benchmark pytest-clarity pytest-xdist
 
@@ -83,12 +84,10 @@ addopts = "--cov --cov-report term-missing"
 norecursedirs = """.* build dist CVS _darcs {arch} *.egg venv \
 tmp*""" # add tmp to the above (defaults)
 
-# TODO: If coverage.py is installed with the toml extra (pip install coverage[toml]),
-# it will automatically read from “pyproject.toml”
 [tool.coverage.run]
 branch = true # more rigour => lowers the coverage percentage
 source = ["mpl_tools"]
-omit = ["bad_file.py"]
+#omit = ["bad_file.py"]
 
 [tool.coverage.report]
 ignore_errors = true
