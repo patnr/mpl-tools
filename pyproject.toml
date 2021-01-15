@@ -2,11 +2,11 @@
 
 [tool.poetry]
 name = "mpl-tools"
-version = "0.2.12" # can update through `poetry version`
+version = "0.2.12"
 description = "Tools for working with matplotlib" # Set == Github descript.
 authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
 license = "MIT"
-readme = "README.md" # includes README on PyPI
+readme = "README.md" # puts the README on PyPI
 keywords = ["matplotlib", "plotting"]
 repository = "https://github.com/patricknraanes/mpl-tools"
 documentation = "https://patricknraanes.github.io/mpl-tools"
