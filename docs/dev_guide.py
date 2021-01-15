@@ -190,6 +190,14 @@ which is a bit uglier, requiring that you set
     ```
 
 ## Travis-CI
+
+#### Why pip3 ?
+[Ref](https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems)
+
+    all three OSes agree about 'pip3'
+    'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
+    'python3' is a 'command not found' error on Windows but 'py' works on Windows only
+
 #### Why stages?
 Jobs run in parallel. But some things should only run
 after others have succeeded (eg. "deploy")

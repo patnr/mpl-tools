@@ -1,5 +1,8 @@
 # Inspired by https://github.com/python-poetry/poetry/issues/366
 
+# MacOS/Python another way:
+# https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages
+
 # Build matrix. Its "expansion" (outer prod) defines the default/test stage
 language: python
 dist: xenial
@@ -10,8 +13,9 @@ python:
 before_install: # Useful for all jobs. Also see {before,after}_script
   # Get poetry
   - python --version
-  - pip install -U pip
-  - pip install poetry
+  - python3 --version
+  - pip3 install -U pip
+  - pip3 install poetry
   - travis_retry poetry install
 install: skip # overwrite default (looks for requirements file)
 script: poetry run pytest
@@ -32,8 +36,13 @@ jobs:
       script: poetry run pre-commit run -a
 
     - stage: coverage
-      install: pip install coveralls
+      install: pip3 install coveralls
       after_success: coveralls || echo "failed"
+
+    - stage: test
+      name: "Python 3.7.4 on macOS"
+      os: osx
+      osx_image: xcode11.2
 
     - stage: deploy
       script: skip
