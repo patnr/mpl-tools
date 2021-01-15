@@ -250,7 +250,8 @@ Checkout `75ba468` for the previous ("secrets") version.
 
 - Copy this one
 - Go through pyproject.toml and change it as needed
-- grep mpl-tools and mpl_tools and change as appropriate
+- Rm this dev_guide.py, and (all of) the html files
+- `grep` `mpl-tools`, `mpl_tools`, `patricknraanes,` and change as appropriate
 - Turn on Travis and Coveralls through their web interface
-- make publish
+- `make publish`
 """
