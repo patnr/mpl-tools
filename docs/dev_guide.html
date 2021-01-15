@@ -131,10 +131,23 @@ skip_install = true
 commands = coverage erase
 ```
 </code></pre>
+<h2 id="travis-ci">Travis-CI</h2>
+<h4 id="why-stages">Why stages</h4>
+<p>Jobs run in parallel. But some things should only run
+after others have succeeded (eg. "deploy") =&gt; Stages
+Here we specify their order.
+<a href="https://docs.travis-ci.com/user/build-stages/#what-are-build-stages">https://docs.travis-ci.com/user/build-stages/#what-are-build-stages</a></p>
+<h4 id="why-not-use-the-makefile-also-on-travis">Why not use the makefile also on travis?</h4>
+<p>It would probably be possible to replace some of the instructions
+in <code>.travis.yml</code> with <code>make blah</code>,
+but there are also quite a few differences,
+so we don't bother to try with that.
+Also, the makefile is supposed to be for linux only,
+while Travis can test other platforms.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L120" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L135" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 # Dev guide
@@ -256,6 +269,21 @@ which is a bit uglier, requiring that you set
     skip_install = true
     commands = coverage erase
     ```
+
+## Travis-CI
+#### Why stages
+Jobs run in parallel. But some things should only run
+after others have succeeded (eg. &#34;deploy&#34;) =&gt; Stages
+Here we specify their order.
+https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
+
+#### Why not use the makefile also on travis?
+It would probably be possible to replace some of the instructions
+in `.travis.yml` with `make blah`,
+but there are also quite a few differences,
+so we don&#39;t bother to try with that.
+Also, the makefile is supposed to be for linux only,
+while Travis can test other platforms.
 &#34;&#34;&#34;</code></pre>
 </details>
 </section>
@@ -283,6 +311,11 @@ data-gaCategoryParameter="dev_guide">
 </li>
 <li><a href="#toxpoetry">Tox/poetry</a></li>
 <li><a href="#toxcoverage">Tox/Coverage</a></li>
+<li><a href="#travis-ci">Travis-CI</a><ul>
+<li><a href="#why-stages">Why stages</a></li>
+<li><a href="#why-not-use-the-makefile-also-on-travis">Why not use the makefile also on travis?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
