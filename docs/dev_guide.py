@@ -9,7 +9,7 @@ coc-settings
 Poetry/pyproject
 Linting
  - Editor: useful
- - Precommit: useful
+ - Precommit: useful. Maybe not markdownlint though?
  - Travis: for PRs
  - As part of pytest - maybe for heavier (eg pylint) linting.
  - As part of tox - nah. This is one overlap too many
