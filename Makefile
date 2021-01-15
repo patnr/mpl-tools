@@ -86,11 +86,13 @@ endef
 install: get_poetry ## Install with dev. tools
 	@echo "Installing $(SRC) with dev. tools"
 	$(POETRY) install
+	$(POETRY) run pre-commit install
 	$(call echo_install_success)
 
 install-no-dev: get_poetry ## Install without dev. tools
 	@echo "Installing $(SRC)"
 	$(POETRY) install --no-dev
+	$(POETRY) run pre-commit install
 	$(call echo_install_success)
 
 #run: ## Run app
