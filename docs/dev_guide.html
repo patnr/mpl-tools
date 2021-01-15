@@ -39,7 +39,7 @@ coc-settings
 Poetry/pyproject
 Linting
 - Editor: useful
-- Precommit: useful
+- Precommit: useful. Maybe not markdownlint though?
 - Travis: for PRs
 - As part of pytest - maybe for heavier (eg pylint) linting.
 - As part of tox - nah. This is one overlap too many</p>
@@ -144,10 +144,16 @@ but there are also quite a few differences,
 so we don't bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.</p>
+<h4 id="why-not-poetry-publish">Why not <code>poetry publish</code>?</h4>
+<p>Because then we can use
+<a href="https://docs.travis-ci.com/user/deployment/pypi/">Travis' encryption mechanism</a>
+to store the encrypted key in <code>.travis.yml</code>
+instead of relying on Github or Travis secrets,
+which requires manual configuration for each new project.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L135" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L142" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 # Dev guide
@@ -160,7 +166,7 @@ coc-settings
 Poetry/pyproject
 Linting
  - Editor: useful
- - Precommit: useful
+ - Precommit: useful. Maybe not markdownlint though?
  - Travis: for PRs
  - As part of pytest - maybe for heavier (eg pylint) linting.
  - As part of tox - nah. This is one overlap too many
@@ -284,6 +290,13 @@ but there are also quite a few differences,
 so we don&#39;t bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.
+
+#### Why not `poetry publish`?
+Because then we can use
+[Travis&#39; encryption mechanism](https://docs.travis-ci.com/user/deployment/pypi/)
+to store the encrypted key in `.travis.yml`
+instead of relying on Github or Travis secrets,
+which requires manual configuration for each new project.
 &#34;&#34;&#34;</code></pre>
 </details>
 </section>
@@ -314,6 +327,7 @@ data-gaCategoryParameter="dev_guide">
 <li><a href="#travis-ci">Travis-CI</a><ul>
 <li><a href="#why-stages">Why stages</a></li>
 <li><a href="#why-not-use-the-makefile-also-on-travis">Why not use the makefile also on travis?</a></li>
+<li><a href="#why-not-poetry-publish">Why not poetry publish?</a></li>
 </ul>
 </li>
 </ul>
