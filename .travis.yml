@@ -34,7 +34,7 @@ stages:
 jobs:
   include:
     - stage: lint
-      script: poetry run pre-commit run --all-files
+      script: poetry run pre-commit run -a
 
     # Needed coz (ref dev_guide.py), coverage via tox tests will yield 0%.
     - stage: coverage
