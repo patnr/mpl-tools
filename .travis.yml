@@ -39,6 +39,7 @@ cache:
   directories:
     - "$HOME/.cache/pre-commit"
 
+
 # Explicitly included (i.e. particular) jobs.
 # There is one for each dash under `jobs.include`.
 # The 1st value of a matrix dimension (e.g. "python") is used unless overwritten.
@@ -72,5 +73,3 @@ jobs:
           repo: patricknraanes/mpl-tools
           tags: true
       #if: tag IS present
-
-
