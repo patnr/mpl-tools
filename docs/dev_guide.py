@@ -1,8 +1,6 @@
-"""
-# Dev guide
+"""Developer guide.
 
-
-Why use `make publish` instead of just `poetry publish`?
+## Why use `make publish` instead of just `poetry publish`?
 As opposed to `poetry publish`, this accomplishes
 
 - Builds docs.
@@ -199,6 +197,15 @@ which is a bit uglier, requiring that you set
     all three OSes agree about 'pip3'
     'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
     'python3' is a 'command not found' error on Windows but 'py' works on Windows only
+
+#### Why only 1 python version of MacOS?
+Coz that's pretty much all Travis supports.
+[Ref](https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems)
+
+- Potentially another
+  [way](https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages)
+- Potentially another
+  [way](https://github.com/travis-ci/travis-ci/issues/9929#issuecomment-505232416)
 
 #### Why stages?
 Jobs run in parallel. But some things should only run
