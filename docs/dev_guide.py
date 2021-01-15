@@ -14,7 +14,9 @@ As opposed to `poetry publish`, this accomplishes
   but it means that only successfully tested builds are published.
 
 ## Want tests to run on any level (`pytest`, `tox`, `travis`)
-
+Note that Travis ain't really a level above tox
+(although it's true that with travis you can even test on different
+OS and platform versions), as explained under `Why not tox?`.
 
 ## Why a makefile (when you already use `poetry/pyproject.toml`) ?
 Poetry not only deals with dependency resolution.
