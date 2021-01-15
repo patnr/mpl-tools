@@ -42,6 +42,7 @@ pre-commit = "*"
 
 # Lint
 flakehell = "*"
+# NB: these should also be put into .pre-commit-config.yaml
 flake8-docstrings = "*"
 flake8-bugbear = "*"
 flake8-comprehensions = "*"
@@ -52,9 +53,9 @@ pep8-naming = "*"
 pyqt5 = "*" # GUI-backend for mpl
 pdoc3 = "^0.9.2" # Doc generation
 
-##########
-#  Test  #
-##########
+##################
+#  Config tests  #
+##################
 
 [tool.tox]
 legacy_tox_ini = """
@@ -94,9 +95,9 @@ exclude_lines = [
     "if __name__ == .__main__.:"
 ]
 
-##########
-#  Lint  #
-##########
+####################
+#  Config linting  #
+####################
 
 [tool.autopep8]
 max_line_length = 88
