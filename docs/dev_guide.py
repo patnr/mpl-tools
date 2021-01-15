@@ -118,4 +118,19 @@ which is a bit uglier, requiring that you set
     skip_install = true
     commands = coverage erase
     ```
+
+## Travis-CI
+#### Why stages
+Jobs run in parallel. But some things should only run
+after others have succeeded (eg. "deploy") => Stages
+Here we specify their order.
+https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
+
+#### Why not use the makefile also on travis?
+It would probably be possible to replace some of the instructions
+in `.travis.yml` with `make blah`,
+but there are also quite a few differences,
+so we don't bother to try with that.
+Also, the makefile is supposed to be for linux only,
+while Travis can test other platforms.
 """
