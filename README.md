@@ -34,6 +34,9 @@ Install [poetry](https://python-poetry.org/docs/#installation).
 Download & extract this git repo.
 Run `poetry install` in your shell/terminal.
 
+**Note**: To add packages, you should not use `pip install`,
+but poetry, e.g. `poetry add --dev somepackage`.
+
 <!-- markdownlint-configure-file
 {
   "no-multiple-blanks": false,
