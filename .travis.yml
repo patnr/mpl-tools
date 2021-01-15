@@ -24,16 +24,8 @@ after_script: skip
 stages:
   - lint
   - test
-  - test_with_make
   - coverage
   - deploy
-
-# Might not be a good idea to cache .tox, ref:
-# https://github.com/sclorg/rpm-list-builder/issues/28
-cache:
-  pip: true
-  directories:
-    - "$HOME/.cache/pre-commit"
 
 # Explicitly included (i.e. particular) jobs (1 per dash).
 # If the stage of a job is not def'd, the above stage is used,
@@ -51,8 +43,7 @@ jobs:
       after_success: coveralls || echo "failed"
 
     - stage: deploy
-      script:
-        - echo Deploying to PyPI...
+      script: skip
       before_deploy:
         # Username set as env var through web interface of project on travis
         - poetry config http-basic.pypi patricknraanes $PYPI_PASS
@@ -68,3 +59,9 @@ jobs:
           repo: patricknraanes/mpl-tools
           tags: true
       #if: tag IS present
+
+# Dont cache .tox, ref: https://github.com/sclorg/rpm-list-builder/issues/28
+cache:
+  pip: true
+  directories:
+    - "$HOME/.cache/pre-commit"
