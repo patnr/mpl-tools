@@ -1,4 +1,4 @@
-"""Documentation for mpl-tools
+"""Documentation for mpl-tools.
 
 ## Dev guide
 Also see `dev_guide`

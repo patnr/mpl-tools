@@ -1,3 +1,4 @@
+"""Provide button to toggle log-scale on and off."""
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.widgets import CheckButtons  # Button
@@ -51,7 +52,6 @@ def toggle_scale(ax, ylim=None, formatter=thousands, _toggle_button=True):
 
     _toggle_button is used internally. Do not set.
     """
-
     # Get status
     log_is_on = getattr(ax, "_log_is_on", False)
 

@@ -1,3 +1,4 @@
+"""Tools for placing axes in a figure."""
 import matplotlib as mpl
 from matplotlib.artist import allow_rasterization
 
@@ -7,7 +8,7 @@ __all__ = ["align_ax_with", "anchor_axes", "set_ax_size", "trans2fig"]
 
 
 def set_ax_size(ax, w, h):
-    "Width/Height in display (pixel) coords."
+    """Width/Height in display (pixel) coords."""
     fig = ax.figure
     w, h = fig.transFigure.inverted().transform([w, h])
     x, y, _, _ = ax.get_position().bounds
@@ -85,7 +86,6 @@ def anchor_axes(ax, get_anchor, loc="NW+"):
     See also mpl_toolkits.axes_grid1.{Divider,Size}, demonstrated by:
     https://matplotlib.org/gallery/axes_grid1/demo_fixed_size_axes.html
     """
-
     # Save size
     size = ax.bbox.width, ax.bbox.height
 

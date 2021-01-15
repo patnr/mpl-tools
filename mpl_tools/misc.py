@@ -1,3 +1,4 @@
+"""Misc tools."""
 import json
 import os
 import platform
@@ -52,6 +53,7 @@ def _get_fmw(fignum):
 
 
 def get_fig_geo(fignum):
+    """Blah."""
     fmw = _get_fmw(fignum)
     try:
         # For Qt4Agg/Qt5Agg
@@ -67,6 +69,7 @@ def get_fig_geo(fignum):
 
 
 def set_fig_geo(fignum, geo):
+    """Set figure geometry."""
     plt.figure(int(fignum))
     fmw = _get_fmw(int(fignum))
     try:
@@ -79,6 +82,7 @@ def set_fig_geo(fignum, geo):
 
 
 def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
+    """Save figure geometries."""
     if append_host:
         path = ".".join([path, platform.node()])
 
@@ -89,6 +93,7 @@ def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
 
 
 def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
+    """Load and set figure geometries."""
     if append_host:
         path = ".".join([path, platform.node()])
 
@@ -155,14 +160,13 @@ def on_xlim_changed(ax):
 
 
 def axprops(dct):
-    """Filters `dct` for properties associated with a plot axes.
+    """Filter `dct` for properties associated with a plot axes.
 
     Example:
     >>> def myplotter(ax, x, y, **COMMON)
     >>>     ax.set(**axprops(COMMON))
     >>>     ax.plot(x, y, COMMON)
     """
-
     # List of included axis properties
     props = ["title", "facecolor", "aspect"]
     # Append xyz-specific props

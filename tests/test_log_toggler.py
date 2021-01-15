@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt  # noqa
 
 class SuppressWarn(object):
     """Turn off warning due to something in `image_comparison`."""
+
     def __enter__(self):
         warnings.simplefilter("ignore", PytestUnknownMarkWarning)
 
