@@ -57,20 +57,20 @@ jobs:
     - stage: deploy
       script:
         - echo Deploying to PyPI...
+      before_deploy:
+        # Username set as env variables through web interface of project on travis
+        - poetry config http-basic.pypi patricknraanes $PYPI_PASS
+        #- poetry config pypi-token.pypi $PYPI_PASSWORD
+        - poetry build
+      deploy:
+        provider: script
+        script: poetry publish
+        skip_cleanup: true
+        on:
+          #all_branches: false
+          #condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
+          repo: patricknraanes/mpl-tools
+          tags: true
+      #if: tag IS present
 
 
-before_deploy:
-  # Username set as env variables through web interface of project on travis
-  - poetry config http-basic.pypi patricknraanes $PYPI_PASS
-  #- poetry config pypi-token.pypi $PYPI_PASSWORD
-  - poetry build
-deploy:
-  provider: script
-  script: poetry publish
-  skip_cleanup: true
-  on:
-    #all_branches: false
-    #condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
-    repo: patricknraanes/mpl-tools
-    tags: true
-#if: tag IS present
