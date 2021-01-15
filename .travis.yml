@@ -31,6 +31,7 @@ stages:
 jobs:
   include:
     - stage: lint
+      #script: poetry run flakehell
       script: poetry run pre-commit run -a
 
     - stage: coverage
