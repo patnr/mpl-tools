@@ -2,28 +2,6 @@
 #
 # NB: This Makefile is mostly linux-only.
 #
-# Why this file ? (when you already use poetry/pyproject.toml)
-# ----------------
-# 	Poetry not only deals with dependency resolution.
-# It also handles packaging/distribution. But, only for PyPI (pip).
-# 	So how are "applications" (vs "libraries") to be packaged?
-# Using pipx? Distributing as .deb package? What about MacOS? etc. Ref:
-# https://docs.python-guide.org/shipping/freezing/#freezing-your-code-ref
-# Remember, they need to create an isolated python environment,
-# and download (or vendorize) dependencies.
-# 	Similarly, how should it be installed from source (github),
-# for the purpose of development?
-# One alternative is to state that poetry is prerequisite.
-# Another way is to provide this makefile, since (GNU) make
-# is pretty universal. This makefile takes care of
-# - Poetry installation
-# - Venv activation (with poetry)
-# - Task running (invoker), avoiding the necessity for
-#   multiple small scripts for testing, cleaning, linting, publishing, etc.
-#   Note that task execution might be handled by poetry in the future:
-#   https://github.com/python-poetry/poetry-core/pull/40 .
-# - Providing (fairly readable) recipies
-#
 # Makefile syntax:
 # ----------------
 # - cheatsheet: https://devhints.io/makefile
@@ -68,15 +46,6 @@ help: ## Show this help message
 get_poetry: # internal -- leave undoc'd
 	@command -v poetry &> /dev/null || \
 		{ echo "Installing poetry"; curl -sSL $(POETRY_URL) | python - ; }
-	# - See also a more secure and detailed version at
-	#   https://github.com/wrike/callisto/blob/master/Makefile
-	# - Could also use `pip install poetry`, but that's not really recommended.
-	# - Pipx is probably not a good idea either, ref:
-	#   https://github.com/python-poetry/poetry/issues/677#issuecomment-443372910
-	# - Approaches using venv:
-	#   https://news.ycombinator.com/item?id=20677114
-	#   https://stackoverflow.com/a/59335943/38281
-
 
 define echo_install_success
 	echo -e "\033[0;34m\n✔️ ✔️ ✔️ ✔️ ✔️ ✔️  You can now run scripts using:\033[0m"
@@ -116,7 +85,7 @@ test: ## Run tests
 	#$(POETRY) run pytest $(TESTS)
 tests: test ## Alias for test
 
-tox: ## Run tests in all supported python versions
+tox: ## Run tests in all supported python versions (using existing pyenv's)
 	@$(POETRY) run tox
 
 # Provide output also in case of no issues.
@@ -138,14 +107,6 @@ doc: ## Build docs (preview in ./docs/index.html)
 		$(SRC) docs/dev_guide.py
 docs: doc ## Alias for doc
 
-# As opposed to `poetry publish`, this accomplishes
-# - Builds docs.
-# - Bumps version with poetry, and tags git with the result,
-#   thus synchronizing these versions
-#   (note that __init__.py gets its __version__ independently).
-#   Travis then gets triggered, and since the commit includes a tag,
-#   it will deploy to PyPI. Of course, travis is slow,
-#   but it means that only successfully tested builds are published.
 publish: docs ## Publish new version to PyPI (for pip). Via Travis-CI => Slow.
 	@echo
 	@echo -e "\033[0;34m" "Committing updated docs" "\033[0m"
