@@ -58,6 +58,10 @@ jobs:
         on:
           tags: true
 
+  allow_failures:
+  - os: osx
+  fast_finish: true
+
 cache:
   pip: true
   directories:
