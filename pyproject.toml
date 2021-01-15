@@ -25,6 +25,10 @@ python = "^3.7"
 matplotlib = ">=3.0"
 importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
 
+# Requires installing project with `poetry install -E mytools`.
+# Might require (rm poetry.lock and) re-initing project.
+patlib = {path = "../patlib", optional=true}
+
 [tool.poetry.dev-dependencies]
 # Test
 pytest = ">=6" # >6 to enable config in pyproject.toml
@@ -52,6 +56,9 @@ pep8-naming = "*"
 
 pyqt5 = "*" # GUI-backend for mpl
 pdoc3 = "^0.9.2" # Doc generation
+
+[tool.poetry.extras]
+mytools = ["patlib"]
 
 ##################
 #  Config tests  #
