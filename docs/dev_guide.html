@@ -32,7 +32,60 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 </header>
 <section id="section-intro">
 <h1 id="dev-guide">Dev guide</h1>
-<h2 id="want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (pytest, tox, travis)</h2>
+<p>Why use <code>make publish</code> instead of just <code>poetry publish</code>?
+As opposed to <code>poetry publish</code>, this accomplishes</p>
+<ul>
+<li>Builds docs.</li>
+<li>Bumps version with <code>poetry</code>, and tags <code>git</code> with the result,
+thus synchronizing these versions
+(note that <code>__init__.py</code> gets its <code>__version__</code> independently).
+<code>Travis</code> then gets triggered, and since the commit includes a tag,
+it will deploy to <code>PyPI.</code> Of course, Travis is slow,
+but it means that only successfully tested builds are published.</li>
+</ul>
+<h2 id="want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (<code>pytest</code>, <code>tox</code>, <code>travis</code>)</h2>
+<p>Note that Travis ain't really a level above tox
+(although it's true that with travis you can even test on different
+OS and platform versions), as explained under <code>Why not tox?</code>.</p>
+<h2 id="why-a-makefile-when-you-already-use-poetrypyprojecttoml">Why a makefile (when you already use <code>poetry/pyproject.toml</code>) ?</h2>
+<p>Poetry not only deals with dependency resolution.
+It also handles packaging/distribution. But, only for PyPI (<code>pip</code>).</p>
+<p>So how are "applications" (vs "libraries") to be packaged?
+Using pipx? Distributing as .deb package? What about MacOS? etc.
+<a href="https://docs.python-guide.org/shipping/freezing/#freezing-your-code-ref">Ref</a>
+Remember, they need to create an isolated python environment,
+and download (or vendorize) dependencies.</p>
+<p>Similarly, how should it be installed from source (github),
+for the purpose of development?
+One alternative is to state that poetry is prerequisite.
+Another way is to provide this makefile, since (GNU) make
+is pretty (awful, but) universal. This makefile takes care of
+the poetry installation, together with the venv activation,
+package and pre-commit installation (with poetry).</p>
+<p>The makefile is also useful as a task runner (invoker),
+avoiding the necessity for multiple small scripts
+for testing, cleaning, linting.
+Some of the tasks are simple enough that it might be better
+just to read the recipe and do them yourself.
+Indeed this makefile hardly takes advantage of the main pros
+of <code>make</code> (DAG of dependencies combined with mtime;
+support for incremental and parallel builds).
+Nevertheless, the makefile still serves as a reminder of
+which tasks "exist", as shown by running <code>make</code> without arguments.
+Note that task execution could
+<a href="https://github.com/python-poetry/poetry-core/pull/40">maybe</a>
+be handled by poetry in the future.</p>
+<h4 id="is-the-makefile-using-the-best-way-to-get-poetry">Is the makefile using the best way to get poetry?</h4>
+<p>It's using the "official" way. Whether it's the best,
+for our purposes, I don't know. Other alternatives:
+- See also a more secure and detailed version at
+<a href="https://github.com/wrike/callisto/blob/master/Makefile">https://github.com/wrike/callisto/blob/master/Makefile</a>
+- Could also use <code>pip install poetry</code>, but that's not really recommended.
+- Pipx is probably not a good idea either, ref:
+<a href="https://github.com/python-poetry/poetry/issues/677#issuecomment-443372910">https://github.com/python-poetry/poetry/issues/677#issuecomment-443372910</a>
+- Approaches using venv:
+<a href="https://news.ycombinator.com/item?id=20677114">https://news.ycombinator.com/item?id=20677114</a>
+<a href="https://stackoverflow.com/a/59335943/38281">https://stackoverflow.com/a/59335943/38281</a></p>
 <h3 id="items">Items</h3>
 <p>Screw cookiecutter and pyscaffold. Use this skeleton
 coc-settings
@@ -143,6 +196,12 @@ commands = coverage erase
 ```
 </code></pre>
 <h2 id="travis-ci">Travis-CI</h2>
+<h4 id="why-pip3">Why pip3 ?</h4>
+<p><a href="https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems">Ref</a></p>
+<pre><code>all three OSes agree about 'pip3'
+'python' points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
+'python3' is a 'command not found' error on Windows but 'py' works on Windows only
+</code></pre>
 <h4 id="why-stages">Why stages?</h4>
 <p>Jobs run in parallel. But some things should only run
 after others have succeeded (eg. "deploy")
@@ -195,12 +254,72 @@ Checkout <code>75ba468</code> for the previous ("secrets") version.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L187" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L255" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 # Dev guide
 
-## Want tests to run on any level (pytest, tox, travis)
+
+Why use `make publish` instead of just `poetry publish`?
+As opposed to `poetry publish`, this accomplishes
+
+- Builds docs.
+- Bumps version with `poetry`, and tags `git` with the result,
+  thus synchronizing these versions
+  (note that `__init__.py` gets its `__version__` independently).
+  `Travis` then gets triggered, and since the commit includes a tag,
+  it will deploy to `PyPI.` Of course, Travis is slow,
+  but it means that only successfully tested builds are published.
+
+## Want tests to run on any level (`pytest`, `tox`, `travis`)
+Note that Travis ain&#39;t really a level above tox
+(although it&#39;s true that with travis you can even test on different
+OS and platform versions), as explained under `Why not tox?`.
+
+## Why a makefile (when you already use `poetry/pyproject.toml`) ?
+Poetry not only deals with dependency resolution.
+It also handles packaging/distribution. But, only for PyPI (`pip`).
+
+So how are &#34;applications&#34; (vs &#34;libraries&#34;) to be packaged?
+Using pipx? Distributing as .deb package? What about MacOS? etc.
+[Ref](https://docs.python-guide.org/shipping/freezing/#freezing-your-code-ref)
+Remember, they need to create an isolated python environment,
+and download (or vendorize) dependencies.
+
+Similarly, how should it be installed from source (github),
+for the purpose of development?
+One alternative is to state that poetry is prerequisite.
+Another way is to provide this makefile, since (GNU) make
+is pretty (awful, but) universal. This makefile takes care of
+the poetry installation, together with the venv activation,
+package and pre-commit installation (with poetry).
+
+The makefile is also useful as a task runner (invoker),
+avoiding the necessity for multiple small scripts
+for testing, cleaning, linting.
+Some of the tasks are simple enough that it might be better
+just to read the recipe and do them yourself.
+Indeed this makefile hardly takes advantage of the main pros
+of `make` (DAG of dependencies combined with mtime;
+support for incremental and parallel builds).
+Nevertheless, the makefile still serves as a reminder of
+which tasks &#34;exist&#34;, as shown by running `make` without arguments.
+Note that task execution could
+[maybe](https://github.com/python-poetry/poetry-core/pull/40)
+be handled by poetry in the future.
+
+#### Is the makefile using the best way to get poetry?
+It&#39;s using the &#34;official&#34; way. Whether it&#39;s the best,
+for our purposes, I don&#39;t know. Other alternatives:
+- See also a more secure and detailed version at
+  https://github.com/wrike/callisto/blob/master/Makefile
+- Could also use `pip install poetry`, but that&#39;s not really recommended.
+- Pipx is probably not a good idea either, ref:
+  https://github.com/python-poetry/poetry/issues/677#issuecomment-443372910
+- Approaches using venv:
+  https://news.ycombinator.com/item?id=20677114
+  https://stackoverflow.com/a/59335943/38281
+
 
 ### Items
 Screw cookiecutter and pyscaffold. Use this skeleton
@@ -331,6 +450,14 @@ which is a bit uglier, requiring that you set
     ```
 
 ## Travis-CI
+
+#### Why pip3 ?
+[Ref](https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems)
+
+    all three OSes agree about &#39;pip3&#39;
+    &#39;python&#39; points to Python 2.7 on macOS but points to Python 3.8 on Linux and Windows
+    &#39;python3&#39; is a &#39;command not found&#39; error on Windows but &#39;py&#39; works on Windows only
+
 #### Why stages?
 Jobs run in parallel. But some things should only run
 after others have succeeded (eg. &#34;deploy&#34;)
@@ -405,13 +532,16 @@ data-gaCategoryParameter="dev_guide">
 <div class="toc">
 <ul>
 <li><a href="#dev-guide">Dev guide</a><ul>
-<li><a href="#want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (pytest, tox, travis)</a><ul>
+<li><a href="#want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (pytest, tox, travis)</a></li>
+<li><a href="#why-a-makefile-when-you-already-use-poetrypyprojecttoml">Why a makefile (when you already use poetry/pyproject.toml) ?</a><ul>
+<li><a href="#is-the-makefile-using-the-best-way-to-get-poetry">Is the makefile using the best way to get poetry?</a></li>
 <li><a href="#items">Items</a></li>
 </ul>
 </li>
 <li><a href="#toxpoetry">Tox/poetry</a></li>
 <li><a href="#toxcoverage">Tox/Coverage</a></li>
 <li><a href="#travis-ci">Travis-CI</a><ul>
+<li><a href="#why-pip3">Why pip3 ?</a></li>
 <li><a href="#why-stages">Why stages?</a></li>
 <li><a href="#can-the-deploy-stage-be-moved-outside-of-jobsinclude">Can the deploy stage be moved outside of jobs.include</a></li>
 <li><a href="#why-not-makefile">Why not makefile?</a></li>
