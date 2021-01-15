@@ -34,15 +34,26 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <h1 id="dev-guide">Dev guide</h1>
 <h2 id="want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (pytest, tox, travis)</h2>
 <h3 id="items">Items</h3>
-<p>Screw cookiecutter and pyscaffold
+<p>Screw cookiecutter and pyscaffold. Use this skeleton
 coc-settings
-Poetry/pyproject
-Linting
-- Editor: useful
-- Precommit: useful. Maybe not markdownlint though?
-- Travis: for PRs
-- As part of pytest - maybe for heavier (eg pylint) linting.
-- As part of tox - nah. This is one overlap too many</p>
+Poetry/pyproject</p>
+<p>Linting</p>
+<ul>
+<li>Editor: useful</li>
+<li>Precommit: useful. Maybe not markdownlint though?</li>
+<li>Travis: for PRs</li>
+<li>As part of pytest - maybe for heavier (eg pylint) linting.</li>
+<li>As part of tox - nah. This is one overlap too many</li>
+</ul>
+<p>Why doesn't makefile use <code>pre-commit</code>
+(e.g. <code>@$(POETRY) run pre-commit flakehell -a</code>) for linting?
+Vice-versa, why does travis use pre-commit for linting?
+Pre-commit's flakehell plugin deps are manually kept in sync
+(pre-commit will likely never support pyproject.toml)
+with pyproject.toml. So they might get out-of-sync,
+which is a slight disadvantage.
+Other than that, there's not really any good reason.
+I just had to chose something.</p>
 <p>Flakehell
 Unlike flake8, flakehell
 - may be configured in pyproject.toml
@@ -132,28 +143,59 @@ commands = coverage erase
 ```
 </code></pre>
 <h2 id="travis-ci">Travis-CI</h2>
-<h4 id="why-stages">Why stages</h4>
+<h4 id="why-stages">Why stages?</h4>
 <p>Jobs run in parallel. But some things should only run
-after others have succeeded (eg. "deploy") =&gt; Stages
-Here we specify their order.
-<a href="https://docs.travis-ci.com/user/build-stages/#what-are-build-stages">https://docs.travis-ci.com/user/build-stages/#what-are-build-stages</a></p>
-<h4 id="why-not-use-the-makefile-also-on-travis">Why not use the makefile also on travis?</h4>
+after others have succeeded (eg. "deploy")
+=&gt; <a href="https://docs.travis-ci.com/user/build-stages/#what-are-build-stages">Stages</a>
+The top-level <code>stages</code> key just serves to specify their order.</p>
+<h4 id="can-the-deploy-stage-be-moved-outside-of-jobsinclude">Can the deploy stage be moved outside of <code>jobs.include</code></h4>
+<p>Yes, it can be moved to the top level, as seen in many travis doc examples.
+You can then remove the <code>stage</code> and the <code>script</code> keys.
+You might need some checks (something similar to
+<code>condition: $TRAVIS_BUILD_STAGE_NAME = Deploy</code>) to ensure
+it won't deploy for each job.</p>
+<h4 id="why-not-makefile">Why not makefile?</h4>
 <p>It would probably be possible to replace some of the instructions
 in <code>.travis.yml</code> with <code>make blah</code>,
 but there are also quite a few differences,
 so we don't bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.</p>
-<h4 id="why-not-poetry-publish">Why not <code>poetry publish</code>?</h4>
+<h4 id="why-not-tox">Why not tox?</h4>
+<p>Checkout <code>3a7750</code> for a working Travis/Tox version.
+AFAICT, the primary benefit of running tox on travis
+(including the use of the <code>tox-travis</code> package to
+only use the python version currently configured by Travis)
+is that it reads your <code>tox</code> configuration. This
+<a href="https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677">example</a>
+seems case-in-point.
+However, I have configured pytest in <code>[tool.pytest.ini_options]</code>,
+i.e. outside of <code>[tool.tox]</code>
+So I might as well just run <code>pytest</code> directly.</p>
+<h4 id="why-not-poetry-publish-merely-poetry-build">Why not <code>poetry publish</code> (merely <code>poetry build</code>)?</h4>
 <p>Because then we can use
 <a href="https://docs.travis-ci.com/user/deployment/pypi/">Travis' encryption mechanism</a>
-to store the encrypted key in <code>.travis.yml</code>
-instead of relying on Github or Travis secrets,
-which requires manual configuration for each new project.</p>
+to store my encrypted pypi-global API token in <code>.travis.yml</code>
+instead of relying on Github or Travis secrets
+(which requires manual configuration for each new project).
+Now, the build log does complain
+<code>python: can't open file
+'/home/travis/build/patricknraanes/mpl-tools/setup.py':
+[Errno 2] No such file or directory</code>
+but nevertheless proceeds with the upload (built by poetry).
+Checkout <code>75ba468</code> for the previous ("secrets") version.</p>
+<h2 id="starting-a-new-project">Starting a new project</h2>
+<ul>
+<li>Copy this one</li>
+<li>Go through pyproject.toml and change it as needed</li>
+<li>grep mpl-tools and mpl_tools and change as appropriate</li>
+<li>Turn on Travis and Coveralls through their web interface</li>
+<li>make publish</li>
+</ul>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L142" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L187" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;
 # Dev guide
@@ -161,15 +203,27 @@ which requires manual configuration for each new project.</p>
 ## Want tests to run on any level (pytest, tox, travis)
 
 ### Items
-Screw cookiecutter and pyscaffold
+Screw cookiecutter and pyscaffold. Use this skeleton
 coc-settings
 Poetry/pyproject
+
 Linting
- - Editor: useful
- - Precommit: useful. Maybe not markdownlint though?
- - Travis: for PRs
- - As part of pytest - maybe for heavier (eg pylint) linting.
- - As part of tox - nah. This is one overlap too many
+
+- Editor: useful
+- Precommit: useful. Maybe not markdownlint though?
+- Travis: for PRs
+- As part of pytest - maybe for heavier (eg pylint) linting.
+- As part of tox - nah. This is one overlap too many
+
+Why doesn&#39;t makefile use `pre-commit`
+(e.g. `@$(POETRY) run pre-commit flakehell -a`) for linting?
+Vice-versa, why does travis use pre-commit for linting?
+Pre-commit&#39;s flakehell plugin deps are manually kept in sync
+(pre-commit will likely never support pyproject.toml)
+with pyproject.toml. So they might get out-of-sync,
+which is a slight disadvantage.
+Other than that, there&#39;s not really any good reason.
+I just had to chose something.
 
 Flakehell
 Unlike flake8, flakehell
@@ -277,13 +331,20 @@ which is a bit uglier, requiring that you set
     ```
 
 ## Travis-CI
-#### Why stages
+#### Why stages?
 Jobs run in parallel. But some things should only run
-after others have succeeded (eg. &#34;deploy&#34;) =&gt; Stages
-Here we specify their order.
-https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
+after others have succeeded (eg. &#34;deploy&#34;)
+=&gt; [Stages](https://docs.travis-ci.com/user/build-stages/#what-are-build-stages)
+The top-level `stages` key just serves to specify their order.
 
-#### Why not use the makefile also on travis?
+#### Can the deploy stage be moved outside of `jobs.include`
+Yes, it can be moved to the top level, as seen in many travis doc examples.
+You can then remove the `stage` and the `script` keys.
+You might need some checks (something similar to
+`condition: $TRAVIS_BUILD_STAGE_NAME = Deploy`) to ensure
+it won&#39;t deploy for each job.
+
+#### Why not makefile?
 It would probably be possible to replace some of the instructions
 in `.travis.yml` with `make blah`,
 but there are also quite a few differences,
@@ -291,12 +352,38 @@ so we don&#39;t bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.
 
-#### Why not `poetry publish`?
+#### Why not tox?
+Checkout `3a7750` for a working Travis/Tox version.
+AFAICT, the primary benefit of running tox on travis
+(including the use of the `tox-travis` package to
+only use the python version currently configured by Travis)
+is that it reads your `tox` configuration. This
+[example](https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677)
+seems case-in-point.
+However, I have configured pytest in `[tool.pytest.ini_options]`,
+i.e. outside of `[tool.tox]`
+So I might as well just run `pytest` directly.
+
+#### Why not `poetry publish` (merely `poetry build`)?
 Because then we can use
 [Travis&#39; encryption mechanism](https://docs.travis-ci.com/user/deployment/pypi/)
-to store the encrypted key in `.travis.yml`
-instead of relying on Github or Travis secrets,
-which requires manual configuration for each new project.
+to store my encrypted pypi-global API token in `.travis.yml`
+instead of relying on Github or Travis secrets
+(which requires manual configuration for each new project).
+Now, the build log does complain
+`python: can&#39;t open file
+&#39;/home/travis/build/patricknraanes/mpl-tools/setup.py&#39;:
+[Errno 2] No such file or directory`
+but nevertheless proceeds with the upload (built by poetry).
+Checkout `75ba468` for the previous (&#34;secrets&#34;) version.
+
+## Starting a new project
+
+- Copy this one
+- Go through pyproject.toml and change it as needed
+- grep mpl-tools and mpl_tools and change as appropriate
+- Turn on Travis and Coveralls through their web interface
+- make publish
 &#34;&#34;&#34;</code></pre>
 </details>
 </section>
@@ -325,11 +412,14 @@ data-gaCategoryParameter="dev_guide">
 <li><a href="#toxpoetry">Tox/poetry</a></li>
 <li><a href="#toxcoverage">Tox/Coverage</a></li>
 <li><a href="#travis-ci">Travis-CI</a><ul>
-<li><a href="#why-stages">Why stages</a></li>
-<li><a href="#why-not-use-the-makefile-also-on-travis">Why not use the makefile also on travis?</a></li>
-<li><a href="#why-not-poetry-publish">Why not poetry publish?</a></li>
+<li><a href="#why-stages">Why stages?</a></li>
+<li><a href="#can-the-deploy-stage-be-moved-outside-of-jobsinclude">Can the deploy stage be moved outside of jobs.include</a></li>
+<li><a href="#why-not-makefile">Why not makefile?</a></li>
+<li><a href="#why-not-tox">Why not tox?</a></li>
+<li><a href="#why-not-poetry-publish-merely-poetry-build">Why not poetry publish (merely poetry build)?</a></li>
 </ul>
 </li>
+<li><a href="#starting-a-new-project">Starting a new project</a></li>
 </ul>
 </li>
 </ul>
