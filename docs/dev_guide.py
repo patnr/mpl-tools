@@ -133,4 +133,11 @@ but there are also quite a few differences,
 so we don't bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.
+
+#### Why not `poetry publish`?
+Because then we can use
+[Travis' encryption mechanism](https://docs.travis-ci.com/user/deployment/pypi/)
+to store the encrypted key in `.travis.yml`
+instead of relying on Github or Travis secrets,
+which requires manual configuration for each new project.
 """

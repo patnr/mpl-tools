@@ -45,13 +45,13 @@ jobs:
     - stage: deploy
       script: skip
       before_deploy:
-        # Username set as env var through web interface of project on travis
-        - poetry config http-basic.pypi patricknraanes $PYPI_PASS
-        #- poetry config pypi-token.pypi $PYPI_PASSWORD
         - poetry build
       deploy:
-        provider: script
-        script: poetry publish
+        provider: pypi
+        username: __token__
+        password:
+          secure: qUubHfUoTsaNXp0eb7IdFvikQkyNzhxx3QAQQBgOnSDcYB8t8MWOb2OYnZ1ZCdhrBP2JkMaf+wPxSqroDyOCgrBxsB2CFvlWhyuqfvU/E5YK+hiCJPri+N8UBrM+8UFkuHWQCJn+8wcshtmNZx2gGLTlVMBFTuSCvrMY86XbfcGNq4b78mPFq9F0qTqs5vlUfxVGRYfskeYmo1ZjF1Su3E0q298DJ/aSagKV/t4OgTsCfAUOgPEtdX7/3haO4vuUwJ0xgZO6ijzYv7exRCoxIkQr5fwnfamudLgtFrcVZoIe5SxdrPNs5iKoxx0h4wjxxq7EHrBqtp1mBQpU4uu8mrYRb5atulgcUljksvj8zOz8D3MJIqFVx3RZGI1cxw3WLXi877mMm5UWQxjynrRz85nOpYkvJ7Sbg07XCW8/1imlQ0/fU3s0g8CDucDrSYcgZTyMvPCGmFHTSeL1QH52drYKgCjB5OYfuijYfZBuBs8Yh0WpRhyE0gTikBTUNI/7QzkK7mflSA5dl3YiGUCprWChb8/KP1RjWE6x9DPhAZVNcVr4M5FVAdOFt5SR6iQX8VOmV1/hrdVHe4py4yjhKBd4Pd9b51gp/j93MvDQeKiJ9D1r8AQb+Onwd3iukewr9+Rxix8PuTTVNdAxidStNwTnA9MAFn4v3DpeHzeHWvQ=
+        distributions: "sdist bdist_wheel"
         skip_cleanup: true
         on:
           #all_branches: false
