@@ -89,8 +89,10 @@ tox: ## Run tests in all supported python versions (using existing pyenv's)
 	@$(POETRY) run tox
 
 # Provide output also in case of no issues.
+# NB: Including sources means that you might forget others
+#     => Let them be discovered instead.
 lint: ## Run linter
-	@$(POETRY) run flakehell lint $(SRC) $(TESTS) && \
+	@$(POETRY) run flakehell lint && \
 	echo -e "Linter found no issues ✨ 🍰 ✨" || \
 	echo -e "❌ Issues detected. See above."
 
