@@ -4,15 +4,27 @@
 ## Want tests to run on any level (pytest, tox, travis)
 
 ### Items
-Screw cookiecutter and pyscaffold
+Screw cookiecutter and pyscaffold. Use this skeleton
 coc-settings
 Poetry/pyproject
+
 Linting
- - Editor: useful
- - Precommit: useful. Maybe not markdownlint though?
- - Travis: for PRs
- - As part of pytest - maybe for heavier (eg pylint) linting.
- - As part of tox - nah. This is one overlap too many
+
+- Editor: useful
+- Precommit: useful. Maybe not markdownlint though?
+- Travis: for PRs
+- As part of pytest - maybe for heavier (eg pylint) linting.
+- As part of tox - nah. This is one overlap too many
+
+Why doesn't makefile use `pre-commit`
+(e.g. `@$(POETRY) run pre-commit flakehell -a`) for linting?
+Vice-versa, why does travis use pre-commit for linting?
+Pre-commit's flakehell plugin deps are manually kept in sync
+(pre-commit will likely never support pyproject.toml)
+with pyproject.toml. So they might get out-of-sync,
+which is a slight disadvantage.
+Other than that, there's not really any good reason.
+I just had to chose something.
 
 Flakehell
 Unlike flake8, flakehell
@@ -126,14 +138,32 @@ after others have succeeded (eg. "deploy")
 => [Stages](https://docs.travis-ci.com/user/build-stages/#what-are-build-stages)
 The top-level `stages` key just serves to specify their order.
 
+#### Can the deploy stage be moved outside of `jobs.include`
+Yes, it can be moved to the top level, as seen in many travis doc examples.
+You can then remove the `stage` and the `script` keys.
+You might need some checks (something similar to
+`condition: $TRAVIS_BUILD_STAGE_NAME = Deploy`) to ensure
+it won't deploy for each job.
 
-#### Why not use the makefile also on travis?
+#### Why not makefile?
 It would probably be possible to replace some of the instructions
 in `.travis.yml` with `make blah`,
 but there are also quite a few differences,
 so we don't bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.
+
+#### Why not tox?
+Checkout `3a7750` for a working Travis/Tox version.
+AFAICT, the primary benefit of running tox on travis
+(including the use of the `tox-travis` package to
+only use the python version currently configured by Travis)
+is that it reads your `tox` configuration. This
+[example](https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677)
+seems case-in-point.
+However, I have configured pytest in `[tool.pytest.ini_options]`,
+i.e. outside of `[tool.tox]`
+So I might as well just run `pytest` directly.
 
 #### Why not `poetry publish` (merely `poetry build`)?
 Because then we can use
@@ -146,14 +176,7 @@ Now, the build log does complain
 '/home/travis/build/patricknraanes/mpl-tools/setup.py':
 [Errno 2] No such file or directory`
 but nevertheless proceeds with the upload (built by poetry).
-Checkout 75ba468 for the previous ("secrets") version.
-
-#### Can the deploy stage be moved outside of `jobs.include`
-Yes, it can be moved to the top level, as seen in many travis doc examples.
-You can then remove the `stage` and the `script` keys.
-You might need some checks (something similar to
-`condition: $TRAVIS_BUILD_STAGE_NAME = Deploy`) to ensure
-it won't deploy for each job.
+Checkout `75ba468` for the previous ("secrets") version.
 
 ## Starting a new project
 
