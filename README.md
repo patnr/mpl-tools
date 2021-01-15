@@ -26,18 +26,13 @@ pip install mpl-tools
 
 #### For development
 
-##### Linux
+**Linux**:
+`git clone <this repo> ; make help; make install`
 
-```sh
-git clone <this repo>
-make
-```
-
-##### Windows (or Linux)
-
-- Install [poetry](https://python-poetry.org/docs/#installation)
-- Download and extract this git repository
-- Run `poetry install` in your shell (terminal)
+**Windows (or Linux)**:
+Install [poetry](https://python-poetry.org/docs/#installation).
+Download & extract this git repo.
+Run `poetry install` in your shell/terminal.
 
 <!-- markdownlint-configure-file
 {
