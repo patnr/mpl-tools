@@ -120,11 +120,12 @@ which is a bit uglier, requiring that you set
     ```
 
 ## Travis-CI
-#### Why stages
+#### Why stages?
 Jobs run in parallel. But some things should only run
-after others have succeeded (eg. "deploy") => Stages
-Here we specify their order.
-https://docs.travis-ci.com/user/build-stages/#what-are-build-stages
+after others have succeeded (eg. "deploy")
+=> [Stages](https://docs.travis-ci.com/user/build-stages/#what-are-build-stages)
+The top-level `stages` key just serves to specify their order.
+
 
 #### Why not use the makefile also on travis?
 It would probably be possible to replace some of the instructions
@@ -134,10 +135,31 @@ so we don't bother to try with that.
 Also, the makefile is supposed to be for linux only,
 while Travis can test other platforms.
 
-#### Why not `poetry publish`?
+#### Why not `poetry publish` (merely `poetry build`)?
 Because then we can use
 [Travis' encryption mechanism](https://docs.travis-ci.com/user/deployment/pypi/)
-to store the encrypted key in `.travis.yml`
-instead of relying on Github or Travis secrets,
-which requires manual configuration for each new project.
+to store my encrypted pypi-global API token in `.travis.yml`
+instead of relying on Github or Travis secrets
+(which requires manual configuration for each new project).
+Now, the build log does complain
+`python: can't open file
+'/home/travis/build/patricknraanes/mpl-tools/setup.py':
+[Errno 2] No such file or directory`
+but nevertheless proceeds with the upload (built by poetry).
+Checkout 75ba468 for the previous ("secrets") version.
+
+#### Can the deploy stage be moved outside of `jobs.include`
+Yes, it can be moved to the top level, as seen in many travis doc examples.
+You can then remove the `stage` and the `script` keys.
+You might need some checks (something similar to
+`condition: $TRAVIS_BUILD_STAGE_NAME = Deploy`) to ensure
+it won't deploy for each job.
+
+## Starting a new project
+
+- Copy this one
+- Go through pyproject.toml and change it as needed
+- grep mpl-tools and mpl_tools and change as appropriate
+- Turn on Travis and Coveralls through their web interface
+- make publish
 """

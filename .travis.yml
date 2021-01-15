@@ -2,24 +2,22 @@
 # More elaborate (but is there a point to that?) tox/travis:
 # https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
 
-# Build matrix. Its "expansion" (outer prod) defines the default stage
+# Build matrix. Its "expansion" (outer prod) defines the default/test stage
 language: python
 dist: xenial
 python:
   - 3.9
   - 3.8
-  - 3.7 # `poetry install` sometimes fails on 3.7
-before_install:
+  - 3.7 # sometimes troublesome with `poetry install`
+before_install: # Useful for all jobs. Also see {before,after}_script
   # Get poetry
   - python --version
   - pip install -U pip
   - pip install poetry
   - travis_retry poetry install
-  - pip install tox-travis # only use current/travis python!
+  - pip install tox-travis # only use current/travis python
 install: skip # overwrite default (looks for requirements file)
-before_script: skip
 script: tox -- -rsx
-after_script: skip
 
 stages:
   - lint
@@ -54,11 +52,7 @@ jobs:
         distributions: "sdist bdist_wheel"
         skip_cleanup: true
         on:
-          #all_branches: false
-          #condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
-          repo: patricknraanes/mpl-tools
           tags: true
-      #if: tag IS present
 
 # Dont cache .tox, ref: https://github.com/sclorg/rpm-list-builder/issues/28
 cache:
