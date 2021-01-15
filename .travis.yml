@@ -1,7 +1,5 @@
+# See dev_guide.py for more documentation.
 # Inspired by https://github.com/python-poetry/poetry/issues/366
-
-# MacOS/Python another way:
-# https://docs.travis-ci.com/user/multi-os/#python-example-unsupported-languages
 
 # Build matrix. Its "expansion" (outer prod) defines the default/test stage
 language: python
@@ -28,7 +26,7 @@ stages:
 
 # Explicitly included (i.e. particular) jobs (1 per dash).
 # If the stage of a job is not def'd, the above stage is used,
-# the default being the "test" stage. The 1st value of a
+# the default being the "test" stage. **(Only) the 1st value** of a
 # matrix dimension (e.g. "python") is used, unless overwritten.
 jobs:
   include:
