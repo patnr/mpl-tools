@@ -1,6 +1,4 @@
 # Inspired by https://github.com/python-poetry/poetry/issues/366
-# More elaborate (but is there a point to that?) tox/travis:
-# https://github.com/python-poetry/poetry/issues/366#issuecomment-634666677
 
 # Build matrix. Its "expansion" (outer prod) defines the default/test stage
 language: python
@@ -15,9 +13,8 @@ before_install: # Useful for all jobs. Also see {before,after}_script
   - pip install -U pip
   - pip install poetry
   - travis_retry poetry install
-  - pip install tox-travis # only use current/travis python
 install: skip # overwrite default (looks for requirements file)
-script: tox -- -rsx
+script: poetry run pytest
 
 stages:
   - lint
@@ -34,10 +31,8 @@ jobs:
     - stage: lint
       script: poetry run pre-commit run -a
 
-    # Needed coz (ref dev_guide.py), coverage via tox tests will yield 0%.
     - stage: coverage
       install: pip install coveralls
-      script: poetry run pytest
       after_success: coveralls || echo "failed"
 
     - stage: deploy
@@ -54,7 +49,6 @@ jobs:
         on:
           tags: true
 
-# Dont cache .tox, ref: https://github.com/sclorg/rpm-list-builder/issues/28
 cache:
   pip: true
   directories:
