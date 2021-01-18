@@ -55,7 +55,6 @@ def comparison(fun):
 
 def gen_plot(fig=None):
     """Generate base plot."""
-
     # Cleanup from previous tests. Don't know why this isn't in image_comparison.
     # Clearly, cleanup is part of the code in mpl/testing/decorators.py
     plt.close("all")
