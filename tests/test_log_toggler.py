@@ -41,7 +41,7 @@ class SuppressWarn(object):
 
 
 def comparison(fun):
-    """Convenience wrapper to `image_comparison` which automates naming."""
+    """Wrap `image_comparison` to make naming conveniently automatic."""
     name = fun.__name__.split("test_")[1]
 
     wrapper = image_comparison(baseline_images=[name],
@@ -75,17 +75,20 @@ def gen_plot(fig=None):
 
 @comparison
 def test_1():
+    """Initial test."""
     fig, ax = gen_plot()
 
 
 @comparison
 def test_2():
+    """Test with toggler added."""
     fig, ax = gen_plot()
     add_log_toggler(ax)
 
 
 @comparison
 def test_3():
+    """Test with log-scale."""
     fig, ax = gen_plot()
     add_log_toggler(ax)
     toggle_scale(ax)
@@ -93,6 +96,7 @@ def test_3():
 
 @comparison
 def test_4():
+    """Test with log-scale removed."""
     fig, ax = gen_plot()
     add_log_toggler(ax)
     toggle_scale(ax)
