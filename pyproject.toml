@@ -23,7 +23,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.7"
 matplotlib = ">=3.0"
-importlib-metadata = {version = "^1.0", python = "<3.8"} # for <3.8 only
+importlib-metadata = {version = "^1.0", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 patlib = ">=0.2.3" # Provides ipython, debuggers, etc
@@ -43,7 +43,8 @@ pre-commit = "*"
 
 # Lint
 flakehell = "*"
-# NB: these should also be put into .pre-commit-config.yaml
+# NB: plugins must also be ENABLED in [tool.flakehell.plugins]
+# NB: plugins should also be listed in .pre-commit-config.yaml
 flake8-docstrings = "*"
 flake8-bugbear = "*"
 flake8-comprehensions = "*"
@@ -80,7 +81,7 @@ norecursedirs = """.* build dist CVS _darcs {arch} *.egg venv \
 tmp*""" # add tmp to the above (defaults)
 
 [tool.coverage.run]
-branch = true # more rigour => lowers the coverage percentage
+branch = true # stricter
 source = ["mpl_tools"]
 #omit = ["bad_file.py"]
 
