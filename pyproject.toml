@@ -49,6 +49,7 @@ pytest-sugar = "*"
 flakehell = "*"
 # NB: plugins must also be ENABLED in [tool.flakehell.plugins]
 # NB: plugins should also be listed in .pre-commit-config.yaml
+flake8-commas = "*"
 flake8-docstrings = "*"
 flake8-bugbear = "*"
 flake8-comprehensions = "*"
@@ -127,6 +128,7 @@ flake8-bugbear = ["+*"]
 flake8-builtins = ["+*"]
 flake8-comprehensions = ["+*", "-C408"]
 #flake8-darglint = ["+*"]
+flake8-commas = ["+*"]
 flake8-docstrings = ["+*"]
 #flake8-eradicate = ["+*"]
 #flake8-isort = ["+*"]
