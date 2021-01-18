@@ -106,7 +106,7 @@ which is a slight disadvantage.
 Other than that, there's not really any good reason.
 I just had to chose something.
 
-Flakehell
+### Flakehell
 Unlike flake8, flakehell
 - may be configured in pyproject.toml
 - has prettier formatting
@@ -131,6 +131,10 @@ NB: remember to comment-out the corresponding lines above
     # pyflakes = ["-*"]           # disable a plugin
     # [tool.flakehell.exceptions."tests/test_example.py"]
     # pyflakes = ["+*"]           # enable a plugin
+
+### Travis fails on linting, while locally nothing seems wrong.
+This is likely due to a problem with flakehell's caching.
+Do `mm ~/.cache/flakehell`
 
 Installation and tasks with Makefile
 
