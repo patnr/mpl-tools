@@ -1,5 +1,27 @@
 """Developer guide.
 
+## Why is patlib not in develop mode?
+Because even though I made it an "extras",
+it appears to still be registered in the lockfile.
+Anyways, when doing `poetry install` on Travis,
+it cannot find this local path (of course), and the installation fails.
+
+I tried adding it in the poetry environment
+(without adding it to `pyproject.toml` or `poetry.lock`)
+by doing `poetry run pip install -e ../patlib`
+but that fails due to issues in this lengthy thread:
+https://github.com/python-poetry/poetry/issues/34
+I could still hack my way around it, with inspiration from that thread,
+beacuse `pip install` will install the dependencies before failing,
+and path to patlib can be provided by inserting a `.pth` file
+in the site-packages of the poetry venv.
+But that's just too dirty.
+
+Still, I don't want to copy-paste all the dependencies from patlib,
+so I include patlib in the project dependencies.
+TODO: Make a pre-commit hook to remove patlib?
+
+
 ## Why use `make publish` instead of just `poetry publish`?
 As opposed to `poetry publish`, this accomplishes
 
@@ -254,11 +276,15 @@ but nevertheless proceeds with the upload (built by poetry).
 Checkout `75ba468` for the previous ("secrets") version.
 
 ## Starting a new project
+Start by copying over `pyproject.toml`, and making appropriate changes.
+This should be enough to get you going.
+It's better to copy over the rest of the files if you need them,
+rather than eliminating them later.
+Use grep to search for `mpl-tools` and `mpl_tools`
 
-- Copy this one
-- Go through pyproject.toml and change it as needed
-- Rm this dev_guide.py, and (all of) the html files
-- `grep` `mpl-tools`, `mpl_tools`, `patricknraanes,` and change as appropriate
-- Turn on Travis and Coveralls through their web interface
-- `make publish`
+You might choose not to copy over the makefile,
+as its use is mainly for developers,
+and developers should be able to get poetry on their own.
+
+Turn on Travis and Coveralls through their web interface
 """
