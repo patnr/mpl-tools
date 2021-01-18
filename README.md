@@ -26,16 +26,19 @@ pip install mpl-tools
 
 #### For development
 
-**Linux**:
-`git clone <this repo> ; make help; make install`
+**On Linux**:
+`git clone <this repo> ; make install`
 
-**Windows (or Linux)**:
+**On Windows (or Linux)**:
+Download & extract this repo.
 Install [poetry](https://python-poetry.org/docs/#installation).
-Download & extract this git repo.
-Run `poetry install` in your shell/terminal.
+Run `poetry install`.
 
-**Note**: To add packages, you should not use `pip install`,
-but poetry, e.g. `poetry add --dev somepackage`.
+**Note**: The above will install *poetry*,
+which then installs the source and its dependencies
+into an isolated *virtual environment*.
+To add packages, you should *not* use `pip install`,
+but *poetry*, e.g. `poetry add --dev somepackage`.
 
 <!-- markdownlint-configure-file
 {
