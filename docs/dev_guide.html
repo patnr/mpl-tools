@@ -32,6 +32,24 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 </header>
 <section id="section-intro">
 <p>Developer guide.</p>
+<h2 id="why-is-patlib-not-in-develop-mode">Why is patlib not in develop mode?</h2>
+<p>Because even though I made it an "extras",
+it appears to still be registered in the lockfile.
+Anyways, when doing <code>poetry install</code> on Travis,
+it cannot find this local path (of course), and the installation fails.</p>
+<p>I tried adding it in the poetry environment
+(without adding it to <code>pyproject.toml</code> or <code>poetry.lock</code>)
+by doing <code>poetry run pip install -e ../patlib</code>
+but that fails due to issues in this lengthy thread:
+<a href="https://github.com/python-poetry/poetry/issues/34">https://github.com/python-poetry/poetry/issues/34</a>
+I could still hack my way around it, with inspiration from that thread,
+beacuse <code>pip install</code> will install the dependencies before failing,
+and path to patlib can be provided by inserting a <code>.pth</code> file
+in the site-packages of the poetry venv.
+But that's just too dirty.</p>
+<p>Still, I don't want to copy-paste all the dependencies from patlib,
+so I include patlib in the project dependencies.
+TODO: Make a pre-commit hook to remove patlib?</p>
 <h2 id="why-use-make-publish-instead-of-just-poetry-publish">Why use <code>make publish</code> instead of just <code>poetry publish</code>?</h2>
 <p>As opposed to <code>poetry publish</code>, this accomplishes</p>
 <ul>
@@ -253,20 +271,43 @@ Now, the build log does complain
 but nevertheless proceeds with the upload (built by poetry).
 Checkout <code>75ba468</code> for the previous ("secrets") version.</p>
 <h2 id="starting-a-new-project">Starting a new project</h2>
-<ul>
-<li>Copy this one</li>
-<li>Go through pyproject.toml and change it as needed</li>
-<li>Rm this dev_guide.py, and (all of) the html files</li>
-<li><code>grep</code> <code>mpl-tools</code>, <code><a title="mpl_tools" href="mpl_tools/index.html">mpl_tools</a></code>, <code>patricknraanes,</code> and change as appropriate</li>
-<li>Turn on Travis and Coveralls through their web interface</li>
-<li><code>make publish</code></li>
-</ul>
+<p>Start by copying over <code>pyproject.toml</code>, and making appropriate changes.
+This should be enough to get you going.
+It's better to copy over the rest of the files if you need them,
+rather than eliminating them later.
+Use grep to search for <code>mpl-tools</code> and <code><a title="mpl_tools" href="mpl_tools/index.html">mpl_tools</a></code></p>
+<p>You might choose not to copy over the makefile,
+as its use is mainly for developers,
+and developers should be able to get poetry on their own.</p>
+<p>Turn on Travis and Coveralls through their web interface</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L263" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L289" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Developer guide.
+
+## Why is patlib not in develop mode?
+Because even though I made it an &#34;extras&#34;,
+it appears to still be registered in the lockfile.
+Anyways, when doing `poetry install` on Travis,
+it cannot find this local path (of course), and the installation fails.
+
+I tried adding it in the poetry environment
+(without adding it to `pyproject.toml` or `poetry.lock`)
+by doing `poetry run pip install -e ../patlib`
+but that fails due to issues in this lengthy thread:
+https://github.com/python-poetry/poetry/issues/34
+I could still hack my way around it, with inspiration from that thread,
+beacuse `pip install` will install the dependencies before failing,
+and path to patlib can be provided by inserting a `.pth` file
+in the site-packages of the poetry venv.
+But that&#39;s just too dirty.
+
+Still, I don&#39;t want to copy-paste all the dependencies from patlib,
+so I include patlib in the project dependencies.
+TODO: Make a pre-commit hook to remove patlib?
+
 
 ## Why use `make publish` instead of just `poetry publish`?
 As opposed to `poetry publish`, this accomplishes
@@ -522,13 +563,17 @@ but nevertheless proceeds with the upload (built by poetry).
 Checkout `75ba468` for the previous (&#34;secrets&#34;) version.
 
 ## Starting a new project
+Start by copying over `pyproject.toml`, and making appropriate changes.
+This should be enough to get you going.
+It&#39;s better to copy over the rest of the files if you need them,
+rather than eliminating them later.
+Use grep to search for `mpl-tools` and `mpl_tools`
 
-- Copy this one
-- Go through pyproject.toml and change it as needed
-- Rm this dev_guide.py, and (all of) the html files
-- `grep` `mpl-tools`, `mpl_tools`, `patricknraanes,` and change as appropriate
-- Turn on Travis and Coveralls through their web interface
-- `make publish`
+You might choose not to copy over the makefile,
+as its use is mainly for developers,
+and developers should be able to get poetry on their own.
+
+Turn on Travis and Coveralls through their web interface
 &#34;&#34;&#34;</code></pre>
 </details>
 </section>
@@ -549,6 +594,7 @@ data-gaCategoryParameter="dev_guide">
 <h1>Index</h1>
 <div class="toc">
 <ul>
+<li><a href="#why-is-patlib-not-in-develop-mode">Why is patlib not in develop mode?</a></li>
 <li><a href="#why-use-make-publish-instead-of-just-poetry-publish">Why use make publish instead of just poetry publish?</a></li>
 <li><a href="#want-tests-to-run-on-any-level-pytest-tox-travis">Want tests to run on any level (pytest, tox, travis)</a></li>
 <li><a href="#why-a-makefile-when-you-already-use-poetrypyprojecttoml">Why a makefile (when you already use poetry/pyproject.toml) ?</a><ul>
