@@ -51,13 +51,13 @@ __all__ = [
     &#34;get_legend_bbox&#34;,
     &#34;is_notebook_or_qt&#34;, &#34;axprops&#34;, &#34;fig_colorbar&#34;]
 
-thousands = mpl.ticker.StrMethodFormatter(&#39;{x:,.7g}&#39;)
+thousands = mpl.ticker.StrMethodFormatter(&#39;{x:,.7g}&#39;)  # type: ignore
 
 _FIG_GEOMETRIES_PATH = &#34;./.fig_geometries&#34;
 
 try:
-    __IPYTHON__
-    from IPython import get_ipython
+    __IPYTHON__  # type: ignore
+    from IPython import get_ipython  # type: ignore
     is_notebook_or_qt = &#39;zmq&#39; in str(type(get_ipython())).lower()
 except (NameError, ImportError):
     is_notebook_or_qt = False

@@ -125,8 +125,8 @@ with pyproject.toml. So they might get out-of-sync,
 which is a slight disadvantage.
 Other than that, there's not really any good reason.
 I just had to chose something.</p>
-<p>Flakehell
-Unlike flake8, flakehell
+<h3 id="flakehell">Flakehell</h3>
+<p>Unlike flake8, flakehell
 - may be configured in pyproject.toml
 - has prettier formatting
 - does not use installed plugins that are not listed below
@@ -149,6 +149,9 @@ flake8-bandit = ["-*", "+S1??"] # enable only codes from S100 to S199
 # [tool.flakehell.exceptions."tests/test_example.py"]
 # pyflakes = ["+*"]           # enable a plugin
 </code></pre>
+<h3 id="travis-fails-on-linting-while-locally-nothing-seems-wrong">Travis fails on linting, while locally nothing seems wrong.</h3>
+<p>This is likely due to a problem with flakehell's caching.
+Do <code>mm ~/.cache/flakehell</code></p>
 <p>Installation and tasks with Makefile</p>
 <p>Pytest
 - Using mpl image comparison</p>
@@ -283,7 +286,7 @@ and developers should be able to get poetry on their own.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L289" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/docs/dev_guide.py#L0-L293" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Developer guide.
 
@@ -393,7 +396,7 @@ which is a slight disadvantage.
 Other than that, there&#39;s not really any good reason.
 I just had to chose something.
 
-Flakehell
+### Flakehell
 Unlike flake8, flakehell
 - may be configured in pyproject.toml
 - has prettier formatting
@@ -418,6 +421,10 @@ NB: remember to comment-out the corresponding lines above
     # pyflakes = [&#34;-*&#34;]           # disable a plugin
     # [tool.flakehell.exceptions.&#34;tests/test_example.py&#34;]
     # pyflakes = [&#34;+*&#34;]           # enable a plugin
+
+### Travis fails on linting, while locally nothing seems wrong.
+This is likely due to a problem with flakehell&#39;s caching.
+Do `mm ~/.cache/flakehell`
 
 Installation and tasks with Makefile
 
@@ -600,6 +607,8 @@ data-gaCategoryParameter="dev_guide">
 <li><a href="#why-a-makefile-when-you-already-use-poetrypyprojecttoml">Why a makefile (when you already use poetry/pyproject.toml) ?</a><ul>
 <li><a href="#is-the-makefile-using-the-best-way-to-get-poetry">Is the makefile using the best way to get poetry?</a></li>
 <li><a href="#items">Items</a></li>
+<li><a href="#flakehell">Flakehell</a></li>
+<li><a href="#travis-fails-on-linting-while-locally-nothing-seems-wrong">Travis fails on linting, while locally nothing seems wrong.</a></li>
 </ul>
 </li>
 <li><a href="#toxpoetry">Tox/poetry</a></li>
