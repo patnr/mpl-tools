@@ -2,15 +2,10 @@
 import json
 import os
 import platform
+from math import sqrt
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-
-__all__ = [
-    "thousands", "freshfig",
-    "get_fig_geo", "set_fig_geo", "fig_placement_save", "fig_placement_load",
-    "get_legend_bbox",
-    "is_notebook_or_qt", "axprops", "fig_colorbar"]
 
 thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')  # type: ignore
 
@@ -29,7 +24,7 @@ def freshfig(num=None, figsize=None, *args, **kwargs):
 
     Similar to:
 
-    >>> fig, ax = suplots(*args,**kwargs)
+    >>> fig, ax = suplots(*args,**kwargs) # doctest: +SKIP
 
     With the modification that:
 
@@ -163,9 +158,9 @@ def axprops(dct):
     """Filter `dct` for properties associated with a plot axes.
 
     Example:
-    >>> def myplotter(ax, x, y, **COMMON)
-    >>>     ax.set(**axprops(COMMON))
-    >>>     ax.plot(x, y, COMMON)
+    >>> def myplotter(ax, x, y, **COMMON) # doctest: +SKIP
+    ...     ax.set(**axprops(COMMON))
+    ...     ax.plot(x, y, COMMON)
     """
     # List of included axis properties
     props = ["title", "facecolor", "aspect"]
@@ -178,6 +173,50 @@ def axprops(dct):
     props = {p: dct.pop(p) for p in props if p in dct}
 
     return props
+
+
+def nRowCol(nTotal, figsize=None, axsize=None):
+    """Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
+
+    Takes into account the shapes of the figure and axes.
+    Default figsize and axsize is taken from `mpl.rcParams`.
+
+    Examples:
+    >>> nRowCol(4)
+    (2, 2)
+    >>> nRowCol(4, (4, 1), (1, 1))
+    (1, 4)
+    >>> nRowCol(4, (4, 1), (4, 1))
+    (2, 2)
+    >>> nRowCol(12, (4, 3), (1, 1))
+    (3, 4)
+    """
+    # Defaults
+    if figsize is None:
+        figsize = mpl.rcParams["figure.figsize"]
+
+    if axsize is None:
+        defaults = {k: mpl.rcParams["figure.subplot." + k]
+                    for k in ["bottom", "left", "right", "top"]}
+        axsize = (defaults["right"] - defaults["left"],
+                  defaults["top"] - defaults["bottom"])
+
+    # Compute ratios
+    w, h = figsize
+    fig_ratio = w / h
+    w, h = axsize
+    ax_ratio = w / h
+    ratio = fig_ratio / ax_ratio
+
+    # Main logic
+    nrows = round(sqrt(nTotal / ratio))
+    ncols = nTotal // nrows
+
+    # ncols always rounds down, so we might have to increase it.
+    if nrows * ncols < nTotal:
+        ncols += 1
+
+    return nrows, ncols
 
 
 def fig_colorbar(fig, collections, *args, **kwargs):
