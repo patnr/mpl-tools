@@ -209,10 +209,9 @@ def nRowCol(nTotal, figsize=None, axsize=None):
     ratio = fig_ratio / ax_ratio
 
     # Main logic
-    nrows = round(sqrt(nTotal / ratio))
+    nrows = round(sqrt(nTotal / ratio)) or 1
     ncols = nTotal // nrows
-
-    # ncols always rounds down, so we might have to increase it.
+    # ncols rounds down, so we might have to increase it.
     if nrows * ncols < nTotal:
         ncols += 1
 
