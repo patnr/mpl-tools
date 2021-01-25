@@ -196,10 +196,10 @@ def nRowCol(nTotal, figsize=None, axsize=None):
         figsize = mpl.rcParams["figure.figsize"]
 
     if axsize is None:
-        defaults = {k: mpl.rcParams["figure.subplot." + k]
-                    for k in ["bottom", "left", "right", "top"]}
-        axsize = (defaults["right"] - defaults["left"],
-                  defaults["top"] - defaults["bottom"])
+        rc = {k: mpl.rcParams["figure.subplot." + k]
+              for k in ["bottom", "left", "right", "top"]}
+        axsize = (rc["right"] - rc["left"],
+                  rc["top"] - rc["bottom"])
 
     # Compute ratios
     w, h = figsize
