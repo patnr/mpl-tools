@@ -110,14 +110,19 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
         file.write(json.dumps(placements))
 
 
+_HAS_NOTIFIED = False
+
+
 def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
     """Load/set figure layout."""
     if append_host:
         path = ".".join([path, platform.node()])
 
+    global _HAS_NOTIFIED
     if not Path(path).is_file():
-        print("Warning: no figure layout found.",
-              "Create a new one if you wish using save().")
+        if not _HAS_NOTIFIED:
+            print(f"Note: for persistent figure layout use {__name__}.save().")
+            _HAS_NOTIFIED = True
         return
 
     with open(path, "r") as file:
