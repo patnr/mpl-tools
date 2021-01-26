@@ -1,12 +1,12 @@
-"""Provide button to toggle log-scale on and off."""
+"""Toggle log-scale on and off. Provide button for it."""
+import warnings
+
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.widgets import CheckButtons  # Button
 
-from mpl_tools.ax_placement import anchor_axes
-from mpl_tools.misc import get_legend_bbox, thousands
-
-__all__ = ["add_log_toggler", "toggle_scale"]
+from mpl_tools.ax_placement import anchor_axes, get_legend_bbox
+from mpl_tools.misc import thousands
 
 
 def add_log_toggler(ax, pos="leg:S+W", ylim=None):
@@ -81,6 +81,8 @@ def toggle_scale(ax, ylim=None, formatter=thousands, _toggle_button=True):
 
 def _xFontsize(fontsize, fig, *args):
     """Multiply by fontsize, in pixels (rather than points)."""
-    plt.pause(.1)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        plt.pause(.1)
     fontsize = fig.canvas.renderer.points_to_pixels(fontsize)
     return tuple(a * fontsize for a in args)

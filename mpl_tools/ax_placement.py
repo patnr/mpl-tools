@@ -1,5 +1,6 @@
 """Tools for placing axes in a figure."""
 import matplotlib as mpl
+from matplotlib import pyplot as plt
 from matplotlib.artist import allow_rasterization
 
 # from mpl_tools.misc import *
@@ -54,9 +55,10 @@ def trans2fig(axis, rect, from_data=True):
 
     Inspired by: https://stackoverflow.com/a/17478227/38281.
 
-    Usage:
-    >>> rect = trans2fig(ax, [x,y,w,h])
-    >>> ax2 = ax.figure.add_axes(rect)
+    Example
+    -------
+    >>> rect = trans2fig(ax, [x,y,w,h]) # doctest: +SKIP
+    ... ax2 = ax.figure.add_axes(rect)
     """
     x, y, w, h = rect
 
@@ -97,3 +99,15 @@ def anchor_axes(ax, get_anchor, loc="NW+"):
         _draw(renderer)
     _draw = ax.draw
     ax.draw = draw.__get__(ax)
+
+
+def get_legend_bbox(ax):
+    """Get legend's bbox in pixel ("display") coords."""
+    # Must pause/draw before bbox can be known
+    def inner():
+        plt.draw()
+        leg = ax.get_legend()
+        bbox = leg.get_window_extent()
+        # bbox = leg.get_frame().get_bbox()
+        return bbox
+    return inner

@@ -1,166 +1,23 @@
-"""Misc tools."""
-import json
-import os
-import platform
+"""Misc mpl tools."""
+import inspect
+import warnings
 from math import sqrt
+from pathlib import Path
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 thousands = mpl.ticker.StrMethodFormatter('{x:,.7g}')  # type: ignore
 
-_FIG_GEOMETRIES_PATH = "./.fig_geometries"
-
-try:
-    __IPYTHON__  # type: ignore
-    from IPython import get_ipython  # type: ignore
-    is_notebook_or_qt = 'zmq' in str(type(get_ipython())).lower()
-except (NameError, ImportError):
-    is_notebook_or_qt = False
-
-
-def freshfig(num=None, figsize=None, *args, **kwargs):
-    """Create/clear figure.
-
-    Similar to:
-
-    >>> fig, ax = suplots(*args,**kwargs) # doctest: +SKIP
-
-    With the modification that:
-
-    - If the figure does not exist: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-    - Otherwise: clear figure.
-      Avoids closing/opening so as to keep pos and size.
-    """
-    # exists = plt.fignum_exists(num)
-
-    fig = plt.figure(num=num, figsize=figsize)
-    fig.clear()
-
-    _, ax = plt.subplots(num=fig.number, *args, **kwargs)
-    return fig, ax
-
-
-def _get_fmw(fignum):
-    """If this fails, there's probs no way to make placement work."""
-    return plt.figure(fignum).canvas.manager.window
-
-
-def get_fig_geo(fignum):
-    """Blah."""
-    fmw = _get_fmw(fignum)
-    try:
-        # For Qt4Agg/Qt5Agg
-        return dict(
-            w=fmw.width(),
-            h=fmw.height(),
-            x=fmw.x(),
-            y=fmw.y(),
-        )
-    except Exception:
-        # For TkAgg
-        return fmw.geometry()
-
-
-def set_fig_geo(fignum, geo):
-    """Set figure geometry."""
-    plt.figure(int(fignum))
-    fmw = _get_fmw(int(fignum))
-    try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
-    except Exception:
-        # For TkAgg
-        # geo = "{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}".format(**geo)
-        fmw.geometry(newGeometry=geo)
-
-
-def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    """Save figure geometries."""
-    if append_host:
-        path = ".".join([path, platform.node()])
-
-    placements = {num: get_fig_geo(num) for num in plt.get_fignums()}
-
-    with open(path, "w") as file:
-        file.write(json.dumps(placements))
-
-
-def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    """Load and set figure geometries."""
-    if append_host:
-        path = ".".join([path, platform.node()])
-
-    if not os.path.exists(path):
-        print("Warning: no saved figure placement found",
-              f"under the name {path}.",
-              "Create a new one using fig_placement_save().")
-        return
-
-    with open(path, "r") as file:
-        placements = json.load(file)
-
-    for num in placements:
-        set_fig_geo(num, placements[num])
-
-
-def get_legend_bbox(ax):
-    """Get legend's bbox in pixel ("display") coords."""
-    # Must pause/draw before bbox can be known
-    def inner():
-        plt.draw()
-        leg = ax.get_legend()
-        bbox = leg.get_window_extent()
-        # bbox = leg.get_frame().get_bbox()
-        return bbox
-    return inner
-
-
-# stackoverflow.com/a/11103301
-def on_xlim_changed(ax):
-    """
-    Autoscale y-axis for subplots with sharex=True.
-
-    Usage:
-    for ax in fig.axes:
-        ax.callbacks.connect('xlim_changed', on_xlim_changed)
-    """
-    import numpy as np
-    xlim = ax.get_xlim()
-    for a in ax.figure.axes:
-        # shortcuts: last avoids n**2 behavior when each axis fires event
-        if a is ax or len(a.lines) == 0 or getattr(a, 'xlim', None) == xlim:
-            continue
-
-        ylim = np.inf, -np.inf
-        for ln in a.lines:
-            x, y = ln.get_data()
-            # faster, but assumes that x is sorted
-            start, stop = np.searchsorted(x, xlim)
-            yc = y[max(start - 1, 0):(stop + 1)]
-            ylim = min(ylim[0], np.nanmin(yc)), max(ylim[1], np.nanmax(yc))
-
-        # TODO: update limits from Patches, Texts, Collections, ...
-
-        # x axis: emit=False avoids infinite loop
-        a.set_xlim(xlim, emit=False)
-
-        # y axis: set dataLim, make sure that autoscale in 'y' is on
-        corners = (xlim[0], ylim[0]), (xlim[1], ylim[1])
-        a.dataLim.update_from_data_xy(corners, ignore=True, updatex=False)
-        a.autoscale(enable=True, axis='y')
-        # cache xlim to mark 'a' as treated
-        a.xlim = xlim
-
 
 def axprops(dct):
     """Filter `dct` for properties associated with a plot axes.
 
-    Example:
-    >>> def myplotter(ax, x, y, **COMMON) # doctest: +SKIP
-    ...     ax.set(**axprops(COMMON))
-    ...     ax.plot(x, y, COMMON)
+    Example
+    -------
+    >>> def myplotter(ax, x, y, **kwargs):
+    ...     ax.set(**axprops(kwargs))  # Pop the kwargs belonging to ax
+    ...     ax.plot(x, y, kwargs)      # Use rest as line props.
     """
     # List of included axis properties
     props = ["title", "facecolor", "aspect"]
@@ -175,13 +32,33 @@ def axprops(dct):
     return props
 
 
+def fig_colorbar(fig, collections, *args, **kwargs):
+    """Add colorbar to the right on a figure.
+
+    Example
+    -------
+    >>> fig, (ax1, ax2) = plt.subplots(nrows=2)
+    >>> cs = ax1.contourf(np.arange(24).reshape((3,-1)), cmap=plt.cm.PuBu_r)
+    >>> # fig.colorbar(cs)          # => colorbar to the right of ax2
+    >>> cb = fig_colorbar(fig, cs)  # => colorbar on the right of figure.
+    """
+    fig.subplots_adjust(right=0.8)
+    cax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    cbar = fig.colorbar(collections, cax, *args, **kwargs)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        plt.pause(.1)
+    return cbar
+
+
 def nRowCol(nTotal, figsize=None, axsize=None):
     """Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
 
     Takes into account the shapes of the figure and axes.
     Default figsize and axsize is taken from `mpl.rcParams`.
 
-    Examples:
+    Examples
+    --------
     >>> nRowCol(4)
     (2, 2)
     >>> nRowCol(4, (4, 1), (1, 1))
@@ -218,10 +95,59 @@ def nRowCol(nTotal, figsize=None, axsize=None):
     return nrows, ncols
 
 
-def fig_colorbar(fig, collections, *args, **kwargs):
-    """Add colorbar to the right on a figure."""
-    fig.subplots_adjust(right=0.8)
-    cax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-    cbar = fig.colorbar(collections, cax, *args, **kwargs)
-    plt.pause(0.1)
-    return cbar
+# TODO: re-include NicePrint from struct-tools?
+class FigSaver():
+    """Simplify exporting a figure, especially when it's part of a series."""
+
+    def __init__(self, script=None, basename=None, n=-1, ext='.pdf'):
+        """Init.
+
+        Parameters
+        ----------
+        script: str
+            Name of dir to put figs in. Defaults to stem of `__file__` of caller.
+
+        basename: str
+            Name of figure files.
+
+        n: int
+           Starting index for file names.
+
+        Example
+        -------
+        >>> fs = FigSaver(n=1, ext=".eps") # doctest: +SKIP
+        ... ax.plot(xdata, ydata) # Add line to plot
+        ... fs.save()             # Save
+        ... ax.plot(xdata, ydata) # Add another line
+        ... fs.save()
+        """
+        # Defaults
+        if script is None:  # Get __file__ of caller
+            script = inspect.getfile(inspect.stack()[1][0])
+        if basename is None:
+            basename = 'figure'
+        # Prep save dir
+        sdir = Path(script).stem
+        Path(sdir).mkdir(parents=True, exist_ok=True)
+        # Set state
+        self.fname = sdir + basename
+        self.n     = n
+        self.ext   = ext
+
+    @property
+    def fullname(self):
+        """Get full name of figure to be saved."""
+        f = self.fname            # Abbrev
+        if self.n >= 0:           # If indexing:
+            f += '_n%d' % self.n  # Add index
+        f += self.ext             # Add extension
+        return f
+
+    def save(self):
+        """Save current figure. Increments the index."""
+        f = self.fullname           # Abbrev
+        print("Saving fig to:", f)  # Print
+        plt.savefig(f)              # Save
+        if self.n >= 0:             # If indexing:
+            self.n += 1                 # Increment
+            plt.pause(0.1)              # For safety

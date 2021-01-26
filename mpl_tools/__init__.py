@@ -15,3 +15,21 @@ except ModuleNotFoundError:
 
 # https://github.com/python-poetry/poetry/pull/2366#issuecomment-652418094
 __version__ = importlib_metadata.version(__name__)
+
+
+import matplotlib as mpl
+
+try:
+    __IPYTHON__  # type: ignore
+    from IPython import get_ipython  # type: ignore
+    is_notebook_or_qt = 'zmq' in str(type(get_ipython())).lower()
+except (NameError, ImportError):
+    is_notebook_or_qt = False
+
+
+def is_using_interactive_backend():
+    """Check fi mpl (currently) using an interactive backend.
+
+    Not to be confused with plt.ion() state.
+    """
+    return mpl.get_backend() in mpl.rcsetup.interactive_bk
