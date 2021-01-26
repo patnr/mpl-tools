@@ -35,10 +35,11 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L0-L98" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L0-L112" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing axes in a figure.&#34;&#34;&#34;
 import matplotlib as mpl
+from matplotlib import pyplot as plt
 from matplotlib.artist import allow_rasterization
 
 # from mpl_tools.misc import *
@@ -93,9 +94,10 @@ def trans2fig(axis, rect, from_data=True):
 
     Inspired by: https://stackoverflow.com/a/17478227/38281.
 
-    Usage:
-    &gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h])
-    &gt;&gt;&gt; ax2 = ax.figure.add_axes(rect)
+    Example
+    -------
+    &gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h]) # doctest: +SKIP
+    ... ax2 = ax.figure.add_axes(rect)
     &#34;&#34;&#34;
     x, y, w, h = rect
 
@@ -135,7 +137,19 @@ def anchor_axes(ax, get_anchor, loc=&#34;NW+&#34;):
         align_ax_with(self, get_anchor(), loc)
         _draw(renderer)
     _draw = ax.draw
-    ax.draw = draw.__get__(ax)</code></pre>
+    ax.draw = draw.__get__(ax)
+
+
+def get_legend_bbox(ax):
+    &#34;&#34;&#34;Get legend&#39;s bbox in pixel (&#34;display&#34;) coords.&#34;&#34;&#34;
+    # Must pause/draw before bbox can be known
+    def inner():
+        plt.draw()
+        leg = ax.get_legend()
+        bbox = leg.get_window_extent()
+        # bbox = leg.get_frame().get_bbox()
+        return bbox
+    return inner</code></pre>
 </details>
 </section>
 <section>
@@ -161,7 +175,7 @@ with padding specified by pad.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L18-L48" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L19-L49" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def align_ax_with(ax, bbox, loc, pad=4):
     &#34;&#34;&#34;Set the location of ax relative to bbox.
@@ -208,7 +222,7 @@ e.g. when the figure is resized.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L80-L99" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L82-L101" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def anchor_axes(ax, get_anchor, loc=&#34;NW+&#34;):
     &#34;&#34;&#34;Attach axes to an anchoring bbox, and keep its size fixed.
@@ -240,7 +254,7 @@ e.g. when the figure is resized.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L10-L15" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L11-L16" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def set_ax_size(ax, w, h):
     &#34;&#34;&#34;Width/Height in display (pixel) coords.&#34;&#34;&#34;
@@ -256,23 +270,24 @@ e.g. when the figure is resized.</p>
 <dd>
 <div class="desc"><p>Transform (data or axis) coordinates to figure coordinates.</p>
 <p>Inspired by: <a href="https://stackoverflow.com/a/17478227/38281.">https://stackoverflow.com/a/17478227/38281.</a></p>
-<p>Usage:</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h])
-&gt;&gt;&gt; ax2 = ax.figure.add_axes(rect)
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h]) # doctest: +SKIP
+... ax2 = ax.figure.add_axes(rect)
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L52-L77" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/ax_placement.py#L53-L79" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def trans2fig(axis, rect, from_data=True):
     &#34;&#34;&#34;Transform (data or axis) coordinates to figure coordinates.
 
     Inspired by: https://stackoverflow.com/a/17478227/38281.
 
-    Usage:
-    &gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h])
-    &gt;&gt;&gt; ax2 = ax.figure.add_axes(rect)
+    Example
+    -------
+    &gt;&gt;&gt; rect = trans2fig(ax, [x,y,w,h]) # doctest: +SKIP
+    ... ax2 = ax.figure.add_axes(rect)
     &#34;&#34;&#34;
     x, y, w, h = rect
 

@@ -40,7 +40,7 @@ through the following links, which are also available in the left sidebar.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L16" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L34" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Documentation for mpl-tools.
 
@@ -58,7 +58,25 @@ except ModuleNotFoundError:
     import importlib_metadata  # type: ignore
 
 # https://github.com/python-poetry/poetry/pull/2366#issuecomment-652418094
-__version__ = importlib_metadata.version(__name__)</code></pre>
+__version__ = importlib_metadata.version(__name__)
+
+
+import matplotlib as mpl
+
+try:
+    __IPYTHON__  # type: ignore
+    from IPython import get_ipython  # type: ignore
+    is_notebook_or_qt = &#39;zmq&#39; in str(type(get_ipython())).lower()
+except (NameError, ImportError):
+    is_notebook_or_qt = False
+
+
+def is_using_interactive_backend():
+    &#34;&#34;&#34;Check fi mpl (currently) using an interactive backend.
+
+    Not to be confused with plt.ion() state.
+    &#34;&#34;&#34;
+    return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
 </details>
 </section>
 <section>
@@ -72,21 +90,67 @@ __version__ = importlib_metadata.version(__name__)</code></pre>
 </dd>
 <!-- CHANGE: Short submodule name -->
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<dt><code class="name"><a title="mpl_tools.conftest" href="conftest.html">conftest</a></code></dt>
+<dd>
+<div class="desc"><p>Configures pytest (beyond the ini file).</p></div>
+</dd>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<dt><code class="name"><a title="mpl_tools.fig_layout" href="fig_layout.html">fig_layout</a></code></dt>
+<dd>
+<div class="desc"><p>Tools for placing figures (not axes) on screen.</p></div>
+</dd>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
 <dt><code class="name"><a title="mpl_tools.log_toggler" href="log_toggler.html">log_toggler</a></code></dt>
 <dd>
-<div class="desc"><p>Provide button to toggle log-scale on and off.</p></div>
+<div class="desc"><p>Toggle log-scale on and off. Provide button for it.</p></div>
 </dd>
 <!-- CHANGE: Short submodule name -->
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
 <dt><code class="name"><a title="mpl_tools.misc" href="misc.html">misc</a></code></dt>
 <dd>
-<div class="desc"><p>Misc tools.</p></div>
+<div class="desc"><p>Misc mpl tools.</p></div>
+</dd>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<dt><code class="name"><a title="mpl_tools.sci" href="sci.html">sci</a></code></dt>
+<dd>
+<div class="desc"><p>Science-related mpl tools.</p></div>
+</dd>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<dt><code class="name"><a title="mpl_tools.visibility" href="visibility.html">visibility</a></code></dt>
+<dd>
+<div class="desc"><p>Toggle visisbility of plot elements on/off. Provide checkmarks for it.</p></div>
 </dd>
 </dl>
 </section>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="mpl_tools.is_using_interactive_backend"><code class="name flex">
+<span>def <span class="ident">is_using_interactive_backend</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check fi mpl (currently) using an interactive backend.</p>
+<p>Not to be confused with plt.ion() state.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L30-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_using_interactive_backend():
+    &#34;&#34;&#34;Check fi mpl (currently) using an interactive backend.
+
+    Not to be confused with plt.ion() state.
+    &#34;&#34;&#34;
+    return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 </section>
@@ -111,10 +175,27 @@ data-gaCategoryParameter="mpl_tools">
 <li><code><a title="mpl_tools.ax_placement" href="ax_placement.html">ax_placement</a></code></li>
 <!-- CHANGE: Short submodule name -->
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<li><code><a title="mpl_tools.conftest" href="conftest.html">conftest</a></code></li>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<li><code><a title="mpl_tools.fig_layout" href="fig_layout.html">fig_layout</a></code></li>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
 <li><code><a title="mpl_tools.log_toggler" href="log_toggler.html">log_toggler</a></code></li>
 <!-- CHANGE: Short submodule name -->
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
 <li><code><a title="mpl_tools.misc" href="misc.html">misc</a></code></li>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<li><code><a title="mpl_tools.sci" href="sci.html">sci</a></code></li>
+<!-- CHANGE: Short submodule name -->
+<!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
+<li><code><a title="mpl_tools.visibility" href="visibility.html">visibility</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="mpl_tools.is_using_interactive_backend" href="#mpl_tools.is_using_interactive_backend">is_using_interactive_backend</a></code></li>
 </ul>
 </li>
 </ul>

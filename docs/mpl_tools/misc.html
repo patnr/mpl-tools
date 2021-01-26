@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>mpl_tools.misc API documentation</title>
-<meta name="description" content="Misc tools." />
+<meta name="description" content="Misc mpl tools." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -31,180 +31,32 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <h1 class="title">Module <code>mpl_tools.misc</code></h1>
 </header>
 <section id="section-intro">
-<p>Misc tools.</p>
+<p>Misc mpl tools.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L188" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L152" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Misc tools.&#34;&#34;&#34;
-import json
-import os
-import platform
+<pre><code class="python">&#34;&#34;&#34;Misc mpl tools.&#34;&#34;&#34;
+import inspect
+import warnings
+from math import sqrt
+from pathlib import Path
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-__all__ = [
-    &#34;thousands&#34;, &#34;freshfig&#34;,
-    &#34;get_fig_geo&#34;, &#34;set_fig_geo&#34;, &#34;fig_placement_save&#34;, &#34;fig_placement_load&#34;,
-    &#34;get_legend_bbox&#34;,
-    &#34;is_notebook_or_qt&#34;, &#34;axprops&#34;, &#34;fig_colorbar&#34;]
-
 thousands = mpl.ticker.StrMethodFormatter(&#39;{x:,.7g}&#39;)  # type: ignore
-
-_FIG_GEOMETRIES_PATH = &#34;./.fig_geometries&#34;
-
-try:
-    __IPYTHON__  # type: ignore
-    from IPython import get_ipython  # type: ignore
-    is_notebook_or_qt = &#39;zmq&#39; in str(type(get_ipython())).lower()
-except (NameError, ImportError):
-    is_notebook_or_qt = False
-
-
-def freshfig(num=None, figsize=None, *args, **kwargs):
-    &#34;&#34;&#34;Create/clear figure.
-
-    Similar to:
-
-    &gt;&gt;&gt; fig, ax = suplots(*args,**kwargs)
-
-    With the modification that:
-
-    - If the figure does not exist: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-    - Otherwise: clear figure.
-      Avoids closing/opening so as to keep pos and size.
-    &#34;&#34;&#34;
-    # exists = plt.fignum_exists(num)
-
-    fig = plt.figure(num=num, figsize=figsize)
-    fig.clear()
-
-    _, ax = plt.subplots(num=fig.number, *args, **kwargs)
-    return fig, ax
-
-
-def _get_fmw(fignum):
-    &#34;&#34;&#34;If this fails, there&#39;s probs no way to make placement work.&#34;&#34;&#34;
-    return plt.figure(fignum).canvas.manager.window
-
-
-def get_fig_geo(fignum):
-    &#34;&#34;&#34;Blah.&#34;&#34;&#34;
-    fmw = _get_fmw(fignum)
-    try:
-        # For Qt4Agg/Qt5Agg
-        return dict(
-            w=fmw.width(),
-            h=fmw.height(),
-            x=fmw.x(),
-            y=fmw.y(),
-        )
-    except Exception:
-        # For TkAgg
-        return fmw.geometry()
-
-
-def set_fig_geo(fignum, geo):
-    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
-    plt.figure(int(fignum))
-    fmw = _get_fmw(int(fignum))
-    try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
-    except Exception:
-        # For TkAgg
-        # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
-        fmw.geometry(newGeometry=geo)
-
-
-def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    &#34;&#34;&#34;Save figure geometries.&#34;&#34;&#34;
-    if append_host:
-        path = &#34;.&#34;.join([path, platform.node()])
-
-    placements = {num: get_fig_geo(num) for num in plt.get_fignums()}
-
-    with open(path, &#34;w&#34;) as file:
-        file.write(json.dumps(placements))
-
-
-def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    &#34;&#34;&#34;Load and set figure geometries.&#34;&#34;&#34;
-    if append_host:
-        path = &#34;.&#34;.join([path, platform.node()])
-
-    if not os.path.exists(path):
-        print(&#34;Warning: no saved figure placement found&#34;,
-              f&#34;under the name {path}.&#34;,
-              &#34;Create a new one using fig_placement_save().&#34;)
-        return
-
-    with open(path, &#34;r&#34;) as file:
-        placements = json.load(file)
-
-    for num in placements:
-        set_fig_geo(num, placements[num])
-
-
-def get_legend_bbox(ax):
-    &#34;&#34;&#34;Get legend&#39;s bbox in pixel (&#34;display&#34;) coords.&#34;&#34;&#34;
-    # Must pause/draw before bbox can be known
-    def inner():
-        plt.draw()
-        leg = ax.get_legend()
-        bbox = leg.get_window_extent()
-        # bbox = leg.get_frame().get_bbox()
-        return bbox
-    return inner
-
-
-# stackoverflow.com/a/11103301
-def on_xlim_changed(ax):
-    &#34;&#34;&#34;
-    Autoscale y-axis for subplots with sharex=True.
-
-    Usage:
-    for ax in fig.axes:
-        ax.callbacks.connect(&#39;xlim_changed&#39;, on_xlim_changed)
-    &#34;&#34;&#34;
-    import numpy as np
-    xlim = ax.get_xlim()
-    for a in ax.figure.axes:
-        # shortcuts: last avoids n**2 behavior when each axis fires event
-        if a is ax or len(a.lines) == 0 or getattr(a, &#39;xlim&#39;, None) == xlim:
-            continue
-
-        ylim = np.inf, -np.inf
-        for ln in a.lines:
-            x, y = ln.get_data()
-            # faster, but assumes that x is sorted
-            start, stop = np.searchsorted(x, xlim)
-            yc = y[max(start - 1, 0):(stop + 1)]
-            ylim = min(ylim[0], np.nanmin(yc)), max(ylim[1], np.nanmax(yc))
-
-        # TODO: update limits from Patches, Texts, Collections, ...
-
-        # x axis: emit=False avoids infinite loop
-        a.set_xlim(xlim, emit=False)
-
-        # y axis: set dataLim, make sure that autoscale in &#39;y&#39; is on
-        corners = (xlim[0], ylim[0]), (xlim[1], ylim[1])
-        a.dataLim.update_from_data_xy(corners, ignore=True, updatex=False)
-        a.autoscale(enable=True, axis=&#39;y&#39;)
-        # cache xlim to mark &#39;a&#39; as treated
-        a.xlim = xlim
 
 
 def axprops(dct):
     &#34;&#34;&#34;Filter `dct` for properties associated with a plot axes.
 
-    Example:
-    &gt;&gt;&gt; def myplotter(ax, x, y, **COMMON)
-    &gt;&gt;&gt;     ax.set(**axprops(COMMON))
-    &gt;&gt;&gt;     ax.plot(x, y, COMMON)
+    Example
+    -------
+    &gt;&gt;&gt; def myplotter(ax, x, y, **kwargs):
+    ...     ax.set(**axprops(kwargs))  # Pop the kwargs belonging to ax
+    ...     ax.plot(x, y, kwargs)      # Use rest as line props.
     &#34;&#34;&#34;
     # List of included axis properties
     props = [&#34;title&#34;, &#34;facecolor&#34;, &#34;aspect&#34;]
@@ -220,12 +72,124 @@ def axprops(dct):
 
 
 def fig_colorbar(fig, collections, *args, **kwargs):
-    &#34;&#34;&#34;Add colorbar to the right on a figure.&#34;&#34;&#34;
+    &#34;&#34;&#34;Add colorbar to the right on a figure.
+
+    Example
+    -------
+    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(nrows=2)
+    &gt;&gt;&gt; cs = ax1.contourf(np.arange(24).reshape((3,-1)), cmap=plt.cm.PuBu_r)
+    &gt;&gt;&gt; # fig.colorbar(cs)          # =&gt; colorbar to the right of ax2
+    &gt;&gt;&gt; cb = fig_colorbar(fig, cs)  # =&gt; colorbar on the right of figure.
+    &#34;&#34;&#34;
     fig.subplots_adjust(right=0.8)
     cax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
     cbar = fig.colorbar(collections, cax, *args, **kwargs)
-    plt.pause(0.1)
-    return cbar</code></pre>
+    with warnings.catch_warnings():
+        warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
+        plt.pause(.1)
+    return cbar
+
+
+def nRowCol(nTotal, figsize=None, axsize=None):
+    &#34;&#34;&#34;Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
+
+    Takes into account the shapes of the figure and axes.
+    Default figsize and axsize is taken from `mpl.rcParams`.
+
+    Examples
+    --------
+    &gt;&gt;&gt; nRowCol(4)
+    (2, 2)
+    &gt;&gt;&gt; nRowCol(4, (4, 1), (1, 1))
+    (1, 4)
+    &gt;&gt;&gt; nRowCol(4, (4, 1), (4, 1))
+    (2, 2)
+    &gt;&gt;&gt; nRowCol(12, (4, 3), (1, 1))
+    (3, 4)
+    &#34;&#34;&#34;
+    # Defaults
+    if figsize is None:
+        figsize = mpl.rcParams[&#34;figure.figsize&#34;]
+
+    if axsize is None:
+        rc = {k: mpl.rcParams[&#34;figure.subplot.&#34; + k]
+              for k in [&#34;bottom&#34;, &#34;left&#34;, &#34;right&#34;, &#34;top&#34;]}
+        axsize = (rc[&#34;right&#34;] - rc[&#34;left&#34;],
+                  rc[&#34;top&#34;] - rc[&#34;bottom&#34;])
+
+    # Compute ratios
+    w, h = figsize
+    fig_ratio = w / h
+    w, h = axsize
+    ax_ratio = w / h
+    ratio = fig_ratio / ax_ratio
+
+    # Main logic
+    nrows = round(sqrt(nTotal / ratio)) or 1
+    ncols = nTotal // nrows
+    # ncols rounds down, so we might have to increase it.
+    if nrows * ncols &lt; nTotal:
+        ncols += 1
+
+    return nrows, ncols
+
+
+# TODO: re-include NicePrint from struct-tools?
+class FigSaver():
+    &#34;&#34;&#34;Simplify exporting a figure, especially when it&#39;s part of a series.&#34;&#34;&#34;
+
+    def __init__(self, script=None, basename=None, n=-1, ext=&#39;.pdf&#39;):
+        &#34;&#34;&#34;Init.
+
+        Parameters
+        ----------
+        script: str
+            Name of dir to put figs in. Defaults to stem of `__file__` of caller.
+
+        basename: str
+            Name of figure files.
+
+        n: int
+           Starting index for file names.
+
+        Example
+        -------
+        &gt;&gt;&gt; fs = FigSaver(n=1, ext=&#34;.eps&#34;) # doctest: +SKIP
+        ... ax.plot(xdata, ydata) # Add line to plot
+        ... fs.save()             # Save
+        ... ax.plot(xdata, ydata) # Add another line
+        ... fs.save()
+        &#34;&#34;&#34;
+        # Defaults
+        if script is None:  # Get __file__ of caller
+            script = inspect.getfile(inspect.stack()[1][0])
+        if basename is None:
+            basename = &#39;figure&#39;
+        # Prep save dir
+        sdir = Path(script).stem
+        Path(sdir).mkdir(parents=True, exist_ok=True)
+        # Set state
+        self.fname = sdir + basename
+        self.n     = n
+        self.ext   = ext
+
+    @property
+    def fullname(self):
+        &#34;&#34;&#34;Get full name of figure to be saved.&#34;&#34;&#34;
+        f = self.fname            # Abbrev
+        if self.n &gt;= 0:           # If indexing:
+            f += &#39;_n%d&#39; % self.n  # Add index
+        f += self.ext             # Add extension
+        return f
+
+    def save(self):
+        &#34;&#34;&#34;Save current figure. Increments the index.&#34;&#34;&#34;
+        f = self.fullname           # Abbrev
+        print(&#34;Saving fig to:&#34;, f)  # Print
+        plt.savefig(f)              # Save
+        if self.n &gt;= 0:             # If indexing:
+            self.n += 1                 # Increment
+            plt.pause(0.1)              # For safety</code></pre>
 </details>
 </section>
 <section>
@@ -235,191 +199,29 @@ def fig_colorbar(fig, collections, *args, **kwargs):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="mpl_tools.misc.freshfig"><code class="name flex">
-<span>def <span class="ident">freshfig</span></span>(<span>num=None, figsize=None, *args, **kwargs)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Create/clear figure.</p>
-<p>Similar to:</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; fig, ax = suplots(*args,**kwargs)
-</code></pre>
-<p>With the modification that:</p>
-<ul>
-<li>If the figure does not exist: create it.
-This allows for figure sizing &ndash; even with mpl backend MacOS.</li>
-<li>Otherwise: clear figure.
-Avoids closing/opening so as to keep pos and size.</li>
-</ul></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L27-L47" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def freshfig(num=None, figsize=None, *args, **kwargs):
-    &#34;&#34;&#34;Create/clear figure.
-
-    Similar to:
-
-    &gt;&gt;&gt; fig, ax = suplots(*args,**kwargs)
-
-    With the modification that:
-
-    - If the figure does not exist: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-    - Otherwise: clear figure.
-      Avoids closing/opening so as to keep pos and size.
-    &#34;&#34;&#34;
-    # exists = plt.fignum_exists(num)
-
-    fig = plt.figure(num=num, figsize=figsize)
-    fig.clear()
-
-    _, ax = plt.subplots(num=fig.number, *args, **kwargs)
-    return fig, ax</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.misc.get_fig_geo"><code class="name flex">
-<span>def <span class="ident">get_fig_geo</span></span>(<span>fignum)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Blah.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L55-L68" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def get_fig_geo(fignum):
-    &#34;&#34;&#34;Blah.&#34;&#34;&#34;
-    fmw = _get_fmw(fignum)
-    try:
-        # For Qt4Agg/Qt5Agg
-        return dict(
-            w=fmw.width(),
-            h=fmw.height(),
-            x=fmw.x(),
-            y=fmw.y(),
-        )
-    except Exception:
-        # For TkAgg
-        return fmw.geometry()</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.misc.set_fig_geo"><code class="name flex">
-<span>def <span class="ident">set_fig_geo</span></span>(<span>fignum, geo)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set figure geometry.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L71-L81" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def set_fig_geo(fignum, geo):
-    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
-    plt.figure(int(fignum))
-    fmw = _get_fmw(int(fignum))
-    try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
-    except Exception:
-        # For TkAgg
-        # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
-        fmw.geometry(newGeometry=geo)</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.misc.fig_placement_save"><code class="name flex">
-<span>def <span class="ident">fig_placement_save</span></span>(<span>path='./.fig_geometries', append_host=True)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Save figure geometries.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L84-L92" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def fig_placement_save(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    &#34;&#34;&#34;Save figure geometries.&#34;&#34;&#34;
-    if append_host:
-        path = &#34;.&#34;.join([path, platform.node()])
-
-    placements = {num: get_fig_geo(num) for num in plt.get_fignums()}
-
-    with open(path, &#34;w&#34;) as file:
-        file.write(json.dumps(placements))</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.misc.fig_placement_load"><code class="name flex">
-<span>def <span class="ident">fig_placement_load</span></span>(<span>path='./.fig_geometries', append_host=True)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Load and set figure geometries.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L95-L110" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def fig_placement_load(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    &#34;&#34;&#34;Load and set figure geometries.&#34;&#34;&#34;
-    if append_host:
-        path = &#34;.&#34;.join([path, platform.node()])
-
-    if not os.path.exists(path):
-        print(&#34;Warning: no saved figure placement found&#34;,
-              f&#34;under the name {path}.&#34;,
-              &#34;Create a new one using fig_placement_save().&#34;)
-        return
-
-    with open(path, &#34;r&#34;) as file:
-        placements = json.load(file)
-
-    for num in placements:
-        set_fig_geo(num, placements[num])</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.misc.get_legend_bbox"><code class="name flex">
-<span>def <span class="ident">get_legend_bbox</span></span>(<span>ax)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Get legend's bbox in pixel ("display") coords.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L113-L122" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def get_legend_bbox(ax):
-    &#34;&#34;&#34;Get legend&#39;s bbox in pixel (&#34;display&#34;) coords.&#34;&#34;&#34;
-    # Must pause/draw before bbox can be known
-    def inner():
-        plt.draw()
-        leg = ax.get_legend()
-        bbox = leg.get_window_extent()
-        # bbox = leg.get_frame().get_bbox()
-        return bbox
-    return inner</code></pre>
-</details>
-</dd>
 <dt id="mpl_tools.misc.axprops"><code class="name flex">
 <span>def <span class="ident">axprops</span></span>(<span>dct)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Filter <code>dct</code> for properties associated with a plot axes.</p>
-<p>Example:</p>
-<pre><code class="language-python-repl">&gt;&gt;&gt; def myplotter(ax, x, y, **COMMON)
-&gt;&gt;&gt;     ax.set(**axprops(COMMON))
-&gt;&gt;&gt;     ax.plot(x, y, COMMON)
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; def myplotter(ax, x, y, **kwargs):
+...     ax.set(**axprops(kwargs))  # Pop the kwargs belonging to ax
+...     ax.plot(x, y, kwargs)      # Use rest as line props.
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L162-L180" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L13-L32" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def axprops(dct):
     &#34;&#34;&#34;Filter `dct` for properties associated with a plot axes.
 
-    Example:
-    &gt;&gt;&gt; def myplotter(ax, x, y, **COMMON)
-    &gt;&gt;&gt;     ax.set(**axprops(COMMON))
-    &gt;&gt;&gt;     ax.plot(x, y, COMMON)
+    Example
+    -------
+    &gt;&gt;&gt; def myplotter(ax, x, y, **kwargs):
+    ...     ax.set(**axprops(kwargs))  # Pop the kwargs belonging to ax
+    ...     ax.plot(x, y, kwargs)      # Use rest as line props.
     &#34;&#34;&#34;
     # List of included axis properties
     props = [&#34;title&#34;, &#34;facecolor&#34;, &#34;aspect&#34;]
@@ -438,24 +240,239 @@ Avoids closing/opening so as to keep pos and size.</li>
 <span>def <span class="ident">fig_colorbar</span></span>(<span>fig, collections, *args, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Add colorbar to the right on a figure.</p></div>
+<div class="desc"><p>Add colorbar to the right on a figure.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(nrows=2)
+&gt;&gt;&gt; cs = ax1.contourf(np.arange(24).reshape((3,-1)), cmap=plt.cm.PuBu_r)
+&gt;&gt;&gt; # fig.colorbar(cs)          # =&gt; colorbar to the right of ax2
+&gt;&gt;&gt; cb = fig_colorbar(fig, cs)  # =&gt; colorbar on the right of figure.
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L183-L189" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L35-L51" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def fig_colorbar(fig, collections, *args, **kwargs):
-    &#34;&#34;&#34;Add colorbar to the right on a figure.&#34;&#34;&#34;
+    &#34;&#34;&#34;Add colorbar to the right on a figure.
+
+    Example
+    -------
+    &gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(nrows=2)
+    &gt;&gt;&gt; cs = ax1.contourf(np.arange(24).reshape((3,-1)), cmap=plt.cm.PuBu_r)
+    &gt;&gt;&gt; # fig.colorbar(cs)          # =&gt; colorbar to the right of ax2
+    &gt;&gt;&gt; cb = fig_colorbar(fig, cs)  # =&gt; colorbar on the right of figure.
+    &#34;&#34;&#34;
     fig.subplots_adjust(right=0.8)
     cax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
     cbar = fig.colorbar(collections, cax, *args, **kwargs)
-    plt.pause(0.1)
+    with warnings.catch_warnings():
+        warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
+        plt.pause(.1)
     return cbar</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.misc.nRowCol"><code class="name flex">
+<span>def <span class="ident">nRowCol</span></span>(<span>nTotal, figsize=None, axsize=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute <code>(nrows, ncols)</code> such that <code>nTotal ≈ nrows*ncols</code>.</p>
+<p>Takes into account the shapes of the figure and axes.
+Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; nRowCol(4)
+(2, 2)
+&gt;&gt;&gt; nRowCol(4, (4, 1), (1, 1))
+(1, 4)
+&gt;&gt;&gt; nRowCol(4, (4, 1), (4, 1))
+(2, 2)
+&gt;&gt;&gt; nRowCol(12, (4, 3), (1, 1))
+(3, 4)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L54-L95" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def nRowCol(nTotal, figsize=None, axsize=None):
+    &#34;&#34;&#34;Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
+
+    Takes into account the shapes of the figure and axes.
+    Default figsize and axsize is taken from `mpl.rcParams`.
+
+    Examples
+    --------
+    &gt;&gt;&gt; nRowCol(4)
+    (2, 2)
+    &gt;&gt;&gt; nRowCol(4, (4, 1), (1, 1))
+    (1, 4)
+    &gt;&gt;&gt; nRowCol(4, (4, 1), (4, 1))
+    (2, 2)
+    &gt;&gt;&gt; nRowCol(12, (4, 3), (1, 1))
+    (3, 4)
+    &#34;&#34;&#34;
+    # Defaults
+    if figsize is None:
+        figsize = mpl.rcParams[&#34;figure.figsize&#34;]
+
+    if axsize is None:
+        rc = {k: mpl.rcParams[&#34;figure.subplot.&#34; + k]
+              for k in [&#34;bottom&#34;, &#34;left&#34;, &#34;right&#34;, &#34;top&#34;]}
+        axsize = (rc[&#34;right&#34;] - rc[&#34;left&#34;],
+                  rc[&#34;top&#34;] - rc[&#34;bottom&#34;])
+
+    # Compute ratios
+    w, h = figsize
+    fig_ratio = w / h
+    w, h = axsize
+    ax_ratio = w / h
+    ratio = fig_ratio / ax_ratio
+
+    # Main logic
+    nrows = round(sqrt(nTotal / ratio)) or 1
+    ncols = nTotal // nrows
+    # ncols rounds down, so we might have to increase it.
+    if nrows * ncols &lt; nTotal:
+        ncols += 1
+
+    return nrows, ncols</code></pre>
 </details>
 </dd>
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="mpl_tools.misc.FigSaver"><code class="flex name class">
+<span>class <span class="ident">FigSaver</span></span>
+<span>(</span><span>script=None, basename=None, n=-1, ext='.pdf')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simplify exporting a figure, especially when it's part of a series.</p>
+<p>Init.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>script</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of dir to put figs in. Defaults to stem of <code>__file__</code> of caller.</dd>
+<dt><strong><code>basename</code></strong> :&ensp;<code>str</code></dt>
+<dd>Name of figure files.</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>Starting index for file names.</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; fs = FigSaver(n=1, ext=&quot;.eps&quot;) # doctest: +SKIP
+... ax.plot(xdata, ydata) # Add line to plot
+... fs.save()             # Save
+... ax.plot(xdata, ydata) # Add another line
+... fs.save()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L99-L153" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FigSaver():
+    &#34;&#34;&#34;Simplify exporting a figure, especially when it&#39;s part of a series.&#34;&#34;&#34;
+
+    def __init__(self, script=None, basename=None, n=-1, ext=&#39;.pdf&#39;):
+        &#34;&#34;&#34;Init.
+
+        Parameters
+        ----------
+        script: str
+            Name of dir to put figs in. Defaults to stem of `__file__` of caller.
+
+        basename: str
+            Name of figure files.
+
+        n: int
+           Starting index for file names.
+
+        Example
+        -------
+        &gt;&gt;&gt; fs = FigSaver(n=1, ext=&#34;.eps&#34;) # doctest: +SKIP
+        ... ax.plot(xdata, ydata) # Add line to plot
+        ... fs.save()             # Save
+        ... ax.plot(xdata, ydata) # Add another line
+        ... fs.save()
+        &#34;&#34;&#34;
+        # Defaults
+        if script is None:  # Get __file__ of caller
+            script = inspect.getfile(inspect.stack()[1][0])
+        if basename is None:
+            basename = &#39;figure&#39;
+        # Prep save dir
+        sdir = Path(script).stem
+        Path(sdir).mkdir(parents=True, exist_ok=True)
+        # Set state
+        self.fname = sdir + basename
+        self.n     = n
+        self.ext   = ext
+
+    @property
+    def fullname(self):
+        &#34;&#34;&#34;Get full name of figure to be saved.&#34;&#34;&#34;
+        f = self.fname            # Abbrev
+        if self.n &gt;= 0:           # If indexing:
+            f += &#39;_n%d&#39; % self.n  # Add index
+        f += self.ext             # Add extension
+        return f
+
+    def save(self):
+        &#34;&#34;&#34;Save current figure. Increments the index.&#34;&#34;&#34;
+        f = self.fullname           # Abbrev
+        print(&#34;Saving fig to:&#34;, f)  # Print
+        plt.savefig(f)              # Save
+        if self.n &gt;= 0:             # If indexing:
+            self.n += 1                 # Increment
+            plt.pause(0.1)              # For safety</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="mpl_tools.misc.FigSaver.fullname"><code class="name">var <span class="ident">fullname</span></code></dt>
+<dd>
+<div class="desc"><p>Get full name of figure to be saved.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L137-L144" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def fullname(self):
+    &#34;&#34;&#34;Get full name of figure to be saved.&#34;&#34;&#34;
+    f = self.fname            # Abbrev
+    if self.n &gt;= 0:           # If indexing:
+        f += &#39;_n%d&#39; % self.n  # Add index
+    f += self.ext             # Add extension
+    return f</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="mpl_tools.misc.FigSaver.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save current figure. Increments the index.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L146-L153" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def save(self):
+    &#34;&#34;&#34;Save current figure. Increments the index.&#34;&#34;&#34;
+    f = self.fullname           # Abbrev
+    print(&#34;Saving fig to:&#34;, f)  # Print
+    plt.savefig(f)              # Save
+    if self.n &gt;= 0:             # If indexing:
+        self.n += 1                 # Increment
+        plt.pause(0.1)              # For safety</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -474,15 +491,21 @@ data-gaCategoryParameter="mpl_tools.misc">
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
-<li><code><a title="mpl_tools.misc.freshfig" href="#mpl_tools.misc.freshfig">freshfig</a></code></li>
-<li><code><a title="mpl_tools.misc.get_fig_geo" href="#mpl_tools.misc.get_fig_geo">get_fig_geo</a></code></li>
-<li><code><a title="mpl_tools.misc.set_fig_geo" href="#mpl_tools.misc.set_fig_geo">set_fig_geo</a></code></li>
-<li><code><a title="mpl_tools.misc.fig_placement_save" href="#mpl_tools.misc.fig_placement_save">fig_placement_save</a></code></li>
-<li><code><a title="mpl_tools.misc.fig_placement_load" href="#mpl_tools.misc.fig_placement_load">fig_placement_load</a></code></li>
-<li><code><a title="mpl_tools.misc.get_legend_bbox" href="#mpl_tools.misc.get_legend_bbox">get_legend_bbox</a></code></li>
+<ul class="">
 <li><code><a title="mpl_tools.misc.axprops" href="#mpl_tools.misc.axprops">axprops</a></code></li>
 <li><code><a title="mpl_tools.misc.fig_colorbar" href="#mpl_tools.misc.fig_colorbar">fig_colorbar</a></code></li>
+<li><code><a title="mpl_tools.misc.nRowCol" href="#mpl_tools.misc.nRowCol">nRowCol</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="mpl_tools.misc.FigSaver" href="#mpl_tools.misc.FigSaver">FigSaver</a></code></h4>
+<ul class="">
+<li><code><a title="mpl_tools.misc.FigSaver.save" href="#mpl_tools.misc.FigSaver.save">save</a></code></li>
+<li><code><a title="mpl_tools.misc.FigSaver.fullname" href="#mpl_tools.misc.FigSaver.fullname">fullname</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

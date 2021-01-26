@@ -1,0 +1,741 @@
+<!-- Search file for "CHANGE" for my own changes -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>mpl_tools.fig_layout API documentation</title>
+<meta name="description" content="Tools for placing figures (not axes) on screen." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<link rel="preconnect" href="https://www.google.com">
+<script async src="https://cse.google.com/cse.js?cx=017837193012385208679:pey8ky8gdqw"></script>
+<style>
+.gsc-control-cse {padding:0 !important;margin-top:1em}
+body.gsc-overflow-hidden #sidebar {overflow: visible;}
+</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<a href="https://github.com/patricknraanes/mpl-tools" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>mpl_tools.fig_layout</code></h1>
+</header>
+<section id="section-intro">
+<p>Tools for placing figures (not axes) on screen.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L280" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
+import json
+import platform
+import warnings
+from pathlib import Path
+
+import matplotlib as mpl
+from matplotlib import pyplot as plt
+
+from mpl_tools import is_using_interactive_backend
+
+_FIG_GEOMETRIES_PATH = &#34;./.fig_geometries&#34;
+
+
+def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
+    &#34;&#34;&#34;Create/clear figure.
+
+    Same as `plt.subplots` with the modification that:
+
+    - If figure exists: clear it.
+      Avoids closing/opening so as to keep pos and size.
+    - Otherwise: create it.
+      This allows for figure sizing -- even with mpl backend MacOS.
+      On Linux, it also allows for figure placement, if `_place`.
+      This is done using `load`.
+
+    Example
+    -------
+    &gt;&gt;&gt; freshfig(1, nrows=2, sharex=True)  # doctest: +NORMALIZE_WHITESPACE
+    (&lt;Figure size 640x480 with 2 Axes&gt;,
+    array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
+    &#34;&#34;&#34;
+    already_open = plt.fignum_exists(num)
+
+    fig = plt.figure(num=num, figsize=figsize)
+
+    # Deal with warning bug
+    # https://github.com/matplotlib/matplotlib/issues/9970
+    with warnings.catch_warnings():
+        warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
+        fig.clf()  # &lt;=&gt; fig.clear()
+
+    if (
+        _do_place
+        and is_using_interactive_backend()
+        and not already_open
+        and num is not None
+    ):
+        load(fignums=fig.number)
+
+    _, ax = plt.subplots(num=fig.number, **kwargs)
+    return fig, ax
+
+
+def _get_fig(fignum=None):
+    &#34;&#34;&#34;Get fig handle from number OR handle.&#34;&#34;&#34;
+    if fignum is None:
+        return plt.gcf()
+    elif isinstance(fignum, mpl.figure.Figure):
+        return fignum
+    else:
+        return plt.figure(fignum)
+
+
+def _get_fmw(fignum):
+    &#34;&#34;&#34;If this fails, there&#39;s probs no way to make placement work.&#34;&#34;&#34;
+    # fmw = plt.get_current_fig_manager().window
+    fig = _get_fig(fignum)
+    fmw = fig.canvas.manager.window
+    return fmw
+
+
+def get_geo1(fignum):
+    &#34;&#34;&#34;Get geometry specification of a figure.&#34;&#34;&#34;
+    fmw = _get_fmw(fignum)
+    try:
+        # For Qt4Agg/Qt5Agg
+        return dict(
+            w=fmw.width(),
+            h=fmw.height(),
+            x=fmw.x(),
+            y=fmw.y(),
+        )
+    except Exception:
+        # For TkAgg
+        return fmw.geometry()
+
+
+def set_geo1(fignum, geo):
+    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
+    plt.figure(fignum)
+    fmw = _get_fmw(int(fignum))
+    try:
+        # For Qt4Agg/Qt5Agg
+        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
+    except Exception:
+        # For TkAgg
+        # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
+        fmw.geometry(newGeometry=geo)
+
+
+def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
+    &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
+    if append_host:
+        path = &#34;.&#34;.join([path, platform.node()])
+
+    placements = {num: get_geo1(num) for num in plt.get_fignums()}
+
+    with open(path, &#34;w&#34;) as file:
+        file.write(json.dumps(placements))
+
+
+def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
+    &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
+    if append_host:
+        path = &#34;.&#34;.join([path, platform.node()])
+
+    if not Path(path).is_file():
+        print(&#34;Warning: no figure layout found.&#34;,
+              &#34;Create a new one if you wish using save().&#34;)
+        return
+
+    with open(path, &#34;r&#34;) as file:
+        placements = json.load(file)
+
+    # Convert fignums to int
+    for k in list(placements):
+        placements[int(k)] = placements.pop(k)
+
+    for num in placements:
+        if fignums is None or num == fignums:
+            set_geo1(num, placements[num])
+
+
+def show_figs(fignums=None):
+    &#34;&#34;&#34;Move all fig windows to top.
+
+    Doesn&#39;t work all that well for all backends/platforms.
+    &#34;&#34;&#34;
+    # Validate fignums
+    if fignums is None:
+        fignums = plt.get_fignums()
+    try:
+        fignums = list(fignums)
+    except TypeError:
+        fignums = [fignums]
+
+    for f in fignums:
+        plt.figure(f)
+        fmw = plt.get_current_fig_manager().window
+        fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
+        fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front
+
+
+def get_screen_size():
+    &#34;&#34;&#34;Get **available** screen size/resolution.
+
+    NB: This might not always work that well,
+    especially since the method used depends on the backend.
+
+    Consider using non-mpl method: https://pypi.org/project/screeninfo
+    &#34;&#34;&#34;
+    if mpl.get_backend().startswith(&#39;Qt&#39;):
+        try:
+            # Ref spyder/widgets/shortcutssummary.py
+            from qtpy.QtWidgets import QDesktopWidget  # type: ignore
+            widget = QDesktopWidget()
+            sc = widget.availableGeometry(widget.primaryScreen())
+            x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
+
+        except ImportError:
+            # https://stackoverflow.com/a/29039755/38281
+            fig = plt.figure()  # new, blank (cheap to resize) figure
+            mgr = plt.get_current_fig_manager()
+            # Now we full-screen the new figure, and pause for effect.
+            # NB: both of these actions results in the figure being shown.
+            mgr.full_screen_toggle(); plt.pause(0.2)  # noqa
+            sc = mgr.canvas
+            x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
+            # mgr.full_screen_toggle()
+            plt.close(fig)
+
+    elif mpl.get_backend() == &#34;TkAgg&#34;:
+        # https://stackoverflow.com/a/42951711/38281
+        mgr = plt.get_current_fig_manager()
+        x0, y0, w0, h0 = (0, 0) + mgr.window.wm_maxsize()
+        # w, h = mgr.window.winfo_screenwidth(), mgr.window.winfo_screenheight()
+    else:
+        print(&#34;Warning: could not detect screen size for this mpl backend.&#34;)
+        print(&#34;Using a default size.&#34;)
+        x0, y0, w0, h0 = 30, 30, 800, 600
+
+    return x0, y0, w0, h0
+
+
+def loc01(fignum=None, x=None, y=None, w=None, h=None):
+    &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
+
+    Only works on Linux?
+    &#34;&#34;&#34;
+    try:
+        fmw = _get_fmw(fignum)
+    except AttributeError:
+        return  # do nothing
+
+    x0, y0, w0, h0 = get_screen_size()
+
+    # It seems the window footers are not taken into account
+    # by the geometry settings. Correct for this:
+    footer = 0.028*(h0+y0)
+
+    # Current values (Qt4Agg only!):
+    w = w if w is not None else fmw.width() / w0
+    h = h if h is not None else fmw.height()/h0
+    x = x if x is not None else fmw.x()     / w0
+    y = y if y is not None else fmw.y()     / h0
+
+    x = x0 + x*w0
+    y = y0 + y*h0 + footer
+    w = w*w0
+    h = h*h0 - footer
+
+    try:  # For Qt4Agg/Qt5Agg
+        fmw.setGeometry(x, y, w, h)
+    except: # noqa # For TkAgg
+        geo = f&#34;{int(w)}x{int(h)}+{int(x)}+{int(y)}&#34;
+        fmw.geometry(newGeometry=geo)
+
+
+def loc(loc, fignum=None):
+    &#34;&#34;&#34;Place figure on screen.
+
+    - loc: string that defines the figures new geometry, given either as
+       * NW, E, ...
+       * 4 digits (as str or int) to define grid M,N,i,j.
+
+    Example
+    -------
+    &gt;&gt;&gt; N = 3
+    &gt;&gt;&gt; for i in 1 + np.arange(N):
+    ...     xy = str(N)*2 + str(i)*2
+    ...     loc(xy, i)
+    &#34;&#34;&#34;
+    loc = str(loc)
+    loc = loc.replace(&#34;,&#34;, &#34;&#34;)
+    if not loc[:4].isnumeric():
+        if loc.startswith(&#39;NW&#39;):
+            loc = &#39;2211&#39;
+        elif loc.startswith(&#39;SW&#39;):
+            loc = &#39;2221&#39;
+        elif loc.startswith(&#39;NE&#39;):
+            loc = &#39;2212&#39;
+        elif loc.startswith(&#39;SE&#39;):
+            loc = &#39;2222&#39;
+        elif loc.startswith(&#39;W&#39;):
+            loc = &#39;1211&#39;
+        elif loc.startswith(&#39;E&#39;):
+            loc = &#39;1212&#39;
+        elif loc.startswith(&#39;S&#39;):
+            loc = &#39;2121&#39;
+        elif loc.startswith(&#39;N&#39;):
+            loc = &#39;2111&#39;
+
+    # Split digits
+    M, N = int(loc[0]), int(loc[1])
+    if loc[3] == &#39;-&#39;:
+        i1, i2 = int(loc[2]), int(loc[4])
+    else:
+        i1, i2 = int(loc[2]), int(loc[2])
+    if loc[-2] == &#39;-&#39;:
+        j1, j2 = int(loc[-3]), int(loc[-1])
+    else:
+        j1, j2 = int(loc[-1]), int(loc[-1])
+    # Validate
+    assert M &gt;= i2 &gt;= i1 &gt; 0, &#34;The specified col index is invalid.&#34;
+    assert N &gt;= j2 &gt;= j1 &gt; 0, &#34;The specified row index is invalid.&#34;
+
+    # Place
+    di = i2-i1+1
+    dj = j2-j1+1
+    loc01(fignum, (j1-1)/N, (i1-1)/M, dj/N, di/M)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="mpl_tools.fig_layout.freshfig"><code class="name flex">
+<span>def <span class="ident">freshfig</span></span>(<span>num=None, figsize=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create/clear figure.</p>
+<p>Same as <code>plt.subplots</code> with the modification that:</p>
+<ul>
+<li>If figure exists: clear it.
+Avoids closing/opening so as to keep pos and size.</li>
+<li>Otherwise: create it.
+This allows for figure sizing &ndash; even with mpl backend MacOS.
+On Linux, it also allows for figure placement, if <code>_place</code>.
+This is done using <code><a title="mpl_tools.fig_layout.load" href="#mpl_tools.fig_layout.load">load()</a></code>.</li>
+</ul>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; freshfig(1, nrows=2, sharex=True)  # doctest: +NORMALIZE_WHITESPACE
+(&lt;Figure size 640x480 with 2 Axes&gt;,
+array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L15-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
+    &#34;&#34;&#34;Create/clear figure.
+
+    Same as `plt.subplots` with the modification that:
+
+    - If figure exists: clear it.
+      Avoids closing/opening so as to keep pos and size.
+    - Otherwise: create it.
+      This allows for figure sizing -- even with mpl backend MacOS.
+      On Linux, it also allows for figure placement, if `_place`.
+      This is done using `load`.
+
+    Example
+    -------
+    &gt;&gt;&gt; freshfig(1, nrows=2, sharex=True)  # doctest: +NORMALIZE_WHITESPACE
+    (&lt;Figure size 640x480 with 2 Axes&gt;,
+    array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
+    &#34;&#34;&#34;
+    already_open = plt.fignum_exists(num)
+
+    fig = plt.figure(num=num, figsize=figsize)
+
+    # Deal with warning bug
+    # https://github.com/matplotlib/matplotlib/issues/9970
+    with warnings.catch_warnings():
+        warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
+        fig.clf()  # &lt;=&gt; fig.clear()
+
+    if (
+        _do_place
+        and is_using_interactive_backend()
+        and not already_open
+        and num is not None
+    ):
+        load(fignums=fig.number)
+
+    _, ax = plt.subplots(num=fig.number, **kwargs)
+    return fig, ax</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.get_geo1"><code class="name flex">
+<span>def <span class="ident">get_geo1</span></span>(<span>fignum)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get geometry specification of a figure.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L73-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def get_geo1(fignum):
+    &#34;&#34;&#34;Get geometry specification of a figure.&#34;&#34;&#34;
+    fmw = _get_fmw(fignum)
+    try:
+        # For Qt4Agg/Qt5Agg
+        return dict(
+            w=fmw.width(),
+            h=fmw.height(),
+            x=fmw.x(),
+            y=fmw.y(),
+        )
+    except Exception:
+        # For TkAgg
+        return fmw.geometry()</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.set_geo1"><code class="name flex">
+<span>def <span class="ident">set_geo1</span></span>(<span>fignum, geo)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set figure geometry.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L89-L99" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def set_geo1(fignum, geo):
+    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
+    plt.figure(fignum)
+    fmw = _get_fmw(int(fignum))
+    try:
+        # For Qt4Agg/Qt5Agg
+        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
+    except Exception:
+        # For TkAgg
+        # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
+        fmw.geometry(newGeometry=geo)</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.save"><code class="name flex">
+<span>def <span class="ident">save</span></span>(<span>path='./.fig_geometries', append_host=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save current figure layout.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L102-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
+    &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
+    if append_host:
+        path = &#34;.&#34;.join([path, platform.node()])
+
+    placements = {num: get_geo1(num) for num in plt.get_fignums()}
+
+    with open(path, &#34;w&#34;) as file:
+        file.write(json.dumps(placements))</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.load"><code class="name flex">
+<span>def <span class="ident">load</span></span>(<span>path='./.fig_geometries', append_host=True, fignums=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load/set figure layout.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L113-L132" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
+    &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
+    if append_host:
+        path = &#34;.&#34;.join([path, platform.node()])
+
+    if not Path(path).is_file():
+        print(&#34;Warning: no figure layout found.&#34;,
+              &#34;Create a new one if you wish using save().&#34;)
+        return
+
+    with open(path, &#34;r&#34;) as file:
+        placements = json.load(file)
+
+    # Convert fignums to int
+    for k in list(placements):
+        placements[int(k)] = placements.pop(k)
+
+    for num in placements:
+        if fignums is None or num == fignums:
+            set_geo1(num, placements[num])</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.show_figs"><code class="name flex">
+<span>def <span class="ident">show_figs</span></span>(<span>fignums=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Move all fig windows to top.</p>
+<p>Doesn't work all that well for all backends/platforms.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L135-L152" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def show_figs(fignums=None):
+    &#34;&#34;&#34;Move all fig windows to top.
+
+    Doesn&#39;t work all that well for all backends/platforms.
+    &#34;&#34;&#34;
+    # Validate fignums
+    if fignums is None:
+        fignums = plt.get_fignums()
+    try:
+        fignums = list(fignums)
+    except TypeError:
+        fignums = [fignums]
+
+    for f in fignums:
+        plt.figure(f)
+        fmw = plt.get_current_fig_manager().window
+        fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
+        fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.get_screen_size"><code class="name flex">
+<span>def <span class="ident">get_screen_size</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get <strong>available</strong> screen size/resolution.</p>
+<p>NB: This might not always work that well,
+especially since the method used depends on the backend.</p>
+<p>Consider using non-mpl method: <a href="https://pypi.org/project/screeninfo">https://pypi.org/project/screeninfo</a></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L155-L193" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def get_screen_size():
+    &#34;&#34;&#34;Get **available** screen size/resolution.
+
+    NB: This might not always work that well,
+    especially since the method used depends on the backend.
+
+    Consider using non-mpl method: https://pypi.org/project/screeninfo
+    &#34;&#34;&#34;
+    if mpl.get_backend().startswith(&#39;Qt&#39;):
+        try:
+            # Ref spyder/widgets/shortcutssummary.py
+            from qtpy.QtWidgets import QDesktopWidget  # type: ignore
+            widget = QDesktopWidget()
+            sc = widget.availableGeometry(widget.primaryScreen())
+            x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
+
+        except ImportError:
+            # https://stackoverflow.com/a/29039755/38281
+            fig = plt.figure()  # new, blank (cheap to resize) figure
+            mgr = plt.get_current_fig_manager()
+            # Now we full-screen the new figure, and pause for effect.
+            # NB: both of these actions results in the figure being shown.
+            mgr.full_screen_toggle(); plt.pause(0.2)  # noqa
+            sc = mgr.canvas
+            x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
+            # mgr.full_screen_toggle()
+            plt.close(fig)
+
+    elif mpl.get_backend() == &#34;TkAgg&#34;:
+        # https://stackoverflow.com/a/42951711/38281
+        mgr = plt.get_current_fig_manager()
+        x0, y0, w0, h0 = (0, 0) + mgr.window.wm_maxsize()
+        # w, h = mgr.window.winfo_screenwidth(), mgr.window.winfo_screenheight()
+    else:
+        print(&#34;Warning: could not detect screen size for this mpl backend.&#34;)
+        print(&#34;Using a default size.&#34;)
+        x0, y0, w0, h0 = 30, 30, 800, 600
+
+    return x0, y0, w0, h0</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.loc01"><code class="name flex">
+<span>def <span class="ident">loc01</span></span>(<span>fignum=None, x=None, y=None, w=None, h=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Place figure on screen, in relative coordinates ∈ [0, 1].</p>
+<p>Only works on Linux?</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L196-L227" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
+    &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
+
+    Only works on Linux?
+    &#34;&#34;&#34;
+    try:
+        fmw = _get_fmw(fignum)
+    except AttributeError:
+        return  # do nothing
+
+    x0, y0, w0, h0 = get_screen_size()
+
+    # It seems the window footers are not taken into account
+    # by the geometry settings. Correct for this:
+    footer = 0.028*(h0+y0)
+
+    # Current values (Qt4Agg only!):
+    w = w if w is not None else fmw.width() / w0
+    h = h if h is not None else fmw.height()/h0
+    x = x if x is not None else fmw.x()     / w0
+    y = y if y is not None else fmw.y()     / h0
+
+    x = x0 + x*w0
+    y = y0 + y*h0 + footer
+    w = w*w0
+    h = h*h0 - footer
+
+    try:  # For Qt4Agg/Qt5Agg
+        fmw.setGeometry(x, y, w, h)
+    except: # noqa # For TkAgg
+        geo = f&#34;{int(w)}x{int(h)}+{int(x)}+{int(y)}&#34;
+        fmw.geometry(newGeometry=geo)</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.fig_layout.loc"><code class="name flex">
+<span>def <span class="ident">loc</span></span>(<span>loc, fignum=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Place figure on screen.</p>
+<ul>
+<li>loc: string that defines the figures new geometry, given either as</li>
+<li>NW, E, &hellip;</li>
+<li>4 digits (as str or int) to define grid M,N,i,j.</li>
+</ul>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; N = 3
+&gt;&gt;&gt; for i in 1 + np.arange(N):
+...     xy = str(N)*2 + str(i)*2
+...     loc(xy, i)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L230-L281" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def loc(loc, fignum=None):
+    &#34;&#34;&#34;Place figure on screen.
+
+    - loc: string that defines the figures new geometry, given either as
+       * NW, E, ...
+       * 4 digits (as str or int) to define grid M,N,i,j.
+
+    Example
+    -------
+    &gt;&gt;&gt; N = 3
+    &gt;&gt;&gt; for i in 1 + np.arange(N):
+    ...     xy = str(N)*2 + str(i)*2
+    ...     loc(xy, i)
+    &#34;&#34;&#34;
+    loc = str(loc)
+    loc = loc.replace(&#34;,&#34;, &#34;&#34;)
+    if not loc[:4].isnumeric():
+        if loc.startswith(&#39;NW&#39;):
+            loc = &#39;2211&#39;
+        elif loc.startswith(&#39;SW&#39;):
+            loc = &#39;2221&#39;
+        elif loc.startswith(&#39;NE&#39;):
+            loc = &#39;2212&#39;
+        elif loc.startswith(&#39;SE&#39;):
+            loc = &#39;2222&#39;
+        elif loc.startswith(&#39;W&#39;):
+            loc = &#39;1211&#39;
+        elif loc.startswith(&#39;E&#39;):
+            loc = &#39;1212&#39;
+        elif loc.startswith(&#39;S&#39;):
+            loc = &#39;2121&#39;
+        elif loc.startswith(&#39;N&#39;):
+            loc = &#39;2111&#39;
+
+    # Split digits
+    M, N = int(loc[0]), int(loc[1])
+    if loc[3] == &#39;-&#39;:
+        i1, i2 = int(loc[2]), int(loc[4])
+    else:
+        i1, i2 = int(loc[2]), int(loc[2])
+    if loc[-2] == &#39;-&#39;:
+        j1, j2 = int(loc[-3]), int(loc[-1])
+    else:
+        j1, j2 = int(loc[-1]), int(loc[-1])
+    # Validate
+    assert M &gt;= i2 &gt;= i1 &gt; 0, &#34;The specified col index is invalid.&#34;
+    assert N &gt;= j2 &gt;= j1 &gt; 0, &#34;The specified row index is invalid.&#34;
+
+    # Place
+    di = i2-i1+1
+    dj = j2-j1+1
+    loc01(fignum, (j1-1)/N, (i1-1)/M, dj/N, di/M)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<div class="gcse-search" style="height: 70px"
+data-as_oq="inurl:github.com/patricknraanes/mpl-tools site:mpl-tools.github.io"
+data-gaCategoryParameter="mpl_tools.fig_layout">
+</div>
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="mpl_tools" href="index.html">mpl_tools</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="mpl_tools.fig_layout.freshfig" href="#mpl_tools.fig_layout.freshfig">freshfig</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.get_geo1" href="#mpl_tools.fig_layout.get_geo1">get_geo1</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.set_geo1" href="#mpl_tools.fig_layout.set_geo1">set_geo1</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.save" href="#mpl_tools.fig_layout.save">save</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.load" href="#mpl_tools.fig_layout.load">load</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.show_figs" href="#mpl_tools.fig_layout.show_figs">show_figs</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.get_screen_size" href="#mpl_tools.fig_layout.get_screen_size">get_screen_size</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.loc01" href="#mpl_tools.fig_layout.loc01">loc01</a></code></li>
+<li><code><a title="mpl_tools.fig_layout.loc" href="#mpl_tools.fig_layout.loc">loc</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
