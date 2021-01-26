@@ -97,7 +97,7 @@ def _autoscale_based_on(ax, line_handles):
     ax.autoscale_view()
 
 
-def toggle_viz(*handles, prompt=False, legend=False, pause=True):
+def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
     """Toggle visibility of the graphics with handle `handles`."""
     are_viz = []
     for h in handles:
@@ -134,7 +134,7 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=True):
     # Pause at where used (typically sequentially in script)
     if prompt:
         input("Press <Enter> to continue...")
-    if pause:
-        plt.pause(0.02)
+    if pause > 0:
+        plt.pause(pause)
 
     return are_viz
