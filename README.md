@@ -8,14 +8,6 @@
 
 This package provides some tools to work with [Matplotlib](https://matplotlib.org/).
 
-- `freshfig`
-- `anchor_axes`, with auxiliaries:
-  - `align_ax_with`
-  - `set_ax_size`
-  - `get_legend_bbox`
-- `add_log_toggler`
-  - `toggle_scale`
-
 ## Installation
 
 #### Normal installation
@@ -40,9 +32,4 @@ into an isolated *virtual environment*.
 To add packages, you should *not* use `pip install`,
 but *poetry*, e.g. `poetry add --dev somepackage`.
 
-<!-- markdownlint-configure-file
-{
-  "no-multiple-blanks": false,
-  "header-increment": false
-}
--->
+<!-- markdownlint-disable-file header-increment -->
