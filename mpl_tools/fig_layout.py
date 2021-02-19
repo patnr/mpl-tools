@@ -12,17 +12,20 @@ from mpl_tools import is_using_interactive_backend
 _FIG_GEOMETRIES_PATH = "./.fig_geometries"
 
 
-def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
-    """Create/clear figure.
+def freshfig(num=None, place=True, **kwargs):
+    """Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
-    Same as `plt.subplots` with the modification that:
+    If `figure(num)` exists, it is **cleared** before calling `subplots`.
+    Unlike closing/opening, this keeps its position and size.
 
-    - If figure exists: clear it.
-      Avoids closing/opening so as to keep pos and size.
-    - Otherwise: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-      On Linux, it also allows for figure placement, if `_place`.
-      This is done using `load`.
+    If `place==2`, the figure placement is `load`ed, provided the figure's
+    position has previously been `save`d. If `place==1`, the active placement
+    only happens if the figure did not yet exist.
+
+    .. note:
+        Active placement (including re-sizing) on the `mpl` backend **MacOSX**
+        [does not work](https://stackoverflow.com/a/30180994). However, sizing
+        **upon creation** works, and Qt5Agg (or TkAgg) can also be installed.
 
     Example
     -------
@@ -32,7 +35,7 @@ def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
     """
     already_open = plt.fignum_exists(num)
 
-    fig = plt.figure(num=num, figsize=figsize)
+    fig = plt.figure(num=num, figsize=kwargs.pop("figsize", None))
 
     # Deal with warning bug
     # https://github.com/matplotlib/matplotlib/issues/9970
@@ -41,10 +44,10 @@ def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
         fig.clf()  # <=> fig.clear()
 
     if (
-        _do_place
-        and is_using_interactive_backend()
-        and not already_open
-        and num is not None
+        is_using_interactive_backend()
+        and place > 1 or (place and not already_open)
+        and num is not None  # It makes little sense to load placement
+                             # for the figure number resulting from None
     ):
         load(fignums=fig.number)
 
@@ -89,7 +92,11 @@ def get_geo1(fignum):
 def set_geo1(fignum, geo):
     """Set figure geometry."""
     plt.figure(fignum)
-    fmw = _get_fmw(int(fignum))
+    try:
+        fmw = _get_fmw(int(fignum))
+    except AttributeError:
+        # print("Could not place window with this mpl backend. Try Qt5Agg.")
+        return
     try:
         # For Qt4Agg/Qt5Agg
         fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
