@@ -65,16 +65,31 @@ def _get_fig(fignum=None):
         return plt.figure(fignum)
 
 
+class FigManagerDoesNotExist(Exception):
+    """Signal that figure placement ain't possible with this mpl backend.
+
+    Use exception (a custom subclass for finesse and thereby safety) to
+    propagate error up stack to where we want to treat them. Consider: the
+    alternative solution of returning some special value to signal an error
+    would necessitate an additional `if (val==SPECIAL): return SPECIAL` clause
+    at each intervening-level, even for functions that are not supposed to
+    return anything.
+    """
+
+
 def _get_fmw(fignum):
-    """If this fails, there's probs no way to make placement work."""
-    # fmw = plt.get_current_fig_manager().window
     fig = _get_fig(fignum)
-    fmw = fig.canvas.manager.window
+    try:
+        fmw = fig.canvas.manager.window
+        # fmw = plt.get_current_fig_manager().window
+    except AttributeError:
+        raise FigManagerDoesNotExist(
+            "Cannot programmatically manipulate figure windows"
+            f" with the current mpl. backend ({mpl.get_backend()})")
     return fmw
 
 
-def get_geo1(fignum):
-    """Get geometry specification of a figure."""
+def _get_geo1(fignum):
     fmw = _get_fmw(fignum)
     try:
         # For Qt4Agg/Qt5Agg
@@ -89,14 +104,9 @@ def get_geo1(fignum):
         return fmw.geometry()
 
 
-def set_geo1(fignum, geo):
-    """Set figure geometry."""
+def _set_geo1(fignum, geo):
     plt.figure(fignum)
-    try:
-        fmw = _get_fmw(int(fignum))
-    except AttributeError:
-        # print("Could not place window with this mpl backend. Try Qt5Agg.")
-        return
+    fmw = _get_fmw(int(fignum))
     try:
         # For Qt4Agg/Qt5Agg
         fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
@@ -111,13 +121,13 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     if append_host:
         path = ".".join([path, platform.node()])
 
-    placements = {num: get_geo1(num) for num in plt.get_fignums()}
-
-    with open(path, "w") as file:
-        file.write(json.dumps(placements))
-
-
-_HAS_NOTIFIED = False
+    try:
+        placements = {num: _get_geo1(num) for num in plt.get_fignums()}
+    except FigManagerDoesNotExist as e:
+        warnings.warn(str(e))
+    else:
+        with open(path, "w") as file:
+            file.write(json.dumps(placements))
 
 
 def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
@@ -125,30 +135,28 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
     if append_host:
         path = ".".join([path, platform.node()])
 
-    global _HAS_NOTIFIED
+    # Suggest saving layout
     if not Path(path).is_file():
-        if not _HAS_NOTIFIED:
-            print(f"Note: for persistent figure layout use {__name__}.save().")
-            _HAS_NOTIFIED = True
+        warnings.warn(f"Note: for persistent figure layout use {__name__}.save().")
         return
 
     with open(path, "r") as file:
         placements = json.load(file)
 
-    # Convert fignums to int
+    # Cast fignums to int
     for k in list(placements):
         placements[int(k)] = placements.pop(k)
 
-    for num in placements:
-        if fignums is None or num == fignums:
-            set_geo1(num, placements[num])
+    try:
+        for num in placements:
+            if fignums is None or num == fignums:
+                _set_geo1(num, placements[num])
+    except FigManagerDoesNotExist as e:
+        warnings.warn(str(e))
 
 
 def show_figs(fignums=None):
-    """Move all fig windows to top.
-
-    Doesn't work all that well for all backends/platforms.
-    """
+    """Move all fig windows to top."""
     # Validate fignums
     if fignums is None:
         fignums = plt.get_fignums()
@@ -157,11 +165,13 @@ def show_figs(fignums=None):
     except TypeError:
         fignums = [fignums]
 
-    for f in fignums:
-        plt.figure(f)
-        fmw = plt.get_current_fig_manager().window
-        fmw.attributes('-topmost', 1)  # Bring to front, but
-        fmw.attributes('-topmost', 0)  # don't keep in front
+    try:
+        for f in fignums:
+            fmw = _get_fmw(f)
+            fmw.attributes('-topmost', 1)  # Bring to front, but
+            fmw.attributes('-topmost', 0)  # don't keep in front
+    except FigManagerDoesNotExist as e:
+        warnings.warn(str(e))
 
 
 def get_screen_size():
@@ -212,8 +222,9 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     """
     try:
         fmw = _get_fmw(fignum)
-    except AttributeError:
-        return  # do nothing
+    except FigManagerDoesNotExist as e:
+        warnings.warn(str(e))
+        return
 
     x0, y0, w0, h0 = get_screen_size()
 

@@ -15,14 +15,14 @@ def test_save_load():
         return
 
     fig, ax = plt.subplots(1)
-    geo1 = fig_layout.get_geo1(1)
+    geo1 = fig_layout._get_geo1(1)
     fig_layout.save()
 
     plt.close("all")
 
     fig, ax = plt.subplots(1)
     fig_layout.load()
-    geo2 = fig_layout.get_geo1(1)
+    geo2 = fig_layout._get_geo1(1)
 
     mpl.use(bk)
     assert geo1 == geo2

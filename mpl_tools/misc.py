@@ -60,13 +60,13 @@ def nRowCol(nTotal, figsize=None, axsize=None):
     Examples
     --------
     >>> nRowCol(4)
-    (2, 2)
+    {'nrows': 2, 'ncols': 2}
     >>> nRowCol(4, (4, 1), (1, 1))
-    (1, 4)
+    {'nrows': 1, 'ncols': 4}
     >>> nRowCol(4, (4, 1), (4, 1))
-    (2, 2)
+    {'nrows': 2, 'ncols': 2}
     >>> nRowCol(12, (4, 3), (1, 1))
-    (3, 4)
+    {'nrows': 3, 'ncols': 4}
     """
     # Defaults
     if figsize is None:
