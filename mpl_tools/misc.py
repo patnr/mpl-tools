@@ -92,7 +92,7 @@ def nRowCol(nTotal, figsize=None, axsize=None):
     if nrows * ncols < nTotal:
         ncols += 1
 
-    return nrows, ncols
+    return {"nrows": nrows, "ncols": ncols}
 
 
 # TODO: re-include NicePrint from struct-tools?
