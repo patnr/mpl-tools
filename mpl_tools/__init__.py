@@ -28,8 +28,20 @@ except (NameError, ImportError):
 
 
 def is_using_interactive_backend():
-    """Check fi mpl (currently) using an interactive backend.
+    """Check if `mpl` is (currently) using an interactive backend.
 
-    Not to be confused with plt.ion() state.
+    This means that the figures may be shown on screen.
+    But only if you've done `plt.ion` so that `mpl.is_interactive`,
+    or after calling `plt.show`.
+
+    Note on jupyter notebook backends:
+    - `%matplotlib notebook` (`nbAgg`) is interactive.
+    - `%matplotlib inline` is not, but still shows up in the notebook.
+      It can also be updated; see `dapper/tools/viz:plot_pause()`.
+      However, it does not allow for mouse interaction,
+      as it is merely a static picture.
+      It also uses different dpi than `nbAgg`, ref
+      https://github.com/matplotlib/matplotlib/issues/4853
+    - `%matplotlib widgets` is for Jupyterlab?
     """
     return mpl.get_backend() in mpl.rcsetup.interactive_bk
