@@ -47,6 +47,9 @@ def freshfig(num=None, place=True, **kwargs):
     If `place==2`, the figure placement is `load`ed, provided the figure's
     position has previously been `save`d. If `place==1`, the active placement
     only happens if the figure did not yet exist.
+    If `figsize` is among the `kwargs` it will still be overruled
+    by the figure placement, as it should (it is quite convenient when
+    working with scripts that *also* run in Jupyter).
 
     .. note:
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
