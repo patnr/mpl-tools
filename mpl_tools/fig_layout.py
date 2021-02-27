@@ -7,7 +7,7 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-from mpl_tools import is_using_interactive_backend
+from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
 
 _FIG_GEOMETRIES_PATH = "./.fig_geometries"
 
@@ -44,8 +44,7 @@ def freshfig(num=None, place=True, **kwargs):
         fig.clf()  # <=> fig.clear()
 
     if (
-        is_using_interactive_backend()
-        and place > 1 or (place and not already_open)
+        place > 1 or (place and not already_open)
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
@@ -132,6 +131,9 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
 
 def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
     """Load/set figure layout."""
+    if is_notebook_or_qt or not is_using_interactive_backend():
+        return  # quietly
+
     if append_host:
         path = ".".join([path, platform.node()])
 
