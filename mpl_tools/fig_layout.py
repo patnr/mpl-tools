@@ -168,7 +168,10 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
 
     # Suggest saving layout
     if not Path(path).is_file():
-        warn(f"Consider using {__name__}.save() for persistent figure layout.")
+        # TODO: deactivate until this is resolved:
+        # https://stackoverflow.com/q/66388579
+        # warn(f"Consider using {__name__}.save()"
+        #      " for persistent figure layout.", stacklevel=2)
         return
 
     with open(path, "r") as file:
