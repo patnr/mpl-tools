@@ -1,4 +1,5 @@
 """Tools for placing figures (not axes) on screen."""
+import functools
 import json
 import platform
 import warnings
@@ -10,6 +11,31 @@ from matplotlib import pyplot as plt
 from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
 
 _FIG_GEOMETRIES_PATH = "./.fig_geometries"
+
+
+@functools.wraps(warnings.warn)
+def warn(*args, **kwargs):
+    """Avoid warnings printing the source code for itself.
+
+    For example, we don't want `warnings.warn("Something went wrong")`
+    to print that whole source line, which would duplicate the actual message.
+    Using the `stacklevel` arg of `warn` doesn't cut it, because we don't
+    necessarily want to climb one level up.
+
+    Refs:
+    - <https://stackoverflow.com/a/26433913>
+    - <https://stackoverflow.com/a/2187390>
+    """
+    kwargs["stacklevel"] = kwargs.get("stacklevel", 1) + 1
+
+    def frmt_warning(msg, category, filename, lineno, file=None, line=None):
+        return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, msg)
+
+    # Set custom frmt_warning (before calling warn), but restore original afterwards
+    original = warnings.formatwarning
+    warnings.formatwarning = frmt_warning
+    warnings.warn(*args, **kwargs)
+    warnings.formatwarning = original
 
 
 def freshfig(num=None, place=True, **kwargs):
@@ -123,7 +149,7 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     try:
         placements = {num: _get_geo1(num) for num in plt.get_fignums()}
     except FigManagerDoesNotExist as e:
-        warnings.warn(str(e))
+        warn(str(e))
     else:
         with open(path, "w") as file:
             file.write(json.dumps(placements))
@@ -139,7 +165,7 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
 
     # Suggest saving layout
     if not Path(path).is_file():
-        warnings.warn(f"Note: for persistent figure layout use {__name__}.save().")
+        warn(f"Consider using {__name__}.save() for persistent figure layout.")
         return
 
     with open(path, "r") as file:
@@ -154,7 +180,7 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
             if fignums is None or num == fignums:
                 _set_geo1(num, placements[num])
     except FigManagerDoesNotExist as e:
-        warnings.warn(str(e))
+        warn(str(e))
 
 
 def show_figs(fignums=None):
@@ -173,7 +199,7 @@ def show_figs(fignums=None):
             fmw.attributes('-topmost', 1)  # Bring to front, but
             fmw.attributes('-topmost', 0)  # don't keep in front
     except FigManagerDoesNotExist as e:
-        warnings.warn(str(e))
+        warn(str(e))
 
 
 def get_screen_size():
@@ -225,7 +251,7 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     try:
         fmw = _get_fmw(fignum)
     except FigManagerDoesNotExist as e:
-        warnings.warn(str(e))
+        warn(str(e))
         return
 
     x0, y0, w0, h0 = get_screen_size()
