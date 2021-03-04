@@ -35,9 +35,10 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L280" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L344" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
+import functools
 import json
 import platform
 import warnings
@@ -46,22 +47,54 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-from mpl_tools import is_using_interactive_backend
+from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
 
 _FIG_GEOMETRIES_PATH = &#34;./.fig_geometries&#34;
 
 
-def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
-    &#34;&#34;&#34;Create/clear figure.
+@functools.wraps(warnings.warn)
+def warn(*args, **kwargs):
+    &#34;&#34;&#34;Avoid warnings printing the source code for itself.
 
-    Same as `plt.subplots` with the modification that:
+    For example, we don&#39;t want `warnings.warn(&#34;Something went wrong&#34;)`
+    to print that whole source line, which would duplicate the actual message.
+    Using the `stacklevel` arg of `warn` doesn&#39;t cut it, because we don&#39;t
+    necessarily want to climb one level up.
 
-    - If figure exists: clear it.
-      Avoids closing/opening so as to keep pos and size.
-    - Otherwise: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-      On Linux, it also allows for figure placement, if `_place`.
-      This is done using `load`.
+    Refs:
+    - &lt;https://stackoverflow.com/a/26433913&gt;
+    - &lt;https://stackoverflow.com/a/2187390&gt;
+    &#34;&#34;&#34;
+    kwargs[&#34;stacklevel&#34;] = kwargs.get(&#34;stacklevel&#34;, 1) + 1
+
+    def frmt_warning(msg, category, filename, lineno, file=None, line=None):
+        return &#39;%s:%s: %s: %s\n&#39; % (filename, lineno, category.__name__, msg)
+
+    # Set custom frmt_warning (before calling warn), but restore original afterwards
+    original = warnings.formatwarning
+    warnings.formatwarning = frmt_warning
+    warnings.warn(*args, **kwargs)
+    warnings.formatwarning = original
+
+
+def freshfig(num=None, place=True, **kwargs):
+    &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
+
+    If `figure(num)` exists, it is **cleared** before calling `subplots`.
+    Unlike closing/opening, this keeps its position and size.
+    Note that `num` can also be a string, i.e. the label of the figure.
+
+    If `place==2`, the figure placement is `load`ed, provided the figure&#39;s
+    position has previously been `save`d. If `place==1`, the active placement
+    only happens if the figure did not yet exist.
+    If `figsize` is among the `kwargs` it will still be overruled
+    by the figure placement, as it should (it is quite convenient when
+    working with scripts that *also* run in Jupyter).
+
+    .. note:
+        Active placement (including re-sizing) on the `mpl` backend **MacOSX**
+        [does not work](https://stackoverflow.com/a/30180994). However, sizing
+        **upon creation** works, and Qt5Agg (or TkAgg) can also be installed.
 
     Example
     -------
@@ -71,7 +104,7 @@ def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
     &#34;&#34;&#34;
     already_open = plt.fignum_exists(num)
 
-    fig = plt.figure(num=num, figsize=figsize)
+    fig = plt.figure(num=num, figsize=kwargs.pop(&#34;figsize&#34;, None))
 
     # Deal with warning bug
     # https://github.com/matplotlib/matplotlib/issues/9970
@@ -80,12 +113,11 @@ def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
         fig.clf()  # &lt;=&gt; fig.clear()
 
     if (
-        _do_place
-        and is_using_interactive_backend()
-        and not already_open
-        and num is not None
+        place &gt; 1 or (place and not already_open)
+        and num is not None  # It makes little sense to load placement
+                             # for the figure number resulting from None
     ):
-        load(fignums=fig.number)
+        load(fignum=num)
 
     _, ax = plt.subplots(num=fig.number, **kwargs)
     return fig, ax
@@ -101,16 +133,31 @@ def _get_fig(fignum=None):
         return plt.figure(fignum)
 
 
+class FigManagerDoesNotExist(Exception):
+    &#34;&#34;&#34;Signal that figure placement ain&#39;t possible with this mpl backend.
+
+    Use exception (a custom subclass for finesse and thereby safety) to
+    propagate error up stack to where we want to treat them. Consider: the
+    alternative solution of returning some special value to signal an error
+    would necessitate an additional `if (val==SPECIAL): return SPECIAL` clause
+    at each intervening-level, even for functions that are not supposed to
+    return anything.
+    &#34;&#34;&#34;
+
+
 def _get_fmw(fignum):
-    &#34;&#34;&#34;If this fails, there&#39;s probs no way to make placement work.&#34;&#34;&#34;
-    # fmw = plt.get_current_fig_manager().window
     fig = _get_fig(fignum)
-    fmw = fig.canvas.manager.window
+    try:
+        fmw = fig.canvas.manager.window
+        # fmw = plt.get_current_fig_manager().window
+    except AttributeError:
+        raise FigManagerDoesNotExist(
+            &#34;Cannot programmatically manipulate figure windows&#34;
+            f&#34; with the current mpl. backend ({mpl.get_backend()})&#34;)
     return fmw
 
 
-def get_geo1(fignum):
-    &#34;&#34;&#34;Get geometry specification of a figure.&#34;&#34;&#34;
+def _get_geo1(fignum):
     fmw = _get_fmw(fignum)
     try:
         # For Qt4Agg/Qt5Agg
@@ -125,10 +172,8 @@ def get_geo1(fignum):
         return fmw.geometry()
 
 
-def set_geo1(fignum, geo):
-    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
-    plt.figure(fignum)
-    fmw = _get_fmw(int(fignum))
+def _set_geo1(fignum, geo):
+    fmw = _get_fmw(fignum)
     try:
         # For Qt4Agg/Qt5Agg
         fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
@@ -143,39 +188,55 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     if append_host:
         path = &#34;.&#34;.join([path, platform.node()])
 
-    placements = {num: get_geo1(num) for num in plt.get_fignums()}
+    try:
+        # Use labels if defined, else numbers
+        lbls = [lbl or num for lbl, num in
+                zip(plt.get_figlabels(), plt.get_fignums())]
+        placements = {k: _get_geo1(k) for k in lbls}
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
+    else:
+        with open(path, &#34;w&#34;) as file:
+            file.write(json.dumps(placements))
 
-    with open(path, &#34;w&#34;) as file:
-        file.write(json.dumps(placements))
 
-
-def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
+def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
+    if is_notebook_or_qt or not is_using_interactive_backend():
+        return  # quietly
+
     if append_host:
         path = &#34;.&#34;.join([path, platform.node()])
 
+    # Suggest saving layout
     if not Path(path).is_file():
-        print(&#34;Warning: no figure layout found.&#34;,
-              &#34;Create a new one if you wish using save().&#34;)
+        # TODO: deactivate until this is resolved:
+        # https://stackoverflow.com/q/66388579
+        # warn(f&#34;Consider using {__name__}.save()&#34;
+        #      &#34; for persistent figure layout.&#34;, stacklevel=2)
         return
 
     with open(path, &#34;r&#34;) as file:
         placements = json.load(file)
 
-    # Convert fignums to int
-    for k in list(placements):
-        placements[int(k)] = placements.pop(k)
+    # Cast nums to int
+    for key in list(placements):
+        try:
+            lbl = int(key)
+        except ValueError:
+            lbl = key
+        placements[lbl] = placements.pop(key)
 
-    for num in placements:
-        if fignums is None or num == fignums:
-            set_geo1(num, placements[num])
+    try:
+        for lbl in placements:
+            if fignum is None or lbl == fignum:
+                _set_geo1(lbl, placements[lbl])
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
 
 
 def show_figs(fignums=None):
-    &#34;&#34;&#34;Move all fig windows to top.
-
-    Doesn&#39;t work all that well for all backends/platforms.
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
     # Validate fignums
     if fignums is None:
         fignums = plt.get_fignums()
@@ -184,11 +245,13 @@ def show_figs(fignums=None):
     except TypeError:
         fignums = [fignums]
 
-    for f in fignums:
-        plt.figure(f)
-        fmw = plt.get_current_fig_manager().window
-        fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
-        fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front
+    try:
+        for f in fignums:
+            fmw = _get_fmw(f)
+            fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
+            fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
 
 
 def get_screen_size():
@@ -239,8 +302,9 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;
     try:
         fmw = _get_fmw(fignum)
-    except AttributeError:
-        return  # do nothing
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
+        return
 
     x0, y0, w0, h0 = get_screen_size()
 
@@ -328,19 +392,23 @@ def loc(loc, fignum=None):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="mpl_tools.fig_layout.freshfig"><code class="name flex">
-<span>def <span class="ident">freshfig</span></span>(<span>num=None, figsize=None, **kwargs)</span>
+<span>def <span class="ident">freshfig</span></span>(<span>num=None, place=True, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create/clear figure.</p>
-<p>Same as <code>plt.subplots</code> with the modification that:</p>
-<ul>
-<li>If figure exists: clear it.
-Avoids closing/opening so as to keep pos and size.</li>
-<li>Otherwise: create it.
-This allows for figure sizing &ndash; even with mpl backend MacOS.
-On Linux, it also allows for figure placement, if <code>_place</code>.
-This is done using <code><a title="mpl_tools.fig_layout.load" href="#mpl_tools.fig_layout.load">load()</a></code>.</li>
-</ul>
+<div class="desc"><p>Create/clear figure, place it, call <code>plt.subplots(**kwargs)</code>.</p>
+<p>If <code>figure(num)</code> exists, it is <strong>cleared</strong> before calling <code>subplots</code>.
+Unlike closing/opening, this keeps its position and size.
+Note that <code>num</code> can also be a string, i.e. the label of the figure.</p>
+<p>If <code>place==2</code>, the figure placement is <code><a title="mpl_tools.fig_layout.load" href="#mpl_tools.fig_layout.load">load()</a></code>ed, provided the figure's
+position has previously been <code><a title="mpl_tools.fig_layout.save" href="#mpl_tools.fig_layout.save">save()</a></code>d. If <code>place==1</code>, the active placement
+only happens if the figure did not yet exist.
+If <code>figsize</code> is among the <code>kwargs</code> it will still be overruled
+by the figure placement, as it should (it is quite convenient when
+working with scripts that <em>also</em> run in Jupyter).</p>
+<p>.. note:
+Active placement (including re-sizing) on the <code>mpl</code> backend <strong>MacOSX</strong>
+<a href="https://stackoverflow.com/a/30180994">does not work</a>. However, sizing
+<strong>upon creation</strong> works, and Qt5Agg (or TkAgg) can also be installed.</p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; freshfig(1, nrows=2, sharex=True)  # doctest: +NORMALIZE_WHITESPACE
 (&lt;Figure size 640x480 with 2 Axes&gt;,
@@ -349,19 +417,26 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L15-L52" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L41-L84" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">def freshfig(num=None, figsize=None, _do_place=True, **kwargs):
-    &#34;&#34;&#34;Create/clear figure.
+<pre><code class="python">def freshfig(num=None, place=True, **kwargs):
+    &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
-    Same as `plt.subplots` with the modification that:
+    If `figure(num)` exists, it is **cleared** before calling `subplots`.
+    Unlike closing/opening, this keeps its position and size.
+    Note that `num` can also be a string, i.e. the label of the figure.
 
-    - If figure exists: clear it.
-      Avoids closing/opening so as to keep pos and size.
-    - Otherwise: create it.
-      This allows for figure sizing -- even with mpl backend MacOS.
-      On Linux, it also allows for figure placement, if `_place`.
-      This is done using `load`.
+    If `place==2`, the figure placement is `load`ed, provided the figure&#39;s
+    position has previously been `save`d. If `place==1`, the active placement
+    only happens if the figure did not yet exist.
+    If `figsize` is among the `kwargs` it will still be overruled
+    by the figure placement, as it should (it is quite convenient when
+    working with scripts that *also* run in Jupyter).
+
+    .. note:
+        Active placement (including re-sizing) on the `mpl` backend **MacOSX**
+        [does not work](https://stackoverflow.com/a/30180994). However, sizing
+        **upon creation** works, and Qt5Agg (or TkAgg) can also be installed.
 
     Example
     -------
@@ -371,7 +446,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     &#34;&#34;&#34;
     already_open = plt.fignum_exists(num)
 
-    fig = plt.figure(num=num, figsize=figsize)
+    fig = plt.figure(num=num, figsize=kwargs.pop(&#34;figsize&#34;, None))
 
     # Deal with warning bug
     # https://github.com/matplotlib/matplotlib/issues/9970
@@ -380,64 +455,14 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
         fig.clf()  # &lt;=&gt; fig.clear()
 
     if (
-        _do_place
-        and is_using_interactive_backend()
-        and not already_open
-        and num is not None
+        place &gt; 1 or (place and not already_open)
+        and num is not None  # It makes little sense to load placement
+                             # for the figure number resulting from None
     ):
-        load(fignums=fig.number)
+        load(fignum=num)
 
     _, ax = plt.subplots(num=fig.number, **kwargs)
     return fig, ax</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.fig_layout.get_geo1"><code class="name flex">
-<span>def <span class="ident">get_geo1</span></span>(<span>fignum)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Get geometry specification of a figure.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L73-L86" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def get_geo1(fignum):
-    &#34;&#34;&#34;Get geometry specification of a figure.&#34;&#34;&#34;
-    fmw = _get_fmw(fignum)
-    try:
-        # For Qt4Agg/Qt5Agg
-        return dict(
-            w=fmw.width(),
-            h=fmw.height(),
-            x=fmw.x(),
-            y=fmw.y(),
-        )
-    except Exception:
-        # For TkAgg
-        return fmw.geometry()</code></pre>
-</details>
-</dd>
-<dt id="mpl_tools.fig_layout.set_geo1"><code class="name flex">
-<span>def <span class="ident">set_geo1</span></span>(<span>fignum, geo)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set figure geometry.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L89-L99" class="git-link">Browse git</a>
-</summary>
-<pre><code class="python">def set_geo1(fignum, geo):
-    &#34;&#34;&#34;Set figure geometry.&#34;&#34;&#34;
-    plt.figure(fignum)
-    fmw = _get_fmw(int(fignum))
-    try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
-    except Exception:
-        # For TkAgg
-        # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
-        fmw.geometry(newGeometry=geo)</code></pre>
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.save"><code class="name flex">
@@ -448,67 +473,82 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L102-L110" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L147-L161" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
     if append_host:
         path = &#34;.&#34;.join([path, platform.node()])
 
-    placements = {num: get_geo1(num) for num in plt.get_fignums()}
-
-    with open(path, &#34;w&#34;) as file:
-        file.write(json.dumps(placements))</code></pre>
+    try:
+        # Use labels if defined, else numbers
+        lbls = [lbl or num for lbl, num in
+                zip(plt.get_figlabels(), plt.get_fignums())]
+        placements = {k: _get_geo1(k) for k in lbls}
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
+    else:
+        with open(path, &#34;w&#34;) as file:
+            file.write(json.dumps(placements))</code></pre>
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.load"><code class="name flex">
-<span>def <span class="ident">load</span></span>(<span>path='./.fig_geometries', append_host=True, fignums=None)</span>
+<span>def <span class="ident">load</span></span>(<span>path='./.fig_geometries', append_host=True, fignum=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Load/set figure layout.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L113-L132" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L164-L196" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
+<pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
+    if is_notebook_or_qt or not is_using_interactive_backend():
+        return  # quietly
+
     if append_host:
         path = &#34;.&#34;.join([path, platform.node()])
 
+    # Suggest saving layout
     if not Path(path).is_file():
-        print(&#34;Warning: no figure layout found.&#34;,
-              &#34;Create a new one if you wish using save().&#34;)
+        # TODO: deactivate until this is resolved:
+        # https://stackoverflow.com/q/66388579
+        # warn(f&#34;Consider using {__name__}.save()&#34;
+        #      &#34; for persistent figure layout.&#34;, stacklevel=2)
         return
 
     with open(path, &#34;r&#34;) as file:
         placements = json.load(file)
 
-    # Convert fignums to int
-    for k in list(placements):
-        placements[int(k)] = placements.pop(k)
+    # Cast nums to int
+    for key in list(placements):
+        try:
+            lbl = int(key)
+        except ValueError:
+            lbl = key
+        placements[lbl] = placements.pop(key)
 
-    for num in placements:
-        if fignums is None or num == fignums:
-            set_geo1(num, placements[num])</code></pre>
+    try:
+        for lbl in placements:
+            if fignum is None or lbl == fignum:
+                _set_geo1(lbl, placements[lbl])
+    except FigManagerDoesNotExist as e:
+        warn(str(e))</code></pre>
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.show_figs"><code class="name flex">
 <span>def <span class="ident">show_figs</span></span>(<span>fignums=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Move all fig windows to top.</p>
-<p>Doesn't work all that well for all backends/platforms.</p></div>
+<div class="desc"><p>Move all fig windows to top.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L135-L152" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L199-L215" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def show_figs(fignums=None):
-    &#34;&#34;&#34;Move all fig windows to top.
-
-    Doesn&#39;t work all that well for all backends/platforms.
-    &#34;&#34;&#34;
+    &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
     # Validate fignums
     if fignums is None:
         fignums = plt.get_fignums()
@@ -517,11 +557,13 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     except TypeError:
         fignums = [fignums]
 
-    for f in fignums:
-        plt.figure(f)
-        fmw = plt.get_current_fig_manager().window
-        fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
-        fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front</code></pre>
+    try:
+        for f in fignums:
+            fmw = _get_fmw(f)
+            fmw.attributes(&#39;-topmost&#39;, 1)  # Bring to front, but
+            fmw.attributes(&#39;-topmost&#39;, 0)  # don&#39;t keep in front
+    except FigManagerDoesNotExist as e:
+        warn(str(e))</code></pre>
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.get_screen_size"><code class="name flex">
@@ -535,7 +577,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L155-L193" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L218-L256" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def get_screen_size():
     &#34;&#34;&#34;Get **available** screen size/resolution.
@@ -587,7 +629,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L196-L227" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L259-L291" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
@@ -596,8 +638,9 @@ especially since the method used depends on the backend.</p>
     &#34;&#34;&#34;
     try:
         fmw = _get_fmw(fignum)
-    except AttributeError:
-        return  # do nothing
+    except FigManagerDoesNotExist as e:
+        warn(str(e))
+        return
 
     x0, y0, w0, h0 = get_screen_size()
 
@@ -642,7 +685,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L230-L281" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L294-L345" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc(loc, fignum=None):
     &#34;&#34;&#34;Place figure on screen.
@@ -701,6 +744,43 @@ especially since the method used depends on the backend.</p>
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="mpl_tools.fig_layout.FigManagerDoesNotExist"><code class="flex name class">
+<span>class <span class="ident">FigManagerDoesNotExist</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Signal that figure placement ain't possible with this mpl backend.</p>
+<p>Use exception (a custom subclass for finesse and thereby safety) to
+propagate error up stack to where we want to treat them. Consider: the
+alternative solution of returning some special value to signal an error
+would necessitate an additional <code>if (val==SPECIAL): return SPECIAL</code> clause
+at each intervening-level, even for functions that are not supposed to
+return anything.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L97-L106" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FigManagerDoesNotExist(Exception):
+    &#34;&#34;&#34;Signal that figure placement ain&#39;t possible with this mpl backend.
+
+    Use exception (a custom subclass for finesse and thereby safety) to
+    propagate error up stack to where we want to treat them. Consider: the
+    alternative solution of returning some special value to signal an error
+    would necessitate an additional `if (val==SPECIAL): return SPECIAL` clause
+    at each intervening-level, even for functions that are not supposed to
+    return anything.
+    &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -721,14 +801,19 @@ data-gaCategoryParameter="mpl_tools.fig_layout">
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
 <li><code><a title="mpl_tools.fig_layout.freshfig" href="#mpl_tools.fig_layout.freshfig">freshfig</a></code></li>
-<li><code><a title="mpl_tools.fig_layout.get_geo1" href="#mpl_tools.fig_layout.get_geo1">get_geo1</a></code></li>
-<li><code><a title="mpl_tools.fig_layout.set_geo1" href="#mpl_tools.fig_layout.set_geo1">set_geo1</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.save" href="#mpl_tools.fig_layout.save">save</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.load" href="#mpl_tools.fig_layout.load">load</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.show_figs" href="#mpl_tools.fig_layout.show_figs">show_figs</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.get_screen_size" href="#mpl_tools.fig_layout.get_screen_size">get_screen_size</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.loc01" href="#mpl_tools.fig_layout.loc01">loc01</a></code></li>
 <li><code><a title="mpl_tools.fig_layout.loc" href="#mpl_tools.fig_layout.loc">loc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="mpl_tools.fig_layout.FigManagerDoesNotExist" href="#mpl_tools.fig_layout.FigManagerDoesNotExist">FigManagerDoesNotExist</a></code></h4>
+</li>
 </ul>
 </li>
 </ul>

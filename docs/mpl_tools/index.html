@@ -40,7 +40,7 @@ through the following links, which are also available in the left sidebar.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L34" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L46" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Documentation for mpl-tools.
 
@@ -72,9 +72,21 @@ except (NameError, ImportError):
 
 
 def is_using_interactive_backend():
-    &#34;&#34;&#34;Check fi mpl (currently) using an interactive backend.
+    &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
 
-    Not to be confused with plt.ion() state.
+    This means that the figures may be shown on screen.
+    But only if you&#39;ve done `plt.ion` so that `mpl.is_interactive`,
+    or after calling `plt.show`.
+
+    Note on jupyter notebook backends:
+    - `%matplotlib notebook` (`nbAgg`) is interactive.
+    - `%matplotlib inline` is not, but still shows up in the notebook.
+      It can also be updated; see `dapper/tools/viz:plot_pause()`.
+      However, it does not allow for mouse interaction,
+      as it is merely a static picture.
+      It also uses different dpi than `nbAgg`, ref
+      https://github.com/matplotlib/matplotlib/issues/4853
+    - `%matplotlib widgets` is for Jupyterlab?
     &#34;&#34;&#34;
     return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
 </details>
@@ -135,17 +147,40 @@ def is_using_interactive_backend():
 <span>def <span class="ident">is_using_interactive_backend</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Check fi mpl (currently) using an interactive backend.</p>
-<p>Not to be confused with plt.ion() state.</p></div>
+<div class="desc"><p>Check if <code>mpl</code> is (currently) using an interactive backend.</p>
+<p>This means that the figures may be shown on screen.
+But only if you've done <code>plt.ion</code> so that <code>mpl.is_interactive</code>,
+or after calling <code>plt.show</code>.</p>
+<p>Note on jupyter notebook backends:
+- <code>%matplotlib notebook</code> (<code>nbAgg</code>) is interactive.
+- <code>%matplotlib inline</code> is not, but still shows up in the notebook.
+It can also be updated; see <code>dapper/tools/viz:plot_pause()</code>.
+However, it does not allow for mouse interaction,
+as it is merely a static picture.
+It also uses different dpi than <code>nbAgg</code>, ref
+<a href="https://github.com/matplotlib/matplotlib/issues/4853">https://github.com/matplotlib/matplotlib/issues/4853</a>
+- <code>%matplotlib widgets</code> is for Jupyterlab?</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L30-L35" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L30-L47" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def is_using_interactive_backend():
-    &#34;&#34;&#34;Check fi mpl (currently) using an interactive backend.
+    &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
 
-    Not to be confused with plt.ion() state.
+    This means that the figures may be shown on screen.
+    But only if you&#39;ve done `plt.ion` so that `mpl.is_interactive`,
+    or after calling `plt.show`.
+
+    Note on jupyter notebook backends:
+    - `%matplotlib notebook` (`nbAgg`) is interactive.
+    - `%matplotlib inline` is not, but still shows up in the notebook.
+      It can also be updated; see `dapper/tools/viz:plot_pause()`.
+      However, it does not allow for mouse interaction,
+      as it is merely a static picture.
+      It also uses different dpi than `nbAgg`, ref
+      https://github.com/matplotlib/matplotlib/issues/4853
+    - `%matplotlib widgets` is for Jupyterlab?
     &#34;&#34;&#34;
     return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
 </details>
