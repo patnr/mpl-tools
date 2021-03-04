@@ -43,6 +43,7 @@ def freshfig(num=None, place=True, **kwargs):
 
     If `figure(num)` exists, it is **cleared** before calling `subplots`.
     Unlike closing/opening, this keeps its position and size.
+    Note that `num` can also be a string, i.e. the label of the figure.
 
     If `place==2`, the figure placement is `load`ed, provided the figure's
     position has previously been `save`d. If `place==1`, the active placement
@@ -77,7 +78,7 @@ def freshfig(num=None, place=True, **kwargs):
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
-        load(fignums=fig.number)
+        load(fignum=num)
 
     _, ax = plt.subplots(num=fig.number, **kwargs)
     return fig, ax
@@ -133,8 +134,7 @@ def _get_geo1(fignum):
 
 
 def _set_geo1(fignum, geo):
-    plt.figure(fignum)
-    fmw = _get_fmw(int(fignum))
+    fmw = _get_fmw(fignum)
     try:
         # For Qt4Agg/Qt5Agg
         fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
@@ -150,7 +150,10 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
         path = ".".join([path, platform.node()])
 
     try:
-        placements = {num: _get_geo1(num) for num in plt.get_fignums()}
+        # Use labels if defined, else numbers
+        lbls = [lbl or num for lbl, num in
+                zip(plt.get_figlabels(), plt.get_fignums())]
+        placements = {k: _get_geo1(k) for k in lbls}
     except FigManagerDoesNotExist as e:
         warn(str(e))
     else:
@@ -158,7 +161,7 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
             file.write(json.dumps(placements))
 
 
-def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
+def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     """Load/set figure layout."""
     if is_notebook_or_qt or not is_using_interactive_backend():
         return  # quietly
@@ -177,14 +180,18 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignums=None):
     with open(path, "r") as file:
         placements = json.load(file)
 
-    # Cast fignums to int
-    for k in list(placements):
-        placements[int(k)] = placements.pop(k)
+    # Cast nums to int
+    for key in list(placements):
+        try:
+            lbl = int(key)
+        except ValueError:
+            lbl = key
+        placements[lbl] = placements.pop(key)
 
     try:
-        for num in placements:
-            if fignums is None or num == fignums:
-                _set_geo1(num, placements[num])
+        for lbl in placements:
+            if fignum is None or lbl == fignum:
+                _set_geo1(lbl, placements[lbl])
     except FigManagerDoesNotExist as e:
         warn(str(e))
 
