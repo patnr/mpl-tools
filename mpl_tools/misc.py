@@ -54,8 +54,9 @@ def fig_colorbar(fig, collections, *args, **kwargs):
 def nRowCol(nTotal, figsize=None, axsize=None):
     """Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
 
-    Takes into account the shapes of the figure and axes.
-    Default figsize and axsize is taken from `mpl.rcParams`.
+    Takes into account the `figsize` and `axsize`, either of which
+    may be given as a tuple, or a number (the ratio width/height).
+    Defaults are taken from `mpl.rcParams`.
 
     Examples
     --------
@@ -79,10 +80,16 @@ def nRowCol(nTotal, figsize=None, axsize=None):
                   rc["top"] - rc["bottom"])
 
     # Compute ratios
-    w, h = figsize
-    fig_ratio = w / h
-    w, h = axsize
-    ax_ratio = w / h
+    try:
+        w, h = figsize
+        fig_ratio = w / h
+    except TypeError:
+        fig_ratio = figsize
+    try:
+        w, h = axsize
+        ax_ratio = w / h
+    except TypeError:
+        ax_ratio = axsize
     ratio = fig_ratio / ax_ratio
 
     # Main logic
