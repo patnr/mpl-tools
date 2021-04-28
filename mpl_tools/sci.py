@@ -1,10 +1,14 @@
 """Science-related mpl tools."""
 
+import matplotlib.colors
+import matplotlib.ticker
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Ellipse
 from numpy.linalg import eigh
+
+from mpl_tools.fig_layout import freshfig
 
 
 def cov_ellipse(ax, mu, sigma, **kwargs):
@@ -69,3 +73,101 @@ def axes_with_marginals(n_joint, n_marg, **kwargs):
     plt.setp(a_y.get_yticklabels(), visible=False)
 
     return ax0, a_x, a_y
+
+
+def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
+    """Do matshow, add **discrete colorbar**.
+
+    Inspired by https://stackoverflow.com/a/60870122
+
+    Example:
+    >>> from scipy import sparse
+    >>> D = sparse.diags([1, -2, 1], [-1, 0, 1], shape=(9, 9))
+    >>> matshow_discrete(D.A)
+    """
+    if isinstance(fig_ax, str):
+        fig, ax = freshfig(fig_ax)
+    elif fig_ax is None:
+        fig, ax = freshfig("matshow_discrete")
+    else:
+        fig, ax = fig_ax
+
+    X = np.asarray(X)
+    m, M = X.min(), X.max()
+
+    # Default cmap
+    if cmap is None:
+        if M == 0:
+            cmap = "cool"
+        elif m == 0:
+            cmap = "autumn"
+        elif m < 0 and M > 0:
+            cmap = "coolwarm"
+        else:
+            cmap = "jet"
+
+    if mode == "set":
+        # Get unique, sorted list of values
+        S = np.round(X, ndigits)
+        S = set(S.flat)  # unique
+        S = np.array(sorted(S))
+        # Get boundaries below and above each value of S
+        # (the exact amount of these margins don't matter).
+        bins = (S[1:] + S[:-1])/2
+        bins = np.concatenate(([m-1], bins, [M+1]))
+        # Center ticks (vs bins)
+        ticks = bins[:-1] + np.diff(bins)/2
+        # Custom tick labels
+        formatter = matplotlib.ticker.FuncFormatter(
+            lambda x, idx: "None" if idx is None else "%.2f" % S[idx])  # type: ignore
+        # Create cmap and norm
+        if cmap == "coolwarm":
+            # Ensure 0 corresponds to .5
+            neg = np.linspace(0, .5, np.sum(S < 0) + 1)[:-1]
+            pos = np.linspace(.5, 1, np.sum(S > 0) + 1)[1:]
+            xx = np.concatenate([neg, [.5], pos])
+        else:
+            xx = np.linspace(0, 1, len(S))
+        cmap = plt.get_cmap(cmap)(xx)
+        cmap = matplotlib.colors.ListedColormap(cmap)
+        norm = matplotlib.colors.BoundaryNorm(bins, cmap.N)
+
+        im = ax.matshow(X, cmap=cmap, norm=norm)
+        cb = fig.colorbar(im, ticks=ticks, format=formatter)
+
+    elif mode == "linear":
+        nlevels = 11
+        ticks = np.linspace(m, M, nlevels)
+        cmap = plt.get_cmap(cmap, nlevels)
+        im = ax.matshow(X, cmap=cmap,
+                        # Center outer ticks by stretching map
+                        vmin=1.5*ticks[0] - .5*ticks[1],
+                        vmax=1.5*ticks[-1] - .5*ticks[-2])
+        cb = fig.colorbar(im, ticks=ticks)
+
+    else:
+        raise ValueError("Invalid mode.")
+
+    return im, cb
+
+
+def matshow_banded(bands, fig_ax=None, lower=True):
+    """Plot matrix with `bands` as in `solveh_banded`, using `matshow_discrete`.
+
+    Example:
+    >>> bands = np.zeros((2, 10-2))
+    >>> bands[0] = 2
+    >>> bands[1, :-1] = -1
+    >>> matshow_banded(bands)
+    """
+    if not lower:
+        raise NotImplementedError
+
+    m = bands.shape[-1]
+    D = np.zeros((m, )*2)
+    for i, band in enumerate(bands):
+        c = 1 if i else .5
+        D += c * np.diag(band[:m-i], k=i)
+    D += D.T
+
+    matshow_discrete(D, fig_ax)
