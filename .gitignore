@@ -52,3 +52,5 @@ MANIFEST
 tmp*
 
 result_images
+
+.vscode/settings.json
