@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
 
-_FIG_GEOMETRIES_PATH = "./.fig_geometries"
+_FIG_GEOMETRIES_PATH = "./.fig_layout"
 
 
 @functools.wraps(warnings.warn)
