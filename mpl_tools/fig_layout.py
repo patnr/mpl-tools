@@ -157,8 +157,15 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     except FigManagerDoesNotExist as e:
         warn(str(e))
     else:
+        # Get old placements
+        if Path(path).is_file():
+            with open(path, "r") as file:
+                old = json.load(file)
+        else:
+            old = {}
+        # Write old + new placements
         with open(path, "w") as file:
-            file.write(json.dumps(placements))
+            file.write(json.dumps({**old, **placements}))
 
 
 def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
