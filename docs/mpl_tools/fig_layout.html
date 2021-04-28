@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L344" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L351" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
 import functools
@@ -49,7 +49,7 @@ from matplotlib import pyplot as plt
 
 from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
 
-_FIG_GEOMETRIES_PATH = &#34;./.fig_geometries&#34;
+_FIG_GEOMETRIES_PATH = &#34;./.fig_layout&#34;
 
 
 @functools.wraps(warnings.warn)
@@ -196,8 +196,15 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     except FigManagerDoesNotExist as e:
         warn(str(e))
     else:
+        # Get old placements
+        if Path(path).is_file():
+            with open(path, &#34;r&#34;) as file:
+                old = json.load(file)
+        else:
+            old = {}
+        # Write old + new placements
         with open(path, &#34;w&#34;) as file:
-            file.write(json.dumps(placements))
+            file.write(json.dumps({**old, **placements}))
 
 
 def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
@@ -466,14 +473,14 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.save"><code class="name flex">
-<span>def <span class="ident">save</span></span>(<span>path='./.fig_geometries', append_host=True)</span>
+<span>def <span class="ident">save</span></span>(<span>path='./.fig_layout', append_host=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Save current figure layout.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L147-L161" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L147-L168" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
@@ -488,19 +495,26 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     except FigManagerDoesNotExist as e:
         warn(str(e))
     else:
+        # Get old placements
+        if Path(path).is_file():
+            with open(path, &#34;r&#34;) as file:
+                old = json.load(file)
+        else:
+            old = {}
+        # Write old + new placements
         with open(path, &#34;w&#34;) as file:
-            file.write(json.dumps(placements))</code></pre>
+            file.write(json.dumps({**old, **placements}))</code></pre>
 </details>
 </dd>
 <dt id="mpl_tools.fig_layout.load"><code class="name flex">
-<span>def <span class="ident">load</span></span>(<span>path='./.fig_geometries', append_host=True, fignum=None)</span>
+<span>def <span class="ident">load</span></span>(<span>path='./.fig_layout', append_host=True, fignum=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Load/set figure layout.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L164-L196" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L171-L203" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
@@ -545,7 +559,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L199-L215" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L206-L222" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def show_figs(fignums=None):
     &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
@@ -577,7 +591,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L218-L256" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L225-L263" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def get_screen_size():
     &#34;&#34;&#34;Get **available** screen size/resolution.
@@ -629,7 +643,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L259-L291" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L266-L298" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
@@ -685,7 +699,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L294-L345" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L301-L352" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc(loc, fignum=None):
     &#34;&#34;&#34;Place figure on screen.

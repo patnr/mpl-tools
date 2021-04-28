@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L152" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L159" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Misc mpl tools.&#34;&#34;&#34;
 import inspect
@@ -93,8 +93,9 @@ def fig_colorbar(fig, collections, *args, **kwargs):
 def nRowCol(nTotal, figsize=None, axsize=None):
     &#34;&#34;&#34;Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
 
-    Takes into account the shapes of the figure and axes.
-    Default figsize and axsize is taken from `mpl.rcParams`.
+    Takes into account the `figsize` and `axsize`, either of which
+    may be given as a tuple, or a number (the ratio width/height).
+    Defaults are taken from `mpl.rcParams`.
 
     Examples
     --------
@@ -118,10 +119,16 @@ def nRowCol(nTotal, figsize=None, axsize=None):
                   rc[&#34;top&#34;] - rc[&#34;bottom&#34;])
 
     # Compute ratios
-    w, h = figsize
-    fig_ratio = w / h
-    w, h = axsize
-    ax_ratio = w / h
+    try:
+        w, h = figsize
+        fig_ratio = w / h
+    except TypeError:
+        fig_ratio = figsize
+    try:
+        w, h = axsize
+        ax_ratio = w / h
+    except TypeError:
+        ax_ratio = axsize
     ratio = fig_ratio / ax_ratio
 
     # Main logic
@@ -276,8 +283,9 @@ class FigSaver():
 </code></dt>
 <dd>
 <div class="desc"><p>Compute <code>(nrows, ncols)</code> such that <code>nTotal ≈ nrows*ncols</code>.</p>
-<p>Takes into account the shapes of the figure and axes.
-Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
+<p>Takes into account the <code>figsize</code> and <code>axsize</code>, either of which
+may be given as a tuple, or a number (the ratio width/height).
+Defaults are taken from <code>mpl.rcParams</code>.</p>
 <h2 id="examples">Examples</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; nRowCol(4)
 {'nrows': 2, 'ncols': 2}
@@ -291,13 +299,14 @@ Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L54-L95" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L54-L102" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def nRowCol(nTotal, figsize=None, axsize=None):
     &#34;&#34;&#34;Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
 
-    Takes into account the shapes of the figure and axes.
-    Default figsize and axsize is taken from `mpl.rcParams`.
+    Takes into account the `figsize` and `axsize`, either of which
+    may be given as a tuple, or a number (the ratio width/height).
+    Defaults are taken from `mpl.rcParams`.
 
     Examples
     --------
@@ -321,10 +330,16 @@ Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
                   rc[&#34;top&#34;] - rc[&#34;bottom&#34;])
 
     # Compute ratios
-    w, h = figsize
-    fig_ratio = w / h
-    w, h = axsize
-    ax_ratio = w / h
+    try:
+        w, h = figsize
+        fig_ratio = w / h
+    except TypeError:
+        fig_ratio = figsize
+    try:
+        w, h = axsize
+        ax_ratio = w / h
+    except TypeError:
+        ax_ratio = axsize
     ratio = fig_ratio / ax_ratio
 
     # Main logic
@@ -369,7 +384,7 @@ Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L99-L153" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L106-L160" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class FigSaver():
     &#34;&#34;&#34;Simplify exporting a figure, especially when it&#39;s part of a series.&#34;&#34;&#34;
@@ -435,7 +450,7 @@ Default figsize and axsize is taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L137-L144" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L144-L151" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def fullname(self):
@@ -458,7 +473,7 @@ def fullname(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L146-L153" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L153-L160" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(self):
     &#34;&#34;&#34;Save current figure. Increments the index.&#34;&#34;&#34;
