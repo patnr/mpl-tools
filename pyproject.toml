@@ -27,6 +27,7 @@ importlib-metadata = {version = "^1.0", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
 #patlib = {path = "../patlib"} # Provides ipython, debuggers, etc
+#patlib = {path = "../patlib", extras = ["math", "misc"], develop=true}
 
 pyqt5 = "*" # GUI-backend for mpl
 pdoc3 = "^0.9.2" # Doc generation
@@ -114,6 +115,10 @@ max_line_length = 88
 format = "grouped" # also try "stat"
 show_source = false
 #whitelist = "../../allowlist.txt" # Used by flake8-spellcheck.
+
+# Tmp fix for flakehell crashing on python3.9
+# https://github.com/flakehell/flakehell/issues/10
+extended_default_ignore=[]
 
 [tool.flakehell.plugins]
 pyflakes = ["+*"]
