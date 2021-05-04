@@ -19,9 +19,9 @@ def cov_ellipse(ax, mu, sigma, **kwargs):
     Example
     -------
     >>> fig, ax = plt.subplots()
-    >>> x, y = 10, 20
+    >>> x, y, C = 10, 20, [[1, .3], [.3, 1]]
     >>> _ = ax.set(xlim=(x-1, x+1), ylim=(y-1, y+1))
-    >>> ellipse = cov_ellipse(ax, (x, y), [[1, .3], [.3, 1]],
+    >>> ellipse = cov_ellipse(ax, (x, y), C,
     ...                       fc='none', ec='r', lw=4, label='$1\\sigma$')
     """
     # Cov --> Width, Height, Theta
@@ -83,7 +83,7 @@ def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
     Example:
     >>> from scipy import sparse
     >>> D = sparse.diags([1, -2, 1], [-1, 0, 1], shape=(9, 9))
-    >>> matshow_discrete(D.A)
+    >>> image, colorbar = matshow_discrete(D.A)
     """
     if isinstance(fig_ax, str):
         fig, ax = freshfig(fig_ax)
@@ -158,7 +158,7 @@ def matshow_banded(bands, fig_ax=None, lower=True):
     >>> bands = np.zeros((2, 10-2))
     >>> bands[0] = 2
     >>> bands[1, :-1] = -1
-    >>> matshow_banded(bands)
+    >>> image, colorbar = matshow_banded(bands)
     """
     if not lower:
         raise NotImplementedError
@@ -170,4 +170,4 @@ def matshow_banded(bands, fig_ax=None, lower=True):
         D += c * np.diag(band[:m-i], k=i)
     D += D.T
 
-    matshow_discrete(D, fig_ax)
+    return matshow_discrete(D, fig_ax)
