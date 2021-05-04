@@ -25,6 +25,7 @@ python = "^3.7"
 importlib-metadata = {version = "^1.0", python = "<3.8"}
 
 matplotlib = ">=3.0"
+scipy = "*"
 
 [tool.poetry.dev-dependencies]
 pyqt5 = "*" # GUI-backend for mpl
