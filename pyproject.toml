@@ -26,8 +26,6 @@ matplotlib = ">=3.0"
 importlib-metadata = {version = "^1.0", python = "<3.8"}
 
 [tool.poetry.dev-dependencies]
-#patlib = {path = "../patlib"} # Provides ipython, debuggers, etc
-#patlib = {path = "../patlib", extras = ["math", "misc"], develop=true}
 
 pyqt5 = "*" # GUI-backend for mpl
 pdoc3 = "^0.9.2" # Doc generation
