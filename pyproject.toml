@@ -57,6 +57,8 @@ flake8-isort = "*"
 flake8-builtins = "*"
 pep8-naming = "*"
 
+patlib = {version = "0.3.3", extras = ["mydev"]}
+
 
 ##################
 #  Config tests  #
