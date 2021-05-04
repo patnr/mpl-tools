@@ -1,6 +1,7 @@
 # Run `make` with no arguments to view possible actions.
 #
 # NB: This Makefile is mostly linux-only.
+# On MacOSX, must use homebrew's gmake!
 #
 # Makefile syntax:
 # ----------------
