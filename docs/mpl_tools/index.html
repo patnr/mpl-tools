@@ -40,7 +40,7 @@ through the following links, which are also available in the left sidebar.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L46" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L50" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Documentation for mpl-tools.
 
@@ -66,7 +66,11 @@ import matplotlib as mpl
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
-    is_notebook_or_qt = &#39;zmq&#39; in str(type(get_ipython())).lower()
+    ip = str(type(get_ipython())).lower()
+    is_notebook_or_qt = (
+        (&#34;zmq&#34; in ip)  # local Jupyter, binder, Kaggle
+        or (&#34;colab&#34; in ip)  # Google Colab
+    )
 except (NameError, ImportError):
     is_notebook_or_qt = False
 
@@ -163,7 +167,7 @@ It also uses different dpi than <code>nbAgg</code>, ref
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L30-L47" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L34-L51" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def is_using_interactive_backend():
     &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
