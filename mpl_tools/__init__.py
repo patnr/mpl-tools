@@ -22,7 +22,11 @@ import matplotlib as mpl
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
-    is_notebook_or_qt = 'zmq' in str(type(get_ipython())).lower()
+    ip = str(type(get_ipython())).lower()
+    is_notebook_or_qt = (
+        ("zmq" in ip)  # local Jupyter, binder, Kaggle
+        or ("colab" in ip)  # Google Colab
+    )
 except (NameError, ImportError):
     is_notebook_or_qt = False
 
