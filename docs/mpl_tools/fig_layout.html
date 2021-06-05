@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L351" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L0-L358" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
 import functools
@@ -174,13 +174,20 @@ def _get_geo1(fignum):
 
 def _set_geo1(fignum, geo):
     fmw = _get_fmw(fignum)
+    # For Qt4Agg/Qt5Agg
     try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
+        return fmw.setGeometry(geo[&#39;x&#39;], geo[&#39;y&#39;], geo[&#39;w&#39;], geo[&#39;h&#39;])
     except Exception:
-        # For TkAgg
+        pass
+    # For TkAgg
+    try:
         # geo = &#34;{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}&#34;.format(**geo)
-        fmw.geometry(newGeometry=geo)
+        return fmw.geometry(newGeometry=geo)
+    except Exception:
+        pass
+    warn(f&#34;Could not place figure {fignum}.&#34;
+         f&#34; Did you change the mpl backend?&#34;
+         f&#34; Try deleting {_FIG_GEOMETRIES_PATH}&#34;)
 
 
 def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
@@ -480,7 +487,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L147-L168" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L154-L175" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
@@ -514,7 +521,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L171-L203" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L178-L210" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
@@ -559,7 +566,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L206-L222" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L213-L229" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def show_figs(fignums=None):
     &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
@@ -591,7 +598,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L225-L263" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L232-L270" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def get_screen_size():
     &#34;&#34;&#34;Get **available** screen size/resolution.
@@ -643,7 +650,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L266-L298" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L273-L305" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
@@ -699,7 +706,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L301-L352" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/fig_layout.py#L308-L359" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc(loc, fignum=None):
     &#34;&#34;&#34;Place figure on screen.
