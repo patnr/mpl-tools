@@ -135,13 +135,18 @@ def _get_geo1(fignum):
 
 def _set_geo1(fignum, geo):
     fmw = _get_fmw(fignum)
+    # For Qt4Agg/Qt5Agg
     try:
-        # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
+        return fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
     except Exception:
-        # For TkAgg
+        pass
+    # For TkAgg
+    try:
         # geo = "{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}".format(**geo)
-        fmw.geometry(newGeometry=geo)
+        return fmw.geometry(newGeometry=geo)
+    except Exception:
+        pass
+    warn(f"Could not place figure. Try deleting {_FIG_GEOMETRIES_PATH}")
 
 
 def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
