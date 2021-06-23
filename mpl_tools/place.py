@@ -38,6 +38,16 @@ def warn(*args, **kwargs):
     warnings.formatwarning = original
 
 
+def relative_figsize(wh):
+    """Multiply `wh` by width and height of `rcParams["figure.figsize"]`.
+
+    Provides convenient way to adjust all figure sizes for a script.
+    """
+    w0, h0 = plt.rcParams["figure.figsize"]
+    w, h = wh
+    return w*w0, h*h0
+
+
 def freshfig(num=None, place=True, rel=False, **kwargs):
     """Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
@@ -51,9 +61,7 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     If `figsize` is among the `kwargs` it will still be overruled
     by the figure placement, as it should (it is quite convenient when
     working with scripts that *also* run in Jupyter).
-
-    If `rel`, then `figsize` is multiplied by `rcParams["figure.figsize"]`,
-    which can then be conveniently used to adjust all figure sizes.
+    If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
@@ -68,12 +76,10 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     """
     already_open = plt.fignum_exists(num)
 
-    # Scale figsize
+    # Get figsize
     figsize = kwargs.pop("figsize", None)
     if rel:
-        w0, h0 = plt.rcParams["figure.figsize"]
-        w, h = figsize
-        figsize = w*w0, h*h0
+        figsize = relative_figsize(figsize)
 
     fig = plt.figure(num=num, figsize=figsize)
 
