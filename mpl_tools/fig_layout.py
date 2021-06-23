@@ -146,7 +146,9 @@ def _set_geo1(fignum, geo):
         return fmw.geometry(newGeometry=geo)
     except Exception:
         pass
-    warn(f"Could not place figure. Try deleting {_FIG_GEOMETRIES_PATH}")
+    warn(f"Could not place figure {fignum}."
+         f" Did you change the mpl backend?"
+         f" Try deleting {_FIG_GEOMETRIES_PATH}")
 
 
 def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
