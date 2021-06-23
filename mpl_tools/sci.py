@@ -8,7 +8,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.patches import Ellipse
 from numpy.linalg import eigh
 
-from mpl_tools.fig_layout import freshfig
+from mpl_tools.place import freshfig
 
 
 def cov_ellipse(ax, mu, sigma, **kwargs):

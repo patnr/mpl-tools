@@ -2,7 +2,7 @@
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-import mpl_tools.fig_layout as fig_layout
+import mpl_tools.place as place
 
 
 def test_save_load():
@@ -15,14 +15,14 @@ def test_save_load():
         return
 
     fig, ax = plt.subplots(1)
-    geo1 = fig_layout._get_geo1(1)
-    fig_layout.save()
+    geo1 = place._get_geo1(1)
+    place.save()
 
     plt.close("all")
 
     fig, ax = plt.subplots(1)
-    fig_layout.load()
-    geo2 = fig_layout._get_geo1(1)
+    place.load()
+    geo2 = place._get_geo1(1)
 
     mpl.use(bk)
     assert geo1 == geo2

@@ -38,7 +38,7 @@ def warn(*args, **kwargs):
     warnings.formatwarning = original
 
 
-def freshfig(num=None, place=True, **kwargs):
+def freshfig(num=None, place=True, rel=False, **kwargs):
     """Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
     If `figure(num)` exists, it is **cleared** before calling `subplots`.
@@ -51,6 +51,9 @@ def freshfig(num=None, place=True, **kwargs):
     If `figsize` is among the `kwargs` it will still be overruled
     by the figure placement, as it should (it is quite convenient when
     working with scripts that *also* run in Jupyter).
+
+    If `rel`, then `figsize` is multiplied by `rcParams["figure.figsize"]`,
+    which can then be conveniently used to adjust all figure sizes.
 
     .. note:
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
@@ -65,7 +68,14 @@ def freshfig(num=None, place=True, **kwargs):
     """
     already_open = plt.fignum_exists(num)
 
-    fig = plt.figure(num=num, figsize=kwargs.pop("figsize", None))
+    # Scale figsize
+    figsize = kwargs.pop("figsize", None)
+    if rel:
+        w0, h0 = plt.rcParams["figure.figsize"]
+        w, h = figsize
+        figsize = w*w0, h*h0
+
+    fig = plt.figure(num=num, figsize=figsize)
 
     # Deal with warning bug
     # https://github.com/matplotlib/matplotlib/issues/9970
