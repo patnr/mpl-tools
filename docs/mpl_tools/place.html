@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L0-L368" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L0-L374" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
 import functools
@@ -77,6 +77,16 @@ def warn(*args, **kwargs):
     warnings.formatwarning = original
 
 
+def relative_figsize(wh):
+    &#34;&#34;&#34;Multiply `wh` by width and height of `rcParams[&#34;figure.figsize&#34;]`.
+
+    Provides convenient way to adjust all figure sizes for a script.
+    &#34;&#34;&#34;
+    w0, h0 = plt.rcParams[&#34;figure.figsize&#34;]
+    w, h = wh
+    return w*w0, h*h0
+
+
 def freshfig(num=None, place=True, rel=False, **kwargs):
     &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
@@ -90,9 +100,7 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     If `figsize` is among the `kwargs` it will still be overruled
     by the figure placement, as it should (it is quite convenient when
     working with scripts that *also* run in Jupyter).
-
-    If `rel`, then `figsize` is multiplied by `rcParams[&#34;figure.figsize&#34;]`,
-    which can then be conveniently used to adjust all figure sizes.
+    If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
@@ -107,12 +115,10 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     &#34;&#34;&#34;
     already_open = plt.fignum_exists(num)
 
-    # Scale figsize
+    # Get figsize
     figsize = kwargs.pop(&#34;figsize&#34;, None)
     if rel:
-        w0, h0 = plt.rcParams[&#34;figure.figsize&#34;]
-        w, h = figsize
-        figsize = w*w0, h*h0
+        figsize = relative_figsize(figsize)
 
     fig = plt.figure(num=num, figsize=figsize)
 
@@ -415,6 +421,27 @@ def loc(loc, fignum=None):
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="mpl_tools.place.relative_figsize"><code class="name flex">
+<span>def <span class="ident">relative_figsize</span></span>(<span>wh)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Multiply <code>wh</code> by width and height of <code>rcParams["figure.figsize"]</code>.</p>
+<p>Provides convenient way to adjust all figure sizes for a script.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L41-L48" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def relative_figsize(wh):
+    &#34;&#34;&#34;Multiply `wh` by width and height of `rcParams[&#34;figure.figsize&#34;]`.
+
+    Provides convenient way to adjust all figure sizes for a script.
+    &#34;&#34;&#34;
+    w0, h0 = plt.rcParams[&#34;figure.figsize&#34;]
+    w, h = wh
+    return w*w0, h*h0</code></pre>
+</details>
+</dd>
 <dt id="mpl_tools.place.freshfig"><code class="name flex">
 <span>def <span class="ident">freshfig</span></span>(<span>num=None, place=True, rel=False, **kwargs)</span>
 </code></dt>
@@ -428,9 +455,8 @@ position has previously been <code><a title="mpl_tools.place.save" href="#mpl_to
 only happens if the figure did not yet exist.
 If <code>figsize</code> is among the <code>kwargs</code> it will still be overruled
 by the figure placement, as it should (it is quite convenient when
-working with scripts that <em>also</em> run in Jupyter).</p>
-<p>If <code>rel</code>, then <code>figsize</code> is multiplied by <code>rcParams["figure.figsize"]</code>,
-which can then be conveniently used to adjust all figure sizes.</p>
+working with scripts that <em>also</em> run in Jupyter).
+If <code>rel</code>, then <code>figsize</code> is passed through <code><a title="mpl_tools.place.relative_figsize" href="#mpl_tools.place.relative_figsize">relative_figsize()</a></code>.</p>
 <p>.. note:
 Active placement (including re-sizing) on the <code>mpl</code> backend <strong>MacOSX</strong>
 <a href="https://stackoverflow.com/a/30180994">does not work</a>. However, sizing
@@ -443,7 +469,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L41-L94" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L51-L100" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def freshfig(num=None, place=True, rel=False, **kwargs):
     &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
@@ -458,9 +484,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     If `figsize` is among the `kwargs` it will still be overruled
     by the figure placement, as it should (it is quite convenient when
     working with scripts that *also* run in Jupyter).
-
-    If `rel`, then `figsize` is multiplied by `rcParams[&#34;figure.figsize&#34;]`,
-    which can then be conveniently used to adjust all figure sizes.
+    If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
@@ -475,12 +499,10 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     &#34;&#34;&#34;
     already_open = plt.fignum_exists(num)
 
-    # Scale figsize
+    # Get figsize
     figsize = kwargs.pop(&#34;figsize&#34;, None)
     if rel:
-        w0, h0 = plt.rcParams[&#34;figure.figsize&#34;]
-        w, h = figsize
-        figsize = w*w0, h*h0
+        figsize = relative_figsize(figsize)
 
     fig = plt.figure(num=num, figsize=figsize)
 
@@ -509,7 +531,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L164-L185" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L170-L191" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
@@ -543,7 +565,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L188-L220" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L194-L226" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
@@ -588,7 +610,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L223-L239" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L229-L245" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def show_figs(fignums=None):
     &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
@@ -620,7 +642,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L242-L280" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L248-L286" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def get_screen_size():
     &#34;&#34;&#34;Get **available** screen size/resolution.
@@ -672,7 +694,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L283-L315" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L289-L321" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
@@ -728,7 +750,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L318-L369" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L324-L375" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc(loc, fignum=None):
     &#34;&#34;&#34;Place figure on screen.
@@ -804,7 +826,7 @@ return anything.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L107-L116" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L113-L122" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class FigManagerDoesNotExist(Exception):
     &#34;&#34;&#34;Signal that figure placement ain&#39;t possible with this mpl backend.
@@ -843,6 +865,7 @@ data-gaCategoryParameter="mpl_tools.place">
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="two-column">
+<li><code><a title="mpl_tools.place.relative_figsize" href="#mpl_tools.place.relative_figsize">relative_figsize</a></code></li>
 <li><code><a title="mpl_tools.place.freshfig" href="#mpl_tools.place.freshfig">freshfig</a></code></li>
 <li><code><a title="mpl_tools.place.save" href="#mpl_tools.place.save">save</a></code></li>
 <li><code><a title="mpl_tools.place.load" href="#mpl_tools.place.load">load</a></code></li>
