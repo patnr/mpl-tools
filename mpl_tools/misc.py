@@ -35,6 +35,9 @@ def axprops(dct):
 def fig_colorbar(fig, collections, *args, **kwargs):
     """Add colorbar to the right on a figure.
 
+    DEPRECATED. Use one of these methods instead:
+    https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/
+
     Example
     -------
     >>> fig, (ax1, ax2) = plt.subplots(nrows=2)
