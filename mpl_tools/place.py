@@ -8,7 +8,8 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
+from mpl_tools import (is_inline, is_notebook_or_qt,
+                       is_using_interactive_backend)
 
 _FIG_GEOMETRIES_PATH = "./.fig_layout"
 
@@ -48,19 +49,23 @@ def relative_figsize(wh):
     return w*w0, h*h0
 
 
-def freshfig(num=None, place=True, rel=False, **kwargs):
+def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
     """Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
     If `figure(num)` exists, it is **cleared** before calling `subplots`.
     Unlike closing/opening, this keeps its position and size.
+
     Note that `num` can also be a string, i.e. the label of the figure.
+    If so, and if `sup`, and if mpl is "inline" (e.g. Jupyter),
+    then `suptitle` is set to that string
+    (since inline mpl does not display the figure label)
 
     If `place==2`, the figure placement is `load`ed, provided the figure's
     position has previously been `save`d. If `place==1`, the active placement
     only happens if the figure did not yet exist.
+
     If `figsize` is among the `kwargs` it will still be overruled
-    by the figure placement, as it should (it is quite convenient when
-    working with scripts that *also* run in Jupyter).
+    by the loaded figure placement, as it should.
     If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
@@ -74,29 +79,36 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     (<Figure size 640x480 with 2 Axes>,
     array([<AxesSubplot:>, <AxesSubplot:>], dtype=object))
     """
-    already_open = plt.fignum_exists(num)
-
     # Get figsize
     figsize = kwargs.pop("figsize", None)
     if rel:
         figsize = relative_figsize(figsize)
 
+    # Create fig
     fig = plt.figure(num=num, figsize=figsize)
 
-    # Deal with warning bug
-    # https://github.com/matplotlib/matplotlib/issues/9970
+    # Clear fig
     with warnings.catch_warnings():
+        # Deal with warning bug
+        # https://github.com/matplotlib/matplotlib/issues/9970
         warnings.simplefilter("ignore", category=UserWarning)
         fig.clf()  # <=> fig.clear()
 
+    # Load placement
     if (
-        place > 1 or (place and not already_open)
+        place > 1 or (place and not plt.fignum_exists(num))
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
         load(fignum=num)
 
+    # Create axes
     _, ax = plt.subplots(num=fig.number, **kwargs)
+
+    # Suptitle
+    if sup and is_inline() and isinstance(num, str):
+        fig.suptitle(num)
+
     return fig, ax
 
 

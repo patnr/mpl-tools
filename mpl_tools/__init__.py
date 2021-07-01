@@ -19,6 +19,7 @@ __version__ = importlib_metadata.version(__name__)
 
 import matplotlib as mpl
 
+# is_notebook_or_qt
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
@@ -34,18 +35,18 @@ except (NameError, ImportError):
 def is_using_interactive_backend():
     """Check if `mpl` is (currently) using an interactive backend.
 
-    This means that the figures may be shown on screen.
-    But only if you've done `plt.ion` so that `mpl.is_interactive`,
-    or after calling `plt.show`.
-
     Note on jupyter notebook backends:
     - `%matplotlib notebook` (`nbAgg`) is interactive.
-    - `%matplotlib inline` is not, but still shows up in the notebook.
-      It can also be updated; see `dapper/tools/viz:plot_pause()`.
-      However, it does not allow for mouse interaction,
-      as it is merely a static picture.
+    - `%matplotlib inline` is not.
+      It can still be updated; see `dapper/tools/viz:plot_pause()`.
+      but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
     - `%matplotlib widgets` is for Jupyterlab?
     """
     return mpl.get_backend() in mpl.rcsetup.interactive_bk
+
+
+def is_inline():
+    """Check if using IPython/Jupyter inline `mpl` backend."""
+    return "inline" in mpl.get_backend()
