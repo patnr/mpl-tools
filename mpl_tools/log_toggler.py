@@ -5,8 +5,8 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 from matplotlib.widgets import CheckButtons  # Button
 
-from mpl_tools.ax_placement import anchor_axes, get_legend_bbox
 from mpl_tools.misc import thousands
+from mpl_tools.place_ax import anchor_axes, get_legend_bbox
 
 
 def add_log_toggler(ax, pos="leg:S+W", ylim=None):
