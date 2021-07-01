@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L0-L139" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L0-L142" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Toggle visisbility of plot elements on/off. Provide checkmarks for it.&#34;&#34;&#34;
 import itertools
@@ -60,6 +60,9 @@ def toggle_lines(ax=None, autoscl=True, numbering=False,
     The state of checkboxes can be inquired by
     &gt;&gt;&gt; OnOff = [lh.get_visible() for lh in # doctest: +SKIP
     ...          ax.findobj(lambda x: isinstance(x,mpl.lines.Line2D))[::2]]
+
+    See History-Matching tutorial for a solution using ipywidgets,
+    ie. that is compatible with Jupyter notebooks. TODO: merge?
     &#34;&#34;&#34;
     if ax is None:
         ax = plt.gca()
@@ -200,11 +203,13 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
 <p>The state of checkboxes can be inquired by</p>
 <pre><code class="language-python-repl">&gt;&gt;&gt; OnOff = [lh.get_visible() for lh in # doctest: +SKIP
 ...          ax.findobj(lambda x: isinstance(x,mpl.lines.Line2D))[::2]]
-</code></pre></div>
+</code></pre>
+<p>See History-Matching tutorial for a solution using ipywidgets,
+ie. that is compatible with Jupyter notebooks. TODO: merge?</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L13-L87" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L13-L90" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def toggle_lines(ax=None, autoscl=True, numbering=False,
                  txtwidth=15, txtsize=None, state=None):
@@ -217,6 +222,9 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
     The state of checkboxes can be inquired by
     &gt;&gt;&gt; OnOff = [lh.get_visible() for lh in # doctest: +SKIP
     ...          ax.findobj(lambda x: isinstance(x,mpl.lines.Line2D))[::2]]
+
+    See History-Matching tutorial for a solution using ipywidgets,
+    ie. that is compatible with Jupyter notebooks. TODO: merge?
     &#34;&#34;&#34;
     if ax is None:
         ax = plt.gca()
@@ -291,7 +299,7 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L100-L140" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/visibility.py#L103-L143" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
     &#34;&#34;&#34;Toggle visibility of the graphics with handle `handles`.&#34;&#34;&#34;

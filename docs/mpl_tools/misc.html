@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L159" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L0-L162" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Misc mpl tools.&#34;&#34;&#34;
 import inspect
@@ -73,6 +73,9 @@ def axprops(dct):
 
 def fig_colorbar(fig, collections, *args, **kwargs):
     &#34;&#34;&#34;Add colorbar to the right on a figure.
+
+    DEPRECATED. Use one of these methods instead:
+    https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/
 
     Example
     -------
@@ -248,6 +251,8 @@ class FigSaver():
 </code></dt>
 <dd>
 <div class="desc"><p>Add colorbar to the right on a figure.</p>
+<p>DEPRECATED. Use one of these methods instead:
+<a href="https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/">https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/</a></p>
 <h2 id="example">Example</h2>
 <pre><code class="language-python-repl">&gt;&gt;&gt; fig, (ax1, ax2) = plt.subplots(nrows=2)
 &gt;&gt;&gt; cs = ax1.contourf(np.arange(24).reshape((3,-1)), cmap=plt.cm.PuBu_r)
@@ -257,10 +262,13 @@ class FigSaver():
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L35-L51" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L35-L54" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def fig_colorbar(fig, collections, *args, **kwargs):
     &#34;&#34;&#34;Add colorbar to the right on a figure.
+
+    DEPRECATED. Use one of these methods instead:
+    https://jdhao.github.io/2017/06/11/mpl_multiplot_one_colorbar/
 
     Example
     -------
@@ -299,7 +307,7 @@ Defaults are taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L54-L102" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L57-L105" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def nRowCol(nTotal, figsize=None, axsize=None):
     &#34;&#34;&#34;Compute `(nrows, ncols)` such that `nTotal ≈ nrows*ncols`.
@@ -384,7 +392,7 @@ Defaults are taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L106-L160" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L109-L163" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class FigSaver():
     &#34;&#34;&#34;Simplify exporting a figure, especially when it&#39;s part of a series.&#34;&#34;&#34;
@@ -450,7 +458,7 @@ Defaults are taken from <code>mpl.rcParams</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L144-L151" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L147-L154" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">@property
 def fullname(self):
@@ -473,7 +481,7 @@ def fullname(self):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L153-L160" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/misc.py#L156-L163" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(self):
     &#34;&#34;&#34;Save current figure. Increments the index.&#34;&#34;&#34;
