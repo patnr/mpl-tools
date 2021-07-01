@@ -16,6 +16,47 @@ def set_ax_size(ax, w, h):
     ax.set_position([x, y, w, h])
 
 
+def adjust_position(ax, adjust_extent=False, **kwargs):
+    """Adjust (add) to axes bounding box.
+
+    Parameters
+    ----------
+    ax: matplotlib.axes
+    adjust_extent: bool, optional
+        If true: `x` and `y` produces `ax` resize, rather than shift.
+        Defaults: False
+    kwargs: dict
+        the keys must be `x0`, `y0`, `width`, `height`;
+        the values are length changes.
+    """
+    # Load get_position into d
+    pos = ax.get_position()
+    pos = {key: getattr(pos, key) for key in ['x0', 'y0', 'width', 'height']}
+
+    abbrevs = dict(
+        x = "x0",
+        y = "y0",
+        w = "width",
+        h = "height",
+    )
+
+    # Make adjustments
+    for key, value in kwargs.items():
+        key = abbrevs.get(key, key)
+
+        # Adjust
+        pos[key] += value
+
+        if adjust_extent:
+            if key == 'x0':
+                pos['width']  -= value
+            if key == 'y0':
+                pos['height'] -= value
+
+    # Set
+    ax.set_position(pos.values())
+
+
 def align_ax_with(ax, bbox, loc, pad=4):
     """Set the location of ax relative to bbox.
 
