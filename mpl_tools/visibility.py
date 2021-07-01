@@ -21,6 +21,9 @@ def toggle_lines(ax=None, autoscl=True, numbering=False,
     The state of checkboxes can be inquired by
     >>> OnOff = [lh.get_visible() for lh in # doctest: +SKIP
     ...          ax.findobj(lambda x: isinstance(x,mpl.lines.Line2D))[::2]]
+
+    See History-Matching tutorial for a solution using ipywidgets,
+    ie. that is compatible with Jupyter notebooks. TODO: merge?
     """
     if ax is None:
         ax = plt.gca()
