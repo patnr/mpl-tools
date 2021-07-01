@@ -35,7 +35,7 @@ body.gsc-overflow-hidden #sidebar {overflow: visible;}
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L0-L374" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L0-L386" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Tools for placing figures (not axes) on screen.&#34;&#34;&#34;
 import functools
@@ -47,7 +47,8 @@ from pathlib import Path
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
-from mpl_tools import is_notebook_or_qt, is_using_interactive_backend
+from mpl_tools import (is_inline, is_notebook_or_qt,
+                       is_using_interactive_backend)
 
 _FIG_GEOMETRIES_PATH = &#34;./.fig_layout&#34;
 
@@ -87,19 +88,23 @@ def relative_figsize(wh):
     return w*w0, h*h0
 
 
-def freshfig(num=None, place=True, rel=False, **kwargs):
+def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
     &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
     If `figure(num)` exists, it is **cleared** before calling `subplots`.
     Unlike closing/opening, this keeps its position and size.
+
     Note that `num` can also be a string, i.e. the label of the figure.
+    If so, and if `sup`, and if mpl is &#34;inline&#34; (e.g. Jupyter),
+    then `suptitle` is set to that string
+    (since inline mpl does not display the figure label)
 
     If `place==2`, the figure placement is `load`ed, provided the figure&#39;s
     position has previously been `save`d. If `place==1`, the active placement
     only happens if the figure did not yet exist.
+
     If `figsize` is among the `kwargs` it will still be overruled
-    by the figure placement, as it should (it is quite convenient when
-    working with scripts that *also* run in Jupyter).
+    by the loaded figure placement, as it should.
     If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
@@ -113,29 +118,36 @@ def freshfig(num=None, place=True, rel=False, **kwargs):
     (&lt;Figure size 640x480 with 2 Axes&gt;,
     array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     &#34;&#34;&#34;
-    already_open = plt.fignum_exists(num)
-
     # Get figsize
     figsize = kwargs.pop(&#34;figsize&#34;, None)
     if rel:
         figsize = relative_figsize(figsize)
 
+    # Create fig
     fig = plt.figure(num=num, figsize=figsize)
 
-    # Deal with warning bug
-    # https://github.com/matplotlib/matplotlib/issues/9970
+    # Clear fig
     with warnings.catch_warnings():
+        # Deal with warning bug
+        # https://github.com/matplotlib/matplotlib/issues/9970
         warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
         fig.clf()  # &lt;=&gt; fig.clear()
 
+    # Load placement
     if (
-        place &gt; 1 or (place and not already_open)
+        place &gt; 1 or (place and not plt.fignum_exists(num))
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
         load(fignum=num)
 
+    # Create axes
     _, ax = plt.subplots(num=fig.number, **kwargs)
+
+    # Suptitle
+    if sup and is_inline() and isinstance(num, str):
+        fig.suptitle(num)
+
     return fig, ax
 
 
@@ -430,7 +442,7 @@ def loc(loc, fignum=None):
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L41-L48" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L42-L49" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def relative_figsize(wh):
     &#34;&#34;&#34;Multiply `wh` by width and height of `rcParams[&#34;figure.figsize&#34;]`.
@@ -443,19 +455,21 @@ def loc(loc, fignum=None):
 </details>
 </dd>
 <dt id="mpl_tools.place.freshfig"><code class="name flex">
-<span>def <span class="ident">freshfig</span></span>(<span>num=None, place=True, rel=False, **kwargs)</span>
+<span>def <span class="ident">freshfig</span></span>(<span>num=None, place=True, rel=False, sup=True, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Create/clear figure, place it, call <code>plt.subplots(**kwargs)</code>.</p>
 <p>If <code>figure(num)</code> exists, it is <strong>cleared</strong> before calling <code>subplots</code>.
-Unlike closing/opening, this keeps its position and size.
-Note that <code>num</code> can also be a string, i.e. the label of the figure.</p>
+Unlike closing/opening, this keeps its position and size.</p>
+<p>Note that <code>num</code> can also be a string, i.e. the label of the figure.
+If so, and if <code>sup</code>, and if mpl is "inline" (e.g. Jupyter),
+then <code>suptitle</code> is set to that string
+(since inline mpl does not display the figure label)</p>
 <p>If <code>place==2</code>, the figure placement is <code><a title="mpl_tools.place.load" href="#mpl_tools.place.load">load()</a></code>ed, provided the figure's
 position has previously been <code><a title="mpl_tools.place.save" href="#mpl_tools.place.save">save()</a></code>d. If <code>place==1</code>, the active placement
-only happens if the figure did not yet exist.
-If <code>figsize</code> is among the <code>kwargs</code> it will still be overruled
-by the figure placement, as it should (it is quite convenient when
-working with scripts that <em>also</em> run in Jupyter).
+only happens if the figure did not yet exist.</p>
+<p>If <code>figsize</code> is among the <code>kwargs</code> it will still be overruled
+by the loaded figure placement, as it should.
 If <code>rel</code>, then <code>figsize</code> is passed through <code><a title="mpl_tools.place.relative_figsize" href="#mpl_tools.place.relative_figsize">relative_figsize()</a></code>.</p>
 <p>.. note:
 Active placement (including re-sizing) on the <code>mpl</code> backend <strong>MacOSX</strong>
@@ -469,21 +483,25 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L51-L100" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L52-L112" class="git-link">Browse git</a>
 </summary>
-<pre><code class="python">def freshfig(num=None, place=True, rel=False, **kwargs):
+<pre><code class="python">def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
     &#34;&#34;&#34;Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
     If `figure(num)` exists, it is **cleared** before calling `subplots`.
     Unlike closing/opening, this keeps its position and size.
+
     Note that `num` can also be a string, i.e. the label of the figure.
+    If so, and if `sup`, and if mpl is &#34;inline&#34; (e.g. Jupyter),
+    then `suptitle` is set to that string
+    (since inline mpl does not display the figure label)
 
     If `place==2`, the figure placement is `load`ed, provided the figure&#39;s
     position has previously been `save`d. If `place==1`, the active placement
     only happens if the figure did not yet exist.
+
     If `figsize` is among the `kwargs` it will still be overruled
-    by the figure placement, as it should (it is quite convenient when
-    working with scripts that *also* run in Jupyter).
+    by the loaded figure placement, as it should.
     If `rel`, then `figsize` is passed through `relative_figsize`.
 
     .. note:
@@ -497,29 +515,36 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     (&lt;Figure size 640x480 with 2 Axes&gt;,
     array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
     &#34;&#34;&#34;
-    already_open = plt.fignum_exists(num)
-
     # Get figsize
     figsize = kwargs.pop(&#34;figsize&#34;, None)
     if rel:
         figsize = relative_figsize(figsize)
 
+    # Create fig
     fig = plt.figure(num=num, figsize=figsize)
 
-    # Deal with warning bug
-    # https://github.com/matplotlib/matplotlib/issues/9970
+    # Clear fig
     with warnings.catch_warnings():
+        # Deal with warning bug
+        # https://github.com/matplotlib/matplotlib/issues/9970
         warnings.simplefilter(&#34;ignore&#34;, category=UserWarning)
         fig.clf()  # &lt;=&gt; fig.clear()
 
+    # Load placement
     if (
-        place &gt; 1 or (place and not already_open)
+        place &gt; 1 or (place and not plt.fignum_exists(num))
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
         load(fignum=num)
 
+    # Create axes
     _, ax = plt.subplots(num=fig.number, **kwargs)
+
+    # Suptitle
+    if sup and is_inline() and isinstance(num, str):
+        fig.suptitle(num)
+
     return fig, ax</code></pre>
 </details>
 </dd>
@@ -531,7 +556,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L170-L191" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L182-L203" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
     &#34;&#34;&#34;Save current figure layout.&#34;&#34;&#34;
@@ -565,7 +590,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L194-L226" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L206-L238" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
     &#34;&#34;&#34;Load/set figure layout.&#34;&#34;&#34;
@@ -610,7 +635,7 @@ array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object))
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L229-L245" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L241-L257" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def show_figs(fignums=None):
     &#34;&#34;&#34;Move all fig windows to top.&#34;&#34;&#34;
@@ -642,7 +667,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L248-L286" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L260-L298" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def get_screen_size():
     &#34;&#34;&#34;Get **available** screen size/resolution.
@@ -694,7 +719,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L289-L321" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L301-L333" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc01(fignum=None, x=None, y=None, w=None, h=None):
     &#34;&#34;&#34;Place figure on screen, in relative coordinates ∈ [0, 1].
@@ -750,7 +775,7 @@ especially since the method used depends on the backend.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L324-L375" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L336-L387" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def loc(loc, fignum=None):
     &#34;&#34;&#34;Place figure on screen.
@@ -826,7 +851,7 @@ return anything.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L113-L122" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/place.py#L125-L134" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">class FigManagerDoesNotExist(Exception):
     &#34;&#34;&#34;Signal that figure placement ain&#39;t possible with this mpl backend.

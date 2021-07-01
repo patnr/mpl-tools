@@ -40,7 +40,7 @@ through the following links, which are also available in the left sidebar.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L50" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L51" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Documentation for mpl-tools.
 
@@ -63,6 +63,7 @@ __version__ = importlib_metadata.version(__name__)
 
 import matplotlib as mpl
 
+# is_notebook_or_qt
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
@@ -78,21 +79,21 @@ except (NameError, ImportError):
 def is_using_interactive_backend():
     &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
 
-    This means that the figures may be shown on screen.
-    But only if you&#39;ve done `plt.ion` so that `mpl.is_interactive`,
-    or after calling `plt.show`.
-
     Note on jupyter notebook backends:
     - `%matplotlib notebook` (`nbAgg`) is interactive.
-    - `%matplotlib inline` is not, but still shows up in the notebook.
-      It can also be updated; see `dapper/tools/viz:plot_pause()`.
-      However, it does not allow for mouse interaction,
-      as it is merely a static picture.
+    - `%matplotlib inline` is not.
+      It can still be updated; see `dapper/tools/viz:plot_pause()`.
+      but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
     - `%matplotlib widgets` is for Jupyterlab?
     &#34;&#34;&#34;
-    return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
+    return mpl.get_backend() in mpl.rcsetup.interactive_bk
+
+
+def is_inline():
+    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.&#34;&#34;&#34;
+    return &#34;inline&#34; in mpl.get_backend()</code></pre>
 </details>
 </section>
 <section>
@@ -152,41 +153,47 @@ def is_using_interactive_backend():
 </code></dt>
 <dd>
 <div class="desc"><p>Check if <code>mpl</code> is (currently) using an interactive backend.</p>
-<p>This means that the figures may be shown on screen.
-But only if you've done <code>plt.ion</code> so that <code>mpl.is_interactive</code>,
-or after calling <code>plt.show</code>.</p>
 <p>Note on jupyter notebook backends:
 - <code>%matplotlib notebook</code> (<code>nbAgg</code>) is interactive.
-- <code>%matplotlib inline</code> is not, but still shows up in the notebook.
-It can also be updated; see <code>dapper/tools/viz:plot_pause()</code>.
-However, it does not allow for mouse interaction,
-as it is merely a static picture.
+- <code>%matplotlib inline</code> is not.
+It can still be updated; see <code>dapper/tools/viz:plot_pause()</code>.
+but does not allow for mouse interaction, being a static picture.
 It also uses different dpi than <code>nbAgg</code>, ref
 <a href="https://github.com/matplotlib/matplotlib/issues/4853">https://github.com/matplotlib/matplotlib/issues/4853</a>
 - <code>%matplotlib widgets</code> is for Jupyterlab?</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L34-L51" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L35-L47" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def is_using_interactive_backend():
     &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
 
-    This means that the figures may be shown on screen.
-    But only if you&#39;ve done `plt.ion` so that `mpl.is_interactive`,
-    or after calling `plt.show`.
-
     Note on jupyter notebook backends:
     - `%matplotlib notebook` (`nbAgg`) is interactive.
-    - `%matplotlib inline` is not, but still shows up in the notebook.
-      It can also be updated; see `dapper/tools/viz:plot_pause()`.
-      However, it does not allow for mouse interaction,
-      as it is merely a static picture.
+    - `%matplotlib inline` is not.
+      It can still be updated; see `dapper/tools/viz:plot_pause()`.
+      but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
     - `%matplotlib widgets` is for Jupyterlab?
     &#34;&#34;&#34;
     return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
+</details>
+</dd>
+<dt id="mpl_tools.is_inline"><code class="name flex">
+<span>def <span class="ident">is_inline</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if using IPython/Jupyter inline <code>mpl</code> backend.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L50-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_inline():
+    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.&#34;&#34;&#34;
+    return &#34;inline&#34; in mpl.get_backend()</code></pre>
 </details>
 </dd>
 </dl>
@@ -235,6 +242,7 @@ data-gaCategoryParameter="mpl_tools">
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="mpl_tools.is_using_interactive_backend" href="#mpl_tools.is_using_interactive_backend">is_using_interactive_backend</a></code></li>
+<li><code><a title="mpl_tools.is_inline" href="#mpl_tools.is_inline">is_inline</a></code></li>
 </ul>
 </li>
 </ul>
