@@ -42,11 +42,17 @@ def is_using_interactive_backend():
       but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
-    - `%matplotlib widgets` is for Jupyterlab?
+    - `%matplotlib widgets` (`ipympl`) is interactive,
+      and works in Jupyterlab unlike (`nbAgg`)
     """
     return mpl.get_backend() in mpl.rcsetup.interactive_bk
 
 
 def is_inline():
-    """Check if using IPython/Jupyter inline `mpl` backend."""
+    """Check if using IPython/Jupyter inline `mpl` backend.
+
+    This is not the opposite of `is_using_interactive_backend`,
+    because this is also `False` for backends: PNG, SVG, PDF, PS.
+    """
+    # return mpl.get_backend() == 'module://ipykernel.pylab.backend_inline'
     return "inline" in mpl.get_backend()
