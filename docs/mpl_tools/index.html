@@ -40,7 +40,7 @@ through the following links, which are also available in the left sidebar.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L51" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L0-L57" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Documentation for mpl-tools.
 
@@ -86,13 +86,19 @@ def is_using_interactive_backend():
       but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
-    - `%matplotlib widgets` is for Jupyterlab?
+    - `%matplotlib widgets` (`ipympl`) is interactive,
+      and works in Jupyterlab unlike (`nbAgg`)
     &#34;&#34;&#34;
     return mpl.get_backend() in mpl.rcsetup.interactive_bk
 
 
 def is_inline():
-    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.&#34;&#34;&#34;
+    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.
+
+    This is not the opposite of `is_using_interactive_backend`,
+    because this is also `False` for backends: PNG, SVG, PDF, PS.
+    &#34;&#34;&#34;
+    # return mpl.get_backend() == &#39;module://ipykernel.pylab.backend_inline&#39;
     return &#34;inline&#34; in mpl.get_backend()</code></pre>
 </details>
 </section>
@@ -121,7 +127,7 @@ def is_inline():
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
 <dt><code class="name"><a title="mpl_tools.place" href="place.html">place</a></code></dt>
 <dd>
-<div class="desc"><p>Tools for placing figures (not axes) on screen.</p></div>
+<div class="desc"><p>Tools for placing <em>figures</em> on screen …</p></div>
 </dd>
 <!-- CHANGE: Short submodule name -->
 <!-- https://github.com/pdoc3/pdoc/issues/265#issuecomment-702426471 -->
@@ -160,11 +166,12 @@ It can still be updated; see <code>dapper/tools/viz:plot_pause()</code>.
 but does not allow for mouse interaction, being a static picture.
 It also uses different dpi than <code>nbAgg</code>, ref
 <a href="https://github.com/matplotlib/matplotlib/issues/4853">https://github.com/matplotlib/matplotlib/issues/4853</a>
-- <code>%matplotlib widgets</code> is for Jupyterlab?</p></div>
+- <code>%matplotlib widgets</code> (<code>ipympl</code>) is interactive,
+and works in Jupyterlab unlike (<code>nbAgg</code>)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L35-L47" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L35-L48" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def is_using_interactive_backend():
     &#34;&#34;&#34;Check if `mpl` is (currently) using an interactive backend.
@@ -176,7 +183,8 @@ It also uses different dpi than <code>nbAgg</code>, ref
       but does not allow for mouse interaction, being a static picture.
       It also uses different dpi than `nbAgg`, ref
       https://github.com/matplotlib/matplotlib/issues/4853
-    - `%matplotlib widgets` is for Jupyterlab?
+    - `%matplotlib widgets` (`ipympl`) is interactive,
+      and works in Jupyterlab unlike (`nbAgg`)
     &#34;&#34;&#34;
     return mpl.get_backend() in mpl.rcsetup.interactive_bk</code></pre>
 </details>
@@ -185,14 +193,21 @@ It also uses different dpi than <code>nbAgg</code>, ref
 <span>def <span class="ident">is_inline</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Check if using IPython/Jupyter inline <code>mpl</code> backend.</p></div>
+<div class="desc"><p>Check if using IPython/Jupyter inline <code>mpl</code> backend.</p>
+<p>This is not the opposite of <code><a title="mpl_tools.is_using_interactive_backend" href="#mpl_tools.is_using_interactive_backend">is_using_interactive_backend()</a></code>,
+because this is also <code>False</code> for backends: PNG, SVG, PDF, PS.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
-<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L50-L52" class="git-link">Browse git</a>
+<a href="https://github.com/patricknraanes/mpl-tools/blob/master/mpl_tools/__init__.py#L51-L58" class="git-link">Browse git</a>
 </summary>
 <pre><code class="python">def is_inline():
-    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.&#34;&#34;&#34;
+    &#34;&#34;&#34;Check if using IPython/Jupyter inline `mpl` backend.
+
+    This is not the opposite of `is_using_interactive_backend`,
+    because this is also `False` for backends: PNG, SVG, PDF, PS.
+    &#34;&#34;&#34;
+    # return mpl.get_backend() == &#39;module://ipykernel.pylab.backend_inline&#39;
     return &#34;inline&#34; in mpl.get_backend()</code></pre>
 </details>
 </dd>
