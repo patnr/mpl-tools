@@ -1,4 +1,15 @@
-"""Tools for placing figures (not axes) on screen."""
+"""Tools for placing *figures* on screen.
+
+Main functions:
+
+- `loc`             : Place a figure -- corner or grid coordinates
+- `loc01`           : Place a figure -- relative coordinates
+- `freshfig`        : Create figure like `plt.subplots`, load placement.
+- `save`            : Save current figure placement**s** from `./.fig_layout.HOST`
+- `load`            : Load figure placement**s**.
+- `show_figs`       : Show all figures
+- `get_screen_size` : Get current screen size.
+"""
 import functools
 import json
 import platform
