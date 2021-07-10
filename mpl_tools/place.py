@@ -282,6 +282,7 @@ def get_screen_size():
 
     Consider using non-mpl method: https://pypi.org/project/screeninfo
     """
+    success = True
     if mpl.get_backend().startswith('Qt'):
         try:
             # Ref spyder/widgets/shortcutssummary.py
@@ -291,35 +292,41 @@ def get_screen_size():
             x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
 
         except ImportError:
-            # https://stackoverflow.com/a/29039755/38281
-            fig = plt.figure()  # new, blank (cheap to resize) figure
-            mgr = plt.get_current_fig_manager()
-            # Now we full-screen the new figure, and pause for effect.
-            # NB: both of these actions results in the figure being shown.
-            mgr.full_screen_toggle(); plt.pause(0.2)  # noqa
-            sc = mgr.canvas
-            x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
-            # mgr.full_screen_toggle()
-            plt.close(fig)
+            success = False
+
+            # From https://stackoverflow.com/a/29039755
+            # Doesn't work on my Mac coz full-screen figure won't close/resize.
+            # fig = plt.figure()  # new, blank (cheap to resize) figure
+            # mgr = plt.get_current_fig_manager()
+            # # Now we full-screen the new figure, and pause for effect.
+            # # NB: both of these actions results in the figure being shown.
+            # mgr.full_screen_toggle(); plt.pause(0.2)  # noqa
+            # sc = mgr.canvas
+            # x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
+            # plt.close(fig)
 
     elif mpl.get_backend() == "TkAgg":
         # https://stackoverflow.com/a/42951711/38281
         mgr = plt.get_current_fig_manager()
         x0, y0, w0, h0 = (0, 0) + mgr.window.wm_maxsize()
         # w, h = mgr.window.winfo_screenwidth(), mgr.window.winfo_screenheight()
+
     else:
+        success = False
+
+    if not success:
         print("Warning: could not detect screen size for this mpl backend.")
         print("Using a default size.")
+        # Safe:
         x0, y0, w0, h0 = 30, 30, 800, 600
+        # Retina Mac:
+        # x0, y0, w0, h0 = 0, 0, 800, 600
 
     return x0, y0, w0, h0
 
 
 def loc01(fignum=None, x=None, y=None, w=None, h=None):
-    """Place figure on screen, in relative coordinates ∈ [0, 1].
-
-    Only works on Linux?
-    """
+    """Place figure on screen, in relative coordinates ∈ [0, 1]."""
     try:
         fmw = _get_fmw(fignum)
     except FigManagerDoesNotExist as e:
