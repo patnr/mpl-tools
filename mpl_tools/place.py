@@ -85,6 +85,7 @@ def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
         figsize = relative_figsize(figsize)
 
     # Create fig
+    was_open = plt.fignum_exists(num)
     fig = plt.figure(num=num, figsize=figsize)
 
     # Clear fig
@@ -96,7 +97,7 @@ def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
 
     # Load placement
     if (
-        place > 1 or (place and not plt.fignum_exists(num))
+        place > 1 or (place and not was_open)
         and num is not None  # It makes little sense to load placement
                              # for the figure number resulting from None
     ):
