@@ -173,17 +173,22 @@ def _get_geo1(fignum):
         return fmw.geometry()
 
 
-def _set_geo1(fignum, geo):
+def _set_geo1(fignum, xywh):
+    # Get figure window manager
     fmw = _get_fmw(fignum)
+    # Convert to dict
+    if isinstance(xywh, tuple):
+        xywh = dict(zip("xywh", xywh))
     # For Qt4Agg/Qt5Agg
     try:
-        return fmw.setGeometry(geo['x'], geo['y'], geo['w'], geo['h'])
+        return fmw.setGeometry(xywh['x'], xywh['y'], xywh['w'], xywh['h'])
     except Exception:
         pass
     # For TkAgg
     try:
-        # geo = "{w:.0f}x{h:.0f}+{x:.0f}+{y:.0f}".format(**geo)
-        return fmw.geometry(newGeometry=geo)
+        if isinstance(xywh, dict):
+            xywh = "{w}x{h}+{x}+{y}".format(**xywh)
+        return fmw.geometry(newGeometry=xywh)
     except Exception:
         pass
     warn(f"Could not place figure {fignum}."
@@ -338,11 +343,7 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     w = w*w0
     h = h*h0 - footer
 
-    try:  # For Qt4Agg/Qt5Agg
-        fmw.setGeometry(x, y, w, h)
-    except: # noqa # For TkAgg
-        geo = f"{int(w)}x{int(h)}+{int(x)}+{int(y)}"
-        fmw.geometry(newGeometry=geo)
+    _set_geo1(fignum, (x, y, w, h))
 
 
 def loc(loc, fignum=None):
