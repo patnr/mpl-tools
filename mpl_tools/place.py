@@ -328,10 +328,10 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     footer = 0.028*(h0+y0)
 
     # Current values (Qt4Agg only!):
-    w = w if w is not None else fmw.width() / w0
-    h = h if h is not None else fmw.height()/h0
-    x = x if x is not None else fmw.x()     / w0
-    y = y if y is not None else fmw.y()     / h0
+    w = w if w is not None else fmw.width()  / w0
+    h = h if h is not None else fmw.height() / h0
+    x = x if x is not None else fmw.x()      / w0
+    y = y if y is not None else fmw.y()      / h0
 
     x = x0 + x*w0
     y = y0 + y*h0 + footer
