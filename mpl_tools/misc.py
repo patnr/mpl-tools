@@ -161,3 +161,10 @@ class FigSaver():
         if self.n >= 0:             # If indexing:
             self.n += 1                 # Increment
             plt.pause(0.1)              # For safety
+
+
+def reverse_legend(ax, **kws):
+    """Reverse order of legend items in `ax`."""
+    leg = ax.get_legend_handles_labels()
+    leg = list(map(list, zip(*leg)))[::-1]
+    ax.legend(*zip(*leg), **kws)
