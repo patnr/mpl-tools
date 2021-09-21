@@ -1,6 +1,6 @@
 """Science-related mpl tools."""
 
-import matplotlib.colors
+import matplotlib as mpl
 import matplotlib.ticker
 import numpy as np
 from matplotlib import pyplot as plt
@@ -129,8 +129,8 @@ def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
         else:
             xx = np.linspace(0, 1, len(S))
         cmap = plt.get_cmap(cmap)(xx)
-        cmap = matplotlib.colors.ListedColormap(cmap)
-        norm = matplotlib.colors.BoundaryNorm(bins, cmap.N)
+        cmap = mpl.colors.ListedColormap(cmap)
+        norm = mpl.colors.BoundaryNorm(bins, cmap.N)
 
         im = ax.matshow(X, cmap=cmap, norm=norm)
         cb = fig.colorbar(im, ticks=ticks, format=formatter)
