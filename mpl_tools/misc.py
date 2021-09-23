@@ -167,4 +167,5 @@ def reverse_legend(ax, **kws):
     """Reverse order of legend items in `ax`."""
     leg = ax.get_legend_handles_labels()
     leg = list(map(list, zip(*leg)))[::-1]
-    ax.legend(*zip(*leg), **kws)
+    if leg:
+        ax.legend(*zip(*leg), **kws)
