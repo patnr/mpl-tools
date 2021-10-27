@@ -63,13 +63,19 @@ def relative_figsize(wh):
 def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
     """Create/clear figure, place it, call `plt.subplots(**kwargs)`.
 
-    If `figure(num)` exists, it is **cleared** before calling `subplots`.
-    Unlike closing/opening, this keeps its position and size.
+    Placement requires that you specify `num`, but you really always should do
+    that, to avoid creating new figures, which should be avoided, because
+    - (on GUI frontends) it creates new windows, spamming your screen.
+    - (with notebook frontends, i.e. `nbAgg` or `ipywidgets`) it hides the old
+      figure, making it hard to close it (and clear it from memory).
 
-    Note that `num` can also be a string, i.e. the label of the figure.
-    If so, and if `sup`, and if mpl is "inline" (e.g. Jupyter),
-    then `suptitle` is set to that string
-    (since inline mpl does not display the figure label)
+    Another benefit of this function is that it builds-in `fig.clear` (remove
+    axes, for ex.). NB: the alternative method of closing and re-opening does
+    not allow for *maintaining* (as opposed to setting) figure pos. & size.
+
+    .. note:
+        `ipywidgets` seems to require that you do `plt.show()` (not `fig.show()`) to make it appear.
+        on subsequent runs in order to make the figure appear.
 
     If `place==2`, the figure placement is `load`ed, provided the figure's
     position has previously been `save`d. If `place==1`, the active placement
@@ -83,6 +89,11 @@ def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
         Active placement (including re-sizing) on the `mpl` backend **MacOSX**
         [does not work](https://stackoverflow.com/a/30180994). However, sizing
         **upon creation** works, and Qt5Agg (or TkAgg) can also be installed.
+
+    Note that `num` can also be a string, i.e. the label of the figure.
+    If so, and if `sup`, and if mpl is "inline" (e.g. Jupyter),
+    then `suptitle` is set to that string
+    (since inline mpl does not display the figure label)
 
     Example
     -------
