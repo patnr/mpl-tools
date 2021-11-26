@@ -15,10 +15,10 @@ import json
 import platform
 import warnings
 from pathlib import Path
-from pkg_resources import parse_version
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
+from pkg_resources import parse_version
 
 from mpl_tools import (is_inline, is_notebook_or_qt,
                        is_using_interactive_backend)
