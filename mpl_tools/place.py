@@ -127,7 +127,7 @@ def freshfig(num=None, place=True, rel=False, sup=True, **kwargs):
     if sup and is_inline() and isinstance(num, str):
         # tight_layout on mpl<3.3 (e.g. Colab) does not account for suptitle
         # Using y=1 (default: 0.98) works both with/without tight_layout.
-        if parse_version(mpl.__version__) < 3.3:
+        if parse_version(mpl.__version__) < parse_version("3.3"):
             fig.suptitle(num, y=1)
         else:
             fig.suptitle(num)
