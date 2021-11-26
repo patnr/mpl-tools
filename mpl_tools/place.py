@@ -152,7 +152,7 @@ def _get_fig(fignum=None):
         return plt.figure(fignum)
 
 
-class FigManagerDoesNotExist(Exception):
+class FigManagerDoesNotExist(Exception):  # noqa
     """Signal that figure placement ain't possible with this mpl backend.
 
     Use exception (a custom subclass for finesse and thereby safety) to
