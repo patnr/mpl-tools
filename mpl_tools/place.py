@@ -153,7 +153,7 @@ def _get_fig(fignum=None):
         return plt.figure(fignum)
 
 
-class FigManagerDoesNotExist(Exception):  # noqa
+class FigManagerDoesNotExistError(Exception):
     """Signal that figure placement ain't possible with this mpl backend.
 
     Use exception (a custom subclass for finesse and thereby safety) to
@@ -171,7 +171,7 @@ def _get_fmw(fignum):
         fmw = fig.canvas.manager.window
         # fmw = plt.get_current_fig_manager().window
     except AttributeError:
-        raise FigManagerDoesNotExist(
+        raise FigManagerDoesNotExistError(
             "Cannot programmatically manipulate figure windows"
             f" with the current mpl. backend ({mpl.get_backend()})")
     return fmw
@@ -225,7 +225,7 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
         lbls = [lbl or num for lbl, num in
                 zip(plt.get_figlabels(), plt.get_fignums())]
         placements = {k: _get_geo1(k) for k in lbls}
-    except FigManagerDoesNotExist as e:
+    except FigManagerDoesNotExistError as e:
         warn(str(e))
     else:
         # Get old placements
@@ -270,7 +270,7 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
         for lbl in placements:
             if fignum is None or lbl == fignum:
                 _set_geo1(lbl, placements[lbl])
-    except FigManagerDoesNotExist as e:
+    except FigManagerDoesNotExistError as e:
         warn(str(e))
 
 
@@ -289,7 +289,7 @@ def show_figs(fignums=None):
             fmw = _get_fmw(f)
             fmw.attributes('-topmost', 1)  # Bring to front, but
             fmw.attributes('-topmost', 0)  # don't keep in front
-    except FigManagerDoesNotExist as e:
+    except FigManagerDoesNotExistError as e:
         warn(str(e))
 
 
@@ -348,7 +348,7 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
     """Place figure on screen, in relative coordinates ∈ [0, 1]."""
     try:
         fmw = _get_fmw(fignum)
-    except FigManagerDoesNotExist as e:
+    except FigManagerDoesNotExistError as e:
         warn(str(e))
         return
 
