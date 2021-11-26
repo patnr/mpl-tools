@@ -2,7 +2,7 @@
 
 [tool.poetry]
 name = "mpl-tools"
-version = "0.2.55"
+version = "0.2.56"
 description = "Tools for working with matplotlib" # Set == Github descript.
 authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
 license = "MIT"
