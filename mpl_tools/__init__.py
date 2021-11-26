@@ -27,6 +27,9 @@ try:
     is_notebook_or_qt = (
         ("zmq" in ip)  # local Jupyter, binder, Kaggle
         or ("colab" in ip)  # Google Colab
+        # Note: it appears to be impossible to detect if we're in
+        # jupyter-notebook or -lab https://discourse.jupyter.org/t/6935 .
+        # Fortunately, for mpl, `%matplotlib widget/ipympl` works with both.
     )
 except (NameError, ImportError):
     is_notebook_or_qt = False
@@ -35,15 +38,17 @@ except (NameError, ImportError):
 def is_using_interactive_backend():
     """Check if `mpl` is (currently) using an interactive backend.
 
-    Note on jupyter notebook backends:
-    - `%matplotlib notebook` (`nbAgg`) is interactive.
-    - `%matplotlib inline` is not.
-      It can still be updated; see `dapper/tools/viz:plot_pause()`.
-      but does not allow for mouse interaction, being a static picture.
-      It also uses different dpi than `nbAgg`, ref
-      https://github.com/matplotlib/matplotlib/issues/4853
-    - `%matplotlib widgets` (`ipympl`) is interactive,
-      and works in Jupyterlab unlike (`nbAgg`)
+    - Examples of interactive: `Qt5Agg` and `MacOSX`
+    - For jupyter notebooks, note that
+        - `%matplotlib notebook` (`nbAgg`) is interactive.
+        - `%matplotlib inline` is not. This means that
+          it does not allow for mouse interaction, being a static picture,
+          though it can still be updated, e.g. `dapper/tools/viz:plot_pause()`.
+          It also uses different `dpi` than `nbAgg`,
+          [ref](https://github.com/matplotlib/matplotlib/issues/4853)
+        - `%matplotlib widgets/ipympl` is interactive,
+          and works in Jupyter-lab, unlike (`nbAgg`).
+          However, it is NOT listed among `interactive_bk`.
     """
     return mpl.get_backend() in mpl.rcsetup.interactive_bk
 
