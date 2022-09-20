@@ -30,7 +30,7 @@ MAKEFLAGS += --no-builtin-rules
 # Hack to avoid poetry using (and complaining about) python < 3
 # https://github.com/python-poetry/poetry/issues/3288#issuecomment-717090078
 POETRY:=python3 $(HOME)/.poetry/bin/poetry
-POETRY_URL:=https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
+POETRY_URL:=https://install.python-poetry.org
 
 # Explained above
 .PHONY: all clean help lint type test tests test-cov tox autoformat doc docs
@@ -46,7 +46,7 @@ help: ## Show this help message
 
 get_poetry: # internal -- leave undoc'd
 	@command -v poetry &> /dev/null || \
-		{ echo "Installing poetry"; curl -sSL $(POETRY_URL) | python - ; }
+		{ echo "Installing poetry"; curl -sSL $(POETRY_URL) | python3 - ; }
 
 define echo_install_success
 	echo -e "\033[0;34m\n✔️ ✔️ ✔️ ✔️ ✔️ ✔️  You can now run scripts using:\033[0m"
