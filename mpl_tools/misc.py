@@ -105,64 +105,8 @@ def nRowCol(nTotal, figsize=None, axsize=None):
     return {"nrows": nrows, "ncols": ncols}
 
 
-# TODO: re-include NicePrint from struct-tools?
-class FigSaver():
-    """Simplify exporting a figure, especially when it's part of a series."""
-
-    def __init__(self, script=None, basename=None, n=-1, ext='.pdf'):
-        """Init.
-
-        Parameters
-        ----------
-        script: str
-            Name of dir to put figs in. Defaults to stem of `__file__` of caller.
-
-        basename: str
-            Name of figure files.
-
-        n: int
-           Starting index for file names.
-
-        Example
-        -------
-        >>> fs = FigSaver(n=1, ext=".eps") # doctest: +SKIP
-        ... ax.plot(xdata, ydata) # Add line to plot
-        ... fs.save()             # Save
-        ... ax.plot(xdata, ydata) # Add another line
-        ... fs.save()
-        """
-        # Defaults
-        if script is None:  # Get __file__ of caller
-            script = inspect.getfile(inspect.stack()[1][0])
-        if basename is None:
-            basename = 'figure'
-        # Prep save dir
-        sdir = Path(script).stem
-        Path(sdir).mkdir(parents=True, exist_ok=True)
-        # Set state
-        self.fname = sdir + basename
-        self.n     = n
-        self.ext   = ext
-
-    @property
-    def fullname(self):
-        """Get full name of figure to be saved."""
-        f = self.fname            # Abbrev
-        if self.n >= 0:           # If indexing:
-            f += '_n%d' % self.n  # Add index
-        f += self.ext             # Add extension
-        return f
-
-    def save(self):
-        """Save current figure. Increments the index."""
-        f = self.fullname           # Abbrev
-        print("Saving fig to:", f)  # Print
-        plt.savefig(f)              # Save
-        if self.n >= 0:             # If indexing:
-            self.n += 1                 # Increment
-            plt.pause(0.1)              # For safety
 def zero_axes(ax, color=(.5, .5, .5), arrow_size=4,
-              ticks=True, ticklabels=False, lw=None):
+              ticks=True, ticklabels=False, lw=None, tick_params=None):
     """Create axes with arrow spines which always go throw origin.
 
     Ref: <https://github.com/matplotlib/matplotlib/issues/17157>

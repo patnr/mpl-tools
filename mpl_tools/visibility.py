@@ -141,3 +141,36 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
         plt.pause(pause)
 
     return are_viz
+
+
+def save_toggle(*objs,
+                exts=("png",),
+                bbox_inches="tight", pad_inches=0, dpi=None,
+                fig=None,
+                pause=.4,
+                ):
+    """Save figure. Toggle visibility of `objs`.
+
+    Example:
+    >>> fig.counter = 1
+    ... fig.savepath = Path(__file__).resolve().parent / f"Pics/{fig.get_label()}"
+    ... save_toggle(line1)
+    ... save_toggle(line2)
+    """
+    if fig is None:
+        fig = objs[0].figure
+
+    if not hasattr(fig, "counter"):
+        fig.counter = 1
+
+    if not hasattr(fig, "savepath"):
+        fig.savepath = fig.get_label()  # ⇒ PWD
+
+    for ext in exts:
+        fig.savefig(f"{fig.savepath}-{fig.counter}.{ext}",
+                    bbox_inches=bbox_inches, pad_inches=pad_inches, dpi=dpi)
+
+    fig.counter += 1
+
+    # Toggle
+    toggle_viz(*objs, pause=pause)
