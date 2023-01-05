@@ -161,6 +161,48 @@ class FigSaver():
         if self.n >= 0:             # If indexing:
             self.n += 1                 # Increment
             plt.pause(0.1)              # For safety
+def zero_axes(ax, color=(.5, .5, .5), arrow_size=4,
+              ticks=True, ticklabels=False, lw=None):
+    """Create axes with arrow spines which always go throw origin.
+
+    Ref: <https://github.com/matplotlib/matplotlib/issues/17157>
+
+    NB: `alpha` cannot be supported, because the spines consist of multiple elements,
+    and where they overlap, the alphas overlay, creating non-homogenous effects.
+    """
+    if tick_params is None:
+        tick_params = {
+            "xtick.direction": "inout",
+            "ytick.direction": "inout",
+            "xtick.major.size": 6,
+            "ytick.major.size": 6,
+            "xtick.major.width": .5,
+            "ytick.major.width": .5,
+            "xtick.color": color,
+            "ytick.color": color,
+        }
+    # Could also use ax.tick_params().
+    with plt.rc_context(tick_params):
+        plt.setp(ax.spines.values(), color=color, lw=lw)
+        ax.spines['bottom'].set_position('zero')
+        ax.spines['left'].set_position('zero')
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        if not ticks:
+            ax.set_xticks([])
+            ax.set_yticks([])
+            # Alternative:
+            # ax.xaxis.set_major_locator(plt.NullLocator())
+        if not ticklabels:
+            ax.set_xticklabels([])
+            ax.set_yticklabels([])
+            # Alternative:
+            # plt.setp( ax.get_xticklabels(), visible=False)
+
+        # Arrow heads
+        kws = dict(ls="", ms=arrow_size, color=color, clip_on=False)
+        ax.plot((1), (0), marker=">", **kws, transform=ax.get_yaxis_transform())
+        ax.plot((0), (1), marker="^", **kws, transform=ax.get_xaxis_transform())
 
 
 def reverse_legend(ax, **kws):
