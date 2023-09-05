@@ -20,6 +20,7 @@ __version__ = importlib_metadata.version(__name__)
 import matplotlib as mpl
 
 # is_notebook_or_qt
+# TODO: check how `tqdm.auto` does it
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
