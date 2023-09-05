@@ -18,7 +18,7 @@ from pathlib import Path
 
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-from pkg_resources import parse_version
+from packaging.version import Version
 
 from mpl_tools import (is_inline, is_notebook_or_qt,
                        is_using_interactive_backend)
@@ -127,7 +127,7 @@ def freshfig(num=None, place=True, rel=False, sup=True, ipympl_show=True, **kwar
     if sup and is_inline() and isinstance(num, str):
         # tight_layout on mpl<3.3 (e.g. Colab) does not account for suptitle
         # Using y=1 (default: 0.98) works both with/without tight_layout.
-        if parse_version(mpl.__version__) < parse_version("3.3"):
+        if Version(mpl.__version__) < Version("3.3"):
             fig.suptitle(num, y=1)
         else:
             fig.suptitle(num)
