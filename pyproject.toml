@@ -2,7 +2,7 @@
 
 [tool.poetry]
 name = "mpl-tools"
-version = "0.2.59"
+version = "0.3.0"
 description = "Tools for working with matplotlib" # Set == Github descript.
 authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
 license = "MIT"
@@ -23,9 +23,9 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.9"
 matplotlib = "~=3.7"
-scipy = "*"
 
 [tool.poetry.dev-dependencies]
+scipy = "*"
 # pyqt5 = "*" # GUI-backend for mpl
 pdoc3 = "^0.9.2" # Doc generation
 
