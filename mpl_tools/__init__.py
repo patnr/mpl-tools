@@ -15,7 +15,6 @@ __version__ = importlib_metadata.version(__name__)
 import matplotlib as mpl
 
 # is_notebook_or_qt
-# TODO: check how `tqdm.auto` does it
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
@@ -29,6 +28,14 @@ try:
     )
 except (NameError, ImportError):
     is_notebook_or_qt = False
+
+
+# # TODO: Rely on tqdm's checks instead?
+# def is_notebook():
+#     """Rely on tqdm to do the (rather fuzzy) check."""
+#     from tqdm.notebook import tqdm_notebook
+#     from tqdm.auto import tqdm
+#     return isinstance(tqdm(disable=True), tqdm_notebook)
 
 
 def is_using_interactive_backend():
