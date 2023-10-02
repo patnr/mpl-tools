@@ -132,14 +132,6 @@ def freshfig(num=None, place=True, rel=False, sup=True, ipympl_show=True, **kwar
         else:
             fig.suptitle(num)
 
-    if "ipympl" in mpl.get_backend() and ipympl_show:
-        # ipympl won't show a figure (with a given figure `num`) when a cell is RE-RUN.
-        # This is different from `%matplotlib notebook or inline`.
-        # Ref: https://github.com/matplotlib/ipympl/issues/248 . Fix:
-        plt.show()  # fig.show() fails.
-        # Note: freshfig is not supposed to deal with plt.show() etc, but if we use
-        # ipympl it's a safe bet that plt.isinteractive() is True (by plt.ion() or o/w).
-
     return fig, ax
 
 
