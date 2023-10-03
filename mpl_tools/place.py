@@ -51,44 +51,32 @@ def warn(*args, **kwargs):
     warnings.formatwarning = original
 
 
-def relative_figsize(wh):
-    """Multiply `wh` by width and height of `rcParams["figure.figsize"]`.
-
-    Provides convenient way to adjust all figure sizes for a script.
-    """
-    w0, h0 = plt.rcParams["figure.figsize"]
-    w, h = wh
-    return w*w0, h*h0
-
-
-def freshfig(num=None, place=True, rel=False, sup=True, ipympl_show=True, **kwargs):
+def freshfig(num=None, figsize=None, place=True, sup=True, **kwargs):
     """Do `plt.subplots(**kwargs)` with some bells and whistles.
 
-    The most important added feature is figure placement. For example,
-    figures get cleared, not closed & re-opened, to *maintain* their placement.
-    *Active* placement requires that you specify `num`, but you really always should do
-    that, to avoid creating new figures, which should be avoided, because
+    The most important added feature is figure placement.
+
+    .. note:
+        Placement (including re-sizing) on the `mpl` backend **MacOSX**
+        [does not work](https://stackoverflow.com/a/30180994). However, sizing
+        **upon creation** works, and Qt5Agg (or TkAgg) could also be installed.
+
+    Therefore figures get cleared -- not closed & re-opened --
+    to *maintaining* their placement.
+
+    Placement requires that you specify `num`, but you really always should do that,
+    to avoid creating new figures, which should be avoided because
+
     - (on GUI frontends) it creates new windows, spamming your screen.
     - (with notebook frontends, i.e. `nbAgg` or `ipywidgets`) it hides the old
       figure, making it hard to close it (and clear it from memory).
 
     If `place==2`, the figure placement is `load`ed, provided the figure's
-    position has previously been `save`d. If `place==1`, the active placement
-    only happens if the figure did not yet exist.
+    position has previously been `save`d. It will also overrule any `figsize`.
+    If `place==1`, the placement only happens if the figure did not yet exist.
 
-    If `figsize` is among the `kwargs` it will still be overruled
-    by the loaded figure placement, as it should.
-    If `rel`, then `figsize` is passed through `relative_figsize`.
-
-    .. note:
-        Active placement (including re-sizing) on the `mpl` backend **MacOSX**
-        [does not work](https://stackoverflow.com/a/30180994). However, sizing
-        **upon creation** works, and Qt5Agg (or TkAgg) can also be installed.
-
-    Note that `num` can also be a string, i.e. the label of the figure.
-    If so, and if `sup`, and if mpl is "inline" (e.g. Jupyter),
-    then `suptitle` is set to that string
-    (since inline mpl does not display the figure label)
+    If mpl is "inline" (e.g. Jupyter), then the figure label is not displayed.
+    Therefore, if `sup` and `num` is a string, the `fig.suptitle` is set to `num`.
 
     Example
     -------
@@ -96,11 +84,6 @@ def freshfig(num=None, place=True, rel=False, sup=True, ipympl_show=True, **kwar
     (<Figure size 640x480 with 2 Axes>,
     array([<AxesSubplot:>, <AxesSubplot:>], dtype=object))
     """
-    # Get figsize
-    figsize = kwargs.pop("figsize", None)
-    if rel:
-        figsize = relative_figsize(figsize)
-
     # Create fig
     was_open = plt.fignum_exists(num)
     fig = plt.figure(num=num, figsize=figsize)
@@ -125,10 +108,9 @@ def freshfig(num=None, place=True, rel=False, sup=True, ipympl_show=True, **kwar
 
     # Suptitle
     if sup and is_inline() and isinstance(num, str):
-        # tight_layout on mpl<3.3 (e.g. Colab) does not account for suptitle
-        # Using y=1 (default: 0.98) works both with/without tight_layout.
         if Version(mpl.__version__) < Version("3.3"):
-            fig.suptitle(num, y=1)
+            # workaround tight_layout fail
+            fig.suptitle(num, y=1) # (default y=0.98)
         else:
             fig.suptitle(num)
 
