@@ -9,6 +9,7 @@ through the following links, which are also available in the left sidebar.
 """
 
 import importlib.metadata as importlib_metadata
+
 __version__ = importlib_metadata.version(__name__)
 
 
@@ -18,6 +19,7 @@ import matplotlib as mpl
 try:
     __IPYTHON__  # type: ignore
     from IPython import get_ipython  # type: ignore
+
     ip = str(type(get_ipython())).lower()
     is_notebook_or_qt = (
         ("zmq" in ip)  # local Jupyter, binder, Kaggle
@@ -53,7 +55,9 @@ def is_using_interactive_backend():
           and works in Jupyter-lab, unlike (`nbAgg`).
           However, it is NOT listed among `interactive_bk`.
     """
-    return mpl.get_backend() in mpl.rcsetup.interactive_bk
+    return mpl.get_backend() in mpl.backends.backend_registry.list_builtin(
+        mpl.backends.BackendFilter.INTERACTIVE
+    )
 
 
 def is_inline():

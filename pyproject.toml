@@ -2,7 +2,7 @@
 
 [tool.poetry]
 name = "mpl-tools"
-version = "0.4.0"
+version = "0.4.1"
 description = "Tools for working with matplotlib" # Set == Github descript.
 authors = ["patricknraanes <patrick.n.raanes@gmail.com>"]
 license = "MIT"
@@ -127,6 +127,7 @@ pycodestyle = ["+*",
     # "-E201", "-E202", "-E203", "-E241", "-E231", # leave arrays as printed
     #"-E202", "-E203",
     # "-E301", "-E302", # dont put spaces between functions
+    "-W503", # line break before binary operator
 ]
 #mccabe = ["+*"]
 #pylint = ["+*"]
