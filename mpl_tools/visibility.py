@@ -65,9 +65,10 @@ def toggle_lines(
     rax = plt.axes([0.05, 0.5 - H / 2, W, H])
     check = CheckButtons(rax, lines["label"], lines["visible"])
 
-    # Adjust button style
+    # Adjust button style. `rectangles` was removed in mpl 3.7; use `patches`.
+    patches = getattr(check, "rectangles", None) or check.ax.patches[1::3]
     for i in range(N):
-        check.rectangles[i].set(lw=0, facecolor=lines["color"][i])
+        patches[i].set(lw=0, facecolor=lines["color"][i])
         check.labels[i].set(color=lines["color"][i])
         if txtsize:
             check.labels[i].set(size=txtsize)

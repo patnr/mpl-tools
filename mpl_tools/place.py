@@ -80,9 +80,9 @@ def freshfig(num=None, figsize=None, place=True, sup=True, **kwargs):
 
     Example
     -------
-    >>> freshfig(1, nrows=2, sharex=True)  # doctest: +NORMALIZE_WHITESPACE
-    (<Figure size 640x480 with 2 Axes>,
-    array([<AxesSubplot:>, <AxesSubplot:>], dtype=object))
+    >>> fig, axs = freshfig(1, nrows=2, sharex=True)
+    >>> len(axs)
+    2
     """
     # Create fig
     was_open = plt.fignum_exists(num)
@@ -194,7 +194,15 @@ def _set_geo1(fignum, xywh):
 
 
 def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
-    """Save current figure layout."""
+    """Save current figure layout.
+
+    Note:
+        Testing `save`/`load` round-trip requires a GUI backend (e.g. Qt5Agg)
+        because headless backends have no concept of window position. To test
+        manually: open an interactive Python session, create some figures, call
+        `save()`, re-create the figures, call `load()`, and check that the
+        windows moved back to the saved positions.
+    """
     if append_host:
         path = ".".join([path, platform.node()])
 

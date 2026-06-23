@@ -31,4 +31,4 @@ jobs:
       - name: Test
         env:
           MPLBACKEND: Agg
-        run: pytest --doctest-modules mpl_tools tests --ignore=tests/test_place.py
+        run: pytest --doctest-modules mpl_tools tests
