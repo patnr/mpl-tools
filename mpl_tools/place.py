@@ -10,6 +10,7 @@ Main functions:
 - `show_figs`       : Show all figures
 - `get_screen_size` : Get current screen size.
 """
+
 import functools
 import json
 import platform
@@ -20,8 +21,7 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 from packaging.version import Version
 
-from mpl_tools import (is_inline, is_notebook_or_qt,
-                       is_using_interactive_backend)
+from mpl_tools import is_inline, is_notebook_or_qt, is_using_interactive_backend
 
 _FIG_GEOMETRIES_PATH = "./.fig_layout"
 
@@ -42,7 +42,7 @@ def warn(*args, **kwargs):
     kwargs["stacklevel"] = kwargs.get("stacklevel", 1) + 1
 
     def frmt_warning(msg, category, filename, lineno, file=None, line=None):
-        return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, msg)
+        return "%s:%s: %s: %s\n" % (filename, lineno, category.__name__, msg)
 
     # Set custom frmt_warning (before calling warn), but restore original afterwards
     original = warnings.formatwarning
@@ -97,20 +97,21 @@ def freshfig(num=None, figsize=None, place=True, sup=True, **kwargs):
 
     # Load placement
     if (
-        place > 1 or (place and not was_open)
+        place > 1
+        or (place and not was_open)
         and num is not None  # It makes little sense to load placement
-                             # for the figure number resulting from None
+        # for the figure number resulting from None
     ):
         load(fignum=num)
 
     # Create axes
-    _, ax = plt.subplots(num=fig.number, **kwargs)
+    _, ax = plt.subplots(num=fig.number, clear=True, **kwargs)
 
     # Suptitle
     if sup and is_inline() and isinstance(num, str):
         if Version(mpl.__version__) < Version("3.3"):
             # workaround tight_layout fail
-            fig.suptitle(num, y=1) # (default y=0.98)
+            fig.suptitle(num, y=1)  # (default y=0.98)
         else:
             fig.suptitle(num)
 
@@ -147,7 +148,8 @@ def _get_fmw(fignum):
     except AttributeError:
         raise FigManagerDoesNotExistError(
             "Cannot programmatically manipulate figure windows"
-            f" with the current mpl. backend ({mpl.get_backend()})")
+            f" with the current mpl. backend ({mpl.get_backend()})"
+        )
     return fmw
 
 
@@ -174,7 +176,7 @@ def _set_geo1(fignum, xywh):
         xywh = dict(zip("xywh", xywh))
     # For Qt4Agg/Qt5Agg
     try:
-        return fmw.setGeometry(xywh['x'], xywh['y'], xywh['w'], xywh['h'])
+        return fmw.setGeometry(xywh["x"], xywh["y"], xywh["w"], xywh["h"])
     except Exception:
         pass
     # For TkAgg
@@ -184,9 +186,11 @@ def _set_geo1(fignum, xywh):
         return fmw.geometry(newGeometry=xywh)
     except Exception:
         pass
-    warn(f"Could not place figure {fignum}."
-         f" Did you change the mpl backend?"
-         f" Try deleting {_FIG_GEOMETRIES_PATH}")
+    warn(
+        f"Could not place figure {fignum}."
+        f" Did you change the mpl backend?"
+        f" Try deleting {_FIG_GEOMETRIES_PATH}"
+    )
 
 
 def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
@@ -196,15 +200,14 @@ def save(path=_FIG_GEOMETRIES_PATH, append_host=True):
 
     try:
         # Use labels if defined, else numbers
-        lbls = [lbl or num for lbl, num in
-                zip(plt.get_figlabels(), plt.get_fignums())]
+        lbls = [lbl or num for lbl, num in zip(plt.get_figlabels(), plt.get_fignums())]
         placements = {k: _get_geo1(k) for k in lbls}
     except FigManagerDoesNotExistError as e:
         warn(str(e))
     else:
         # Get old placements
         if Path(path).is_file():
-            with open(path, "r") as file:
+            with open(path) as file:
                 old = json.load(file)
         else:
             old = {}
@@ -229,7 +232,7 @@ def load(path=_FIG_GEOMETRIES_PATH, append_host=True, fignum=None):
         #      " for persistent figure layout.", stacklevel=2)
         return
 
-    with open(path, "r") as file:
+    with open(path) as file:
         placements = json.load(file)
 
     # Cast nums to int
@@ -261,8 +264,8 @@ def show_figs(fignums=None):
     try:
         for f in fignums:
             fmw = _get_fmw(f)
-            fmw.attributes('-topmost', 1)  # Bring to front, but
-            fmw.attributes('-topmost', 0)  # don't keep in front
+            fmw.attributes("-topmost", 1)  # Bring to front, but
+            fmw.attributes("-topmost", 0)  # don't keep in front
     except FigManagerDoesNotExistError as e:
         warn(str(e))
 
@@ -276,10 +279,11 @@ def get_screen_size():
     Consider using non-mpl method: https://pypi.org/project/screeninfo
     """
     success = True
-    if mpl.get_backend().startswith('Qt'):
+    if mpl.get_backend().startswith("Qt"):
         try:
             # Ref spyder/widgets/shortcutssummary.py
             from qtpy.QtWidgets import QDesktopWidget  # type: ignore
+
             widget = QDesktopWidget()
             sc = widget.availableGeometry(widget.primaryScreen())
             x0, y0, w0, h0 = sc.x(), sc.y(), sc.width(), sc.height()
@@ -330,18 +334,18 @@ def loc01(fignum=None, x=None, y=None, w=None, h=None):
 
     # It seems the window footers are not taken into account
     # by the geometry settings. Correct for this:
-    footer = 0.028*(h0+y0)
+    footer = 0.028 * (h0 + y0)
 
     # Current values (Qt4Agg only!):
-    w = w if w is not None else fmw.width()  / w0
+    w = w if w is not None else fmw.width() / w0
     h = h if h is not None else fmw.height() / h0
-    x = x if x is not None else fmw.x()      / w0
-    y = y if y is not None else fmw.y()      / h0
+    x = x if x is not None else fmw.x() / w0
+    y = y if y is not None else fmw.y() / h0
 
-    x = x0 + x*w0
-    y = y0 + y*h0 + footer
-    w = w*w0
-    h = h*h0 - footer
+    x = x0 + x * w0
+    y = y0 + y * h0 + footer
+    w = w * w0
+    h = h * h0 - footer
 
     _set_geo1(fignum, (x, y, w, h))
 
@@ -363,30 +367,30 @@ def loc(loc, fignum=None):
     loc = str(loc)
     loc = loc.replace(",", "")
     if not loc[:4].isnumeric():
-        if loc.startswith('NW'):
-            loc = '2211'
-        elif loc.startswith('SW'):
-            loc = '2221'
-        elif loc.startswith('NE'):
-            loc = '2212'
-        elif loc.startswith('SE'):
-            loc = '2222'
-        elif loc.startswith('W'):
-            loc = '1211'
-        elif loc.startswith('E'):
-            loc = '1212'
-        elif loc.startswith('S'):
-            loc = '2121'
-        elif loc.startswith('N'):
-            loc = '2111'
+        if loc.startswith("NW"):
+            loc = "2211"
+        elif loc.startswith("SW"):
+            loc = "2221"
+        elif loc.startswith("NE"):
+            loc = "2212"
+        elif loc.startswith("SE"):
+            loc = "2222"
+        elif loc.startswith("W"):
+            loc = "1211"
+        elif loc.startswith("E"):
+            loc = "1212"
+        elif loc.startswith("S"):
+            loc = "2121"
+        elif loc.startswith("N"):
+            loc = "2111"
 
     # Split digits
     M, N = int(loc[0]), int(loc[1])
-    if loc[3] == '-':
+    if loc[3] == "-":
         i1, i2 = int(loc[2]), int(loc[4])
     else:
         i1, i2 = int(loc[2]), int(loc[2])
-    if loc[-2] == '-':
+    if loc[-2] == "-":
         j1, j2 = int(loc[-3]), int(loc[-1])
     else:
         j1, j2 = int(loc[-1]), int(loc[-1])
@@ -395,6 +399,6 @@ def loc(loc, fignum=None):
     assert N >= j2 >= j1 > 0, "The specified row index is invalid."
 
     # Place
-    di = i2-i1+1
-    dj = j2-j1+1
-    loc01(fignum, (j1-1)/N, (i1-1)/M, dj/N, di/M)
+    di = i2 - i1 + 1
+    dj = j2 - j1 + 1
+    loc01(fignum, (j1 - 1) / N, (i1 - 1) / M, dj / N, di / M)
