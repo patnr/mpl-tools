@@ -33,7 +33,7 @@ def cov_ellipse(ax, mu, sigma, **kwargs):
     h, w = 2 * np.sqrt(vals.clip(0))
 
     # Get artist
-    e = Ellipse(mu, w, h, theta, **kwargs)
+    e = Ellipse(mu, w, h, angle=theta, **kwargs)
 
     ax.add_patch(e)
     e.set_clip_box(ax.bbox)  # why is this necessary?
@@ -63,8 +63,8 @@ def axes_with_marginals(n_joint, n_marg, **kwargs):
     # _.set_visible(False) # Actually removing would bug the axis ticks etc.
 
     # Method 2
-    gs   = GridSpec(N, N, **kwargs)
-    fig  = plt.gcf()
+    gs = GridSpec(N, N, **kwargs)
+    fig = plt.gcf()
     ax0 = fig.add_subplot(gs[n_marg:N, 0:n_joint])
     a_x = fig.add_subplot(gs[0:n_marg, 0:n_joint], sharex=ax0)
     a_y = fig.add_subplot(gs[n_marg:N, n_joint:N], sharey=ax0)
@@ -91,7 +91,7 @@ def discretize_cmap(cmap, N, val0=0, val1=1, name=None):
     # A cmap in itself is not sufficient to create a colorbar. It must have cbounds.
     # A ScalarMappable combines cmap and bounds, and is usually implicitly created
     # by or `matshow` or `coutourf`, getting the bounds from the data.
-    cNorm = mpl.colors.Normalize(-.5, -.5+N)
+    cNorm = mpl.colors.Normalize(-0.5, -0.5 + N)
     sm = mpl.cm.ScalarMappable(cNorm, cmap)
 
     # Set-up convenvience function to label cbar ticks
@@ -101,6 +101,7 @@ def discretize_cmap(cmap, N, val0=0, val1=1, name=None):
             cb.set_ticks(np.arange(len(ticklabels)))
             cb.set_ticklabels(ticklabels)
         return cb
+
     return sm.cmap, create_cbar
 
 
@@ -112,7 +113,7 @@ def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
     Example:
     >>> from scipy import sparse
     >>> D = sparse.diags([1, -2, 1], [-1, 0, 1], shape=(9, 9))
-    >>> image, colorbar = matshow_discrete(D.A)
+    >>> image, colorbar = matshow_discrete(D.toarray())
     """
     if isinstance(fig_ax, str):
         fig, ax = freshfig(fig_ax)
@@ -142,19 +143,20 @@ def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
         S = np.array(sorted(S))
         # Get boundaries below and above each value of S
         # (the exact amount of these margins don't matter).
-        bins = (S[1:] + S[:-1])/2
-        bins = np.concatenate(([m-1], bins, [M+1]))
+        bins = (S[1:] + S[:-1]) / 2
+        bins = np.concatenate(([m - 1], bins, [M + 1]))
         # Center ticks (vs bins)
-        ticks = bins[:-1] + np.diff(bins)/2
+        ticks = bins[:-1] + np.diff(bins) / 2
         # Custom tick labels
         formatter = matplotlib.ticker.FuncFormatter(
-            lambda x, idx: "None" if idx is None else "%.2f" % S[idx])  # type: ignore
+            lambda x, idx: "None" if idx is None else "%.2f" % S[idx]
+        )  # type: ignore
         # Create cmap and norm
         if cmap == "coolwarm":
             # Ensure 0 corresponds to .5
-            neg = np.linspace(0, .5, np.sum(S < 0) + 1)[:-1]
-            pos = np.linspace(.5, 1, np.sum(S > 0) + 1)[1:]
-            xx = np.concatenate([neg, [.5], pos])
+            neg = np.linspace(0, 0.5, np.sum(S < 0) + 1)[:-1]
+            pos = np.linspace(0.5, 1, np.sum(S > 0) + 1)[1:]
+            xx = np.concatenate([neg, [0.5], pos])
         else:
             xx = np.linspace(0, 1, len(S))
         cmap = plt.get_cmap(cmap)(xx)
@@ -168,10 +170,13 @@ def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
         nlevels = 11
         ticks = np.linspace(m, M, nlevels)
         cmap = plt.get_cmap(cmap, nlevels)
-        im = ax.matshow(X, cmap=cmap,
-                        # Center outer ticks by stretching map
-                        vmin=1.5*ticks[0] - .5*ticks[1],
-                        vmax=1.5*ticks[-1] - .5*ticks[-2])
+        im = ax.matshow(
+            X,
+            cmap=cmap,
+            # Center outer ticks by stretching map
+            vmin=1.5 * ticks[0] - 0.5 * ticks[1],
+            vmax=1.5 * ticks[-1] - 0.5 * ticks[-2],
+        )
         cb = fig.colorbar(im, ticks=ticks)
 
     else:
@@ -193,10 +198,10 @@ def matshow_banded(bands, fig_ax=None, lower=True):
         raise NotImplementedError
 
     m = bands.shape[-1]
-    D = np.zeros((m, )*2)
+    D = np.zeros((m,) * 2)
     for i, band in enumerate(bands):
-        c = 1 if i else .5
-        D += c * np.diag(band[:m-i], k=i)
+        c = 1 if i else 0.5
+        D += c * np.diag(band[: m - i], k=i)
     D += D.T
 
     return matshow_discrete(D, fig_ax)

@@ -1,4 +1,5 @@
 """Toggle visisbility of plot elements on/off. Provide checkmarks for it."""
+
 import itertools
 import textwrap
 import warnings
@@ -10,8 +11,9 @@ from matplotlib import transforms as mtransforms
 from matplotlib.widgets import CheckButtons
 
 
-def toggle_lines(ax=None, autoscl=True, numbering=False,
-                 txtwidth=15, txtsize=None, state=None):
+def toggle_lines(
+    ax=None, autoscl=True, numbering=False, txtwidth=15, txtsize=None, state=None
+):
     """Make checkbuttons to toggle visibility of each line in current plot.
 
     - `autoscl`  : Rescale axis limits as required by currently visible lines.
@@ -28,59 +30,61 @@ def toggle_lines(ax=None, autoscl=True, numbering=False,
     if ax is None:
         ax = plt.gca()
     if txtsize is None:
-        txtsize = mpl.rcParams['font.size']
+        txtsize = mpl.rcParams["font.size"]
 
     # Get lines and their properties
-    lines = {'handle': list(ax.get_lines())}
-    for prop in ['label', 'color', 'visible']:
-        lines[prop] = [plt.getp(x, prop) for x in lines['handle']]
+    lines = {"handle": list(ax.get_lines())}
+    for prop in ["label", "color", "visible"]:
+        lines[prop] = [plt.getp(x, prop) for x in lines["handle"]]
 
     # Rm those that start with _
-    not_ = [not x.startswith('_') for x in lines['label']]
+    not_ = [not x.startswith("_") for x in lines["label"]]
     for prop in lines:
         lines[prop] = list(itertools.compress(lines[prop], not_))
-    N = len(lines['handle'])
+    N = len(lines["handle"])
 
     # Adjust labels
     if numbering:
-        lines['label'] = [str(i) + ': ' + x for i, x in enumerate(lines['label'])]
+        lines["label"] = [str(i) + ": " + x for i, x in enumerate(lines["label"])]
     if txtwidth:
-        lines['label'] = [textwrap.fill(x, width=txtwidth) for x in lines['label']]
+        lines["label"] = [textwrap.fill(x, width=txtwidth) for x in lines["label"]]
 
     # Set state. BUGGY? sometimes causes MPL complaints after clicking boxes
     if state is not None:
         state = np.array(state).astype(bool)
-        lines['visible'] = state
+        lines["visible"] = state
         for i, x in enumerate(state):
-            lines['handle'][i].set_visible(x)
+            lines["handle"][i].set_visible(x)
 
     # Setup buttons
     # When there's many, the box-sizing is awful, but difficult to fix.
     W = 0.23 * txtwidth / 15 * txtsize / 10
-    nBreaks = sum(x.count('\n') for x in lines['label'])  # count linebreaks
+    nBreaks = sum(x.count("\n") for x in lines["label"])  # count linebreaks
     H = min(1, 0.05 * (N + nBreaks))
     plt.subplots_adjust(left=W + 0.12, right=0.97)
     rax = plt.axes([0.05, 0.5 - H / 2, W, H])
-    check = CheckButtons(rax, lines['label'], lines['visible'])
+    check = CheckButtons(rax, lines["label"], lines["visible"])
 
     # Adjust button style
     for i in range(N):
-        check.rectangles[i].set(lw=0, facecolor=lines['color'][i])
-        check.labels[i].set(color=lines['color'][i])
+        check.rectangles[i].set(lw=0, facecolor=lines["color"][i])
+        check.labels[i].set(color=lines["color"][i])
         if txtsize:
             check.labels[i].set(size=txtsize)
 
     # Callback
     def toggle_visible(label):
-        ind    = lines['label'].index(label)
-        handle = lines['handle'][ind]
-        vs     = not lines['visible'][ind]
+        ind = lines["label"].index(label)
+        handle = lines["handle"][ind]
+        vs = not lines["visible"][ind]
         handle.set_visible(vs)
-        lines['visible'][ind] = vs
+        lines["visible"][ind] = vs
         if autoscl:
-            _autoscale_based_on(ax, list(itertools.compress(
-                lines['handle'], lines['visible'])))
+            _autoscale_based_on(
+                ax, list(itertools.compress(lines["handle"], lines["visible"]))
+            )
         plt.draw()
+
     check.on_clicked(toggle_visible)
 
     # Return focus
@@ -104,7 +108,6 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
     """Toggle visibility of the graphics with handle `handles`."""
     are_viz = []
     for h in handles:
-
         # Core functionality: turn on/off
         is_viz = not h.get_visible()
         h.set_visible(is_viz)
@@ -121,7 +124,7 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
                     pass
             else:
                 h.actual_label = h.get_label()
-                h.set_label('_nolegend_')
+                h.set_label("_nolegend_")
             # Legend refresh
             ax = h.axes
             with warnings.catch_warnings():
@@ -132,7 +135,7 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
                     # If all labels are '_nolabel_' then ax.legend() throws warning,
                     # and quits before refreshing.
                     # => Refresh by creating/rm another legend.
-                    ax.legend('TMP').remove()
+                    ax.legend("TMP").remove()
 
     # Pause at where used (typically sequentially in script)
     if prompt:
@@ -143,19 +146,23 @@ def toggle_viz(*handles, prompt=False, legend=False, pause=0.0):
     return are_viz
 
 
-def save_toggle(*objs,
-                exts=("png",),
-                bbox_inches="tight", pad_inches=0, dpi=None,
-                fig=None,
-                pause=.4,
-                ):
+def save_toggle(
+    *objs,
+    exts=("png",),
+    bbox_inches="tight",
+    pad_inches=0,
+    dpi=None,
+    fig=None,
+    pause=0.4,
+):
     """Save figure. Toggle visibility of `objs`.
 
-    Example:
-    >>> fig.counter = 1
-    ... fig.savepath = Path(__file__).resolve().parent / f"Pics/{fig.get_label()}"
-    ... save_toggle(line1)
-    ... save_toggle(line2)
+    Example::
+
+        fig.counter = 1
+        fig.savepath = Path(__file__).resolve().parent / f"Pics/{fig.get_label()}"
+        save_toggle(line1)
+        save_toggle(line2)
     """
     if fig is None:
         fig = objs[0].figure
@@ -167,8 +174,12 @@ def save_toggle(*objs,
         fig.savepath = fig.get_label()  # ⇒ PWD
 
     for ext in exts:
-        fig.savefig(f"{fig.savepath}-{fig.counter}.{ext}",
-                    bbox_inches=bbox_inches, pad_inches=pad_inches, dpi=dpi)
+        fig.savefig(
+            f"{fig.savepath}-{fig.counter}.{ext}",
+            bbox_inches=bbox_inches,
+            pad_inches=pad_inches,
+            dpi=dpi,
+        )
 
     fig.counter += 1
 
