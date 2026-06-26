@@ -96,7 +96,7 @@ def discretize_cmap(cmap, N, val0=0, val1=1, name=None):
 
     # Set-up convenvience function to label cbar ticks
     def create_cbar(ax, ticklabels=None, **kwargs):
-        fig = ax[0].figure if isinstance(ax, (list, tuple)) else ax.figure
+        fig = ax[0].figure if isinstance(ax, (list, tuple, np.ndarray)) else ax.figure
         cb = fig.colorbar(sm, ax=ax, **kwargs)
         if ticklabels:
             cb.set_ticks(np.arange(len(ticklabels)))
