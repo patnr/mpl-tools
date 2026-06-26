@@ -96,13 +96,14 @@ def discretize_cmap(cmap, N, val0=0, val1=1, name=None):
 
     # Set-up convenvience function to label cbar ticks
     def create_cbar(ax, ticklabels=None, **kwargs):
-        cb = ax.figure.colorbar(sm, ax=ax, **kwargs)
+        fig = ax[0].figure if isinstance(ax, (list, tuple)) else ax.figure
+        cb = fig.colorbar(sm, ax=ax, **kwargs)
         if ticklabels:
             cb.set_ticks(np.arange(len(ticklabels)))
             cb.set_ticklabels(ticklabels)
         return cb
 
-    return sm.cmap, create_cbar
+    return sm.cmap, create_cbar, sm
 
 
 def matshow_discrete(X, fig_ax=None, cmap=None, mode="set", ndigits=8):
